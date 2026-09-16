@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Profile — NexHire
+  </title>
+  <script>
+   (function(){const s=localStorage.getItem('nexhire-theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=s||(d?'dark':'light')})();
+  </script>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest">
+  </script>
+  <link href="css/recruiter.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <div class="app-shell">
+   <aside class="sidebar">
+    <a class="brand" href="recruiter_dashboard.html">
+     <span class="brand-mark">
+      <span>
+      </span>
+      <span>
+      </span>
+      <span>
+      </span>
+     </span>
+     <span class="brand-name">
+      Nex
+      <span>
+       Hire
+      </span>
+     </span>
+    </a>
+    <div class="side-label">
+     RECRUITER WORKSPACE
+    </div>
+    <nav class="side-nav">
+     <a class="side-link" href="recruiter_dashboard.html">
+      <i class="nav-icon" data-lucide="layout-dashboard">
+      </i>
+      Dashboard
+     </a>
+     <a class="side-link" href="recruiter_jobs.html">
+      <i class="nav-icon" data-lucide="briefcase-business">
+      </i>
+      My Jobs
+     </a>
+     <a class="side-link" href="recruiter_job-details.html">
+      <i class="nav-icon" data-lucide="inbox">
+      </i>
+      Applications
+     </a>
+     <a class="side-link" href="recruiter_job-details.html">
+      <i class="nav-icon" data-lucide="trophy">
+      </i>
+      Candidate Rankings
+     </a>
+     <a class="side-link" href="recruiter_candidates.html">
+      <i class="nav-icon" data-lucide="users">
+      </i>
+      Candidates
+     </a>
+    </nav>
+    <div class="sidebar-bottom">
+     <a class="side-link" href="#">
+      <i class="nav-icon" data-lucide="settings">
+      </i>
+      Settings
+     </a>
+     <a class="side-link logout" href="../recruiter-login.html">
+      <i class="nav-icon" data-lucide="log-out">
+      </i>
+      Logout
+     </a>
+    </div>
+   </aside>
+   <div class="overlay">
+   </div>
+   <main class="main">
+    <header class="topbar">
+     <div class="top-actions">
+      <button aria-label="Open menu" class="icon-button mobile-menu" data-menu="">
+       <i data-lucide="menu">
+       </i>
+      </button>
+      <span class="crumb">
+       Recruiter Portal / Profile
+      </span>
+     </div>
+     <div class="top-actions">
+      <button aria-label="Switch theme" class="icon-button" data-theme-toggle="">
+       <i data-lucide="moon">
+       </i>
+      </button>
+      <div class="profile-menu-wrap">
+       <button aria-expanded="false" aria-label="Open recruiter menu" class="profile-chip" data-profile-menu="">
+        <span class="avatar-sm">
+         RS
+        </span>
+        <span class="profile-chip-name">
+         Recruiter
+        </span>
+        <i data-lucide="chevron-down">
+        </i>
+       </button>
+       <div class="profile-dropdown" data-profile-dropdown="">
+        <a href="recruiter_profile.html">
+         <i data-lucide="user-round">
+         </i>
+         <span>
+          Profile
+         </span>
+        </a>
+        <a href="#">
+         <i data-lucide="settings">
+         </i>
+         <span>
+          Settings
+         </span>
+        </a>
+        <button class="dropdown-logout logout">
+         <i data-lucide="log-out">
+         </i>
+         <span>
+          Logout
+         </span>
+        </button>
+       </div>
+      </div>
+     </div>
+    </header>
+    <section class="page profile-page">
+     <div class="page-header">
+      <div>
+       <div class="kicker">
+        ACCOUNT
+       </div>
+       <h1>
+        Profile &amp; Company
+       </h1>
+       <p>
+        Manage your recruiter identity and the company information candidates see.
+       </p>
+      </div>
+      <button class="button button-primary" data-save-profile="">
+       <i data-lucide="save">
+       </i>
+       Save Changes
+      </button>
+     </div>
+     <div class="profile-layout">
+      <aside class="card profile-summary">
+       <div class="profile-cover">
+       </div>
+       <div class="profile-avatar-xl">
+        RS
+       </div>
+       <div class="profile-summary-body">
+        <span class="profile-role-badge">
+         RECRUITER
+        </span>
+        <h2>
+         Recruiter Sharma
+        </h2>
+        <p class="profile-position">
+         Talent Acquisition Manager
+        </p>
+        <p class="profile-company">
+         <i data-lucide="building-2">
+         </i>
+         NexTech Solutions
+        </p>
+        <div class="profile-contact">
+         <div>
+          <i data-lucide="mail">
+          </i>
+          <span>
+           recruiter@nexhire.demo
+          </span>
+         </div>
+         <div>
+          <i data-lucide="phone">
+          </i>
+          <span>
+           +91 98765 43210
+          </span>
+         </div>
+        </div>
+       </div>
+      </aside>
+      <div class="profile-content">
+       <article class="card profile-section">
+        <div class="profile-section-head">
+         <div>
+          <span class="section-number">
+           01
+          </span>
+          <div>
+           <h2>
+            Personal Information
+           </h2>
+           <p>
+            Your recruiter account details.
+           </p>
+          </div>
+         </div>
+        </div>
+        <div class="profile-form-grid">
+         <div class="field">
+          <label for="name">
+           Full Name
+          </label>
+          <input id="name" value="Recruiter Sharma"/>
+         </div>
+         <div class="field">
+          <label for="role">
+           Job Title
+          </label>
+          <input id="role" value="Talent Acquisition Manager"/>
+         </div>
+         <div class="field">
+          <label for="email">
+           Work Email
+          </label>
+          <input id="email" type="email" value="recruiter@nexhire.demo"/>
+         </div>
+         <div class="field">
+          <label for="phone">
+           Phone Number
+          </label>
+          <input id="phone" value="+91 98765 43210"/>
+         </div>
+        </div>
+       </article>
+       <article class="card profile-section">
+        <div class="profile-section-head">
+         <div>
+          <span class="section-number">
+           02
+          </span>
+          <div>
+           <h2>
+            Company Information
+           </h2>
+           <p>
+            Details associated with your hiring organization.
+           </p>
+          </div>
+         </div>
+        </div>
+        <div class="profile-form-grid">
+         <div class="field">
+          <label for="company">
+           Company Name
+          </label>
+          <input id="company" value="NexTech Solutions"/>
+         </div>
+         <div class="field">
+          <label for="website">
+           Company Website
+          </label>
+          <input id="website" value="https://nextech.example"/>
+         </div>
+         <div class="field full">
+          <label for="company-about">
+           Company Description
+          </label>
+          <textarea id="company-about" rows="4">NexTech Solutions is a technology-focused organization building modern software products and services.</textarea>
+         </div>
+        </div>
+       </article>
+       <article class="card profile-section security-card">
+        <div class="security-icon">
+         <i data-lucide="shield-check">
+         </i>
+        </div>
+        <div>
+         <h2>
+          Account Security
+         </h2>
+         <p>
+          Your recruiter account is protected. Password and authentication settings can be connected when the authentication backend is available.
+         </p>
+        </div>
+        <button class="button button-secondary" type="button">
+         Manage Security
+        </button>
+       </article>
+      </div>
+     </div>
+    </section>
+   </main>
+  </div>
+  <div class="toast">
+  </div>
+  <script src="js/recruiter.js">
+  </script>
+ </body>
+</html>
