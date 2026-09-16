@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NexHire — AI-powered resume screening, job matching and career assistance for candidates and recruiters.">
+  <meta name="theme-color" content="#f7f9fc">
+  <title>NexHire — AI-Powered Hiring. Smarter Careers.</title>
+
+  <script>
+    (function () {
+      const saved = localStorage.getItem("nexhire-theme");
+      const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.dataset.theme = saved || (systemDark ? "dark" : "light");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="site-header" id="site-header">
+    <nav class="navbar container" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="NexHire home">
+        <span class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span class="brand-name">Nex<span>Hire</span></span>
+      </a>
+
+      <button class="mobile-menu-toggle icon-button" type="button" aria-label="Open navigation menu"
+              aria-expanded="false" aria-controls="main-nav">
+        <i data-lucide="menu"></i>
+      </button>
+
+      <div class="nav-panel" id="main-nav">
+        <div class="nav-links">
+          <a href="#candidates">Candidates</a>
+          <a href="#recruiters">Recruiters</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#features">Features</a>
+        </div>
+
+        <div class="nav-actions">
+          <div class="nav-menu-wrap">
+            <button class="nav-text-button dropdown-trigger" type="button"
+                    aria-expanded="false" aria-haspopup="true">
+              Login <i data-lucide="chevron-down"></i>
+            </button>
+            <div class="dropdown-menu" role="menu">
+              <a href="candidate-login.html" role="menuitem">
+                <span class="menu-icon"><i data-lucide="user-round"></i></span>
+                <span><strong>Candidate Login</strong><small>Access your career dashboard</small></span>
+              </a>
+              <a href="recruiter-login.html" role="menuitem">
+                <span class="menu-icon"><i data-lucide="briefcase-business"></i></span>
+                <span><strong>Recruiter Login</strong><small>Manage your hiring workspace</small></span>
+              </a>
+            </div>
+          </div>
+
+          <div class="nav-menu-wrap">
+            <button class="button button-primary button-small dropdown-trigger" type="button"
+                    aria-expanded="false" aria-haspopup="true">
+              Get Started <i data-lucide="chevron-down"></i>
+            </button>
+            <div class="dropdown-menu dropdown-right" role="menu">
+              <a href="candidate-signup.html" role="menuitem">
+                <span class="menu-icon candidate-icon"><i data-lucide="user-plus"></i></span>
+                <span><strong>I'm a Candidate</strong><small>Discover your next opportunity</small></span>
+              </a>
+              <a href="recruiter-signup.html" role="menuitem">
+                <span class="menu-icon recruiter-icon"><i data-lucide="building-2"></i></span>
+                <span><strong>I'm a Recruiter</strong><small>Find your next great hire</small></span>
+              </a>
+            </div>
+          </div>
+
+          <button class="theme-toggle icon-button" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+            <i class="theme-sun" data-lucide="sun"></i>
+            <i class="theme-moon" data-lucide="moon"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <!-- Hero -->
+    <section class="hero section-grid" aria-labelledby="hero-title">
+      <div class="hero-orb orb-one" aria-hidden="true"></div>
+      <div class="hero-orb orb-two" aria-hidden="true"></div>
+      <div class="hero-content container">
+        <div class="hero-copy reveal">
+          <div class="eyebrow"><span class="eyebrow-spark">✦</span> AI-Powered Recruitment Platform</div>
+          <h1 id="hero-title">AI-Powered Hiring.<br><span>Smarter Careers.</span></h1>
+          <p class="hero-description">
+            NexHire connects talent with opportunity through intelligent resume screening,
+            personalized job matching, and AI-powered career assistance.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary button-large" href="candidate-signup.html">
+              Find Your Next Opportunity <i data-lucide="arrow-up-right"></i>
+            </a>
+            <a class="button button-secondary button-large" href="recruiter-signup.html">
+              Hire Smarter <i data-lucide="arrow-up-right"></i>
+            </a>
+          </div>
+          <p class="trust-line"><i data-lucide="sparkles"></i> Built to make hiring faster, smarter, and more relevant.</p>
+        </div>
+
+        <div class="hero-visual reveal reveal-delay" aria-label="AI recruitment matching visualization">
+          <div class="visual-grid" aria-hidden="true"></div>
+          <div class="network-lines" aria-hidden="true">
+            <span class="line line-a"></span>
+            <span class="line line-b"></span>
+            <span class="line line-c"></span>
+            <span class="node node-a"></span>
+            <span class="node node-b"></span>
+            <span class="node node-c"></span>
+          </div>
+
+          <div class="match-card glass-card">
+            <div class="card-topline">
+              <div>
+                <span class="mini-label">AI MATCH ANALYSIS</span>
+                <h3>Candidate Profile</h3>
+              </div>
+              <span class="status-dot" aria-label="AI analysis active"></span>
+            </div>
+
+            <div class="profile-row">
+              <div class="avatar"><i data-lucide="user-round"></i></div>
+              <div>
+                <strong>Software Engineer</strong>
+                <span>Candidate profile</span>
+              </div>
+              <i class="verified" data-lucide="badge-check"></i>
+            </div>
+
+            <div class="skill-list">
+              <span>Python</span><span>Java</span><span>SQL</span><span>Machine Learning</span>
+            </div>
+
+            <div class="match-score">
+              <div class="score-heading">
+                <span>AI Match</span><strong>92%</strong>
+              </div>
+              <div class="progress-track"><span style="width: 92%"></span></div>
+            </div>
+
+            <div class="checks">
+              <span><i data-lucide="check"></i> Skills match</span>
+              <span><i data-lucide="check"></i> Experience match</span>
+              <span><i data-lucide="check"></i> Role relevance</span>
+            </div>
+          </div>
+
+          <div class="recommended-card glass-card">
+            <div class="recommend-icon"><i data-lucide="briefcase"></i></div>
+            <div class="recommend-copy">
+              <span>Recommended Job</span>
+              <strong>Backend Developer</strong>
+              <small>AI-ranked opportunity</small>
+            </div>
+            <div class="recommend-match">92%<small>Match</small></div>
+          </div>
+
+          <div class="floating-pill pill-top"><i data-lucide="sparkles"></i> AI analyzed</div>
+          <div class="floating-pill pill-bottom"><i data-lucide="zap"></i> Smart match</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capability strip -->
+    <section class="capability-strip" aria-label="NexHire capabilities">
+      <div class="container capability-grid">
+        <div class="capability-item reveal">
+          <span class="capability-icon"><i data-lucide="scan-search"></i></span>
+          <div><strong>AI-Powered</strong><span>Resume Analysis</span></div>
+        </div>
+        <div class="capability-item reveal">
+          <span class="capability-icon"><i data-lucide="waypoints"></i></span>
+          <div><strong>Smart</strong><span>Job Matching</span></div>
+        </div>
+        <div class="capability-item reveal">
+          <span class="capability-icon"><i data-lucide="wand-sparkles"></i></span>
+          <div><strong>Personalized</strong><span>Recommendations</span></div>
+        </div>
+        <div class="capability-item reveal">
+          <span class="capability-icon"><i data-lucide="messages-square"></i></span>
+          <div><strong>Career-Focused</strong><span>AI Assistance</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Two-sided platform -->
+    <section class="section platform-section" id="candidates" aria-labelledby="platform-title">
+      <div class="container">
+        <div class="section-heading centered reveal">
+          <span class="section-kicker">THE NEXHIRE ECOSYSTEM</span>
+          <h2 id="platform-title">One Platform. <span>Two Possibilities.</span></h2>
+          <p>Whether you're building your career or building your team, NexHire helps you move forward with better insights.</p>
+        </div>
+
+        <div class="persona-grid">
+          <article class="persona-card candidate-card reveal">
+            <div class="persona-glow"></div>
+            <div class="persona-icon"><i data-lucide="user-round-search"></i></div>
+            <span class="persona-label">FOR CANDIDATES</span>
+            <h3>Build your next chapter.</h3>
+            <p>Discover relevant opportunities, understand where your skills fit, and take the next step toward your career goals.</p>
+            <ul>
+              <li><i data-lucide="check"></i> AI-powered job matching</li>
+              <li><i data-lucide="check"></i> Personalized recommendations</li>
+              <li><i data-lucide="check"></i> Resume management</li>
+              <li><i data-lucide="check"></i> Application tracking</li>
+              <li><i data-lucide="check"></i> Interview preparation</li>
+              <li><i data-lucide="check"></i> AI career assistant</li>
+            </ul>
+            <a class="text-link" href="candidate-signup.html">Build Your Career <i data-lucide="arrow-right"></i></a>
+          </article>
+
+          <article class="persona-card recruiter-card reveal" id="recruiters">
+            <div class="persona-glow"></div>
+            <div class="persona-icon"><i data-lucide="users-round"></i></div>
+            <span class="persona-label">FOR RECRUITERS</span>
+            <h3>Hire with more clarity.</h3>
+            <p>Find relevant candidates faster with intelligent resume screening and candidate-job matching.</p>
+            <ul>
+              <li><i data-lucide="check"></i> Create and manage jobs</li>
+              <li><i data-lucide="check"></i> AI resume screening</li>
+              <li><i data-lucide="check"></i> Candidate matching</li>
+              <li><i data-lucide="check"></i> Applicant management</li>
+              <li><i data-lucide="check"></i> Candidate profiles</li>
+              <li><i data-lucide="check"></i> Hiring insights</li>
+            </ul>
+            <a class="text-link" href="recruiter-signup.html">Start Hiring <i data-lucide="arrow-right"></i></a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section process-section" id="how-it-works" aria-labelledby="process-title">
+      <div class="container">
+        <div class="section-heading centered reveal">
+          <span class="section-kicker">THE PROCESS</span>
+          <h2 id="process-title">How NexHire Works</h2>
+          <p>A simpler path from resume to opportunity.</p>
+        </div>
+
+        <div class="process-grid">
+          <article class="process-step reveal">
+            <div class="step-number">01</div>
+            <div class="step-icon"><i data-lucide="circle-user-round"></i></div>
+            <h3>Create Your Profile</h3>
+            <p>Candidate or recruiter creates a profile and provides relevant information.</p>
+          </article>
+          <div class="process-connector" aria-hidden="true"><i data-lucide="arrow-right"></i></div>
+
+          <article class="process-step reveal">
+            <div class="step-number">02</div>
+            <div class="step-icon"><i data-lucide="brain-circuit"></i></div>
+            <h3>AI Understands</h3>
+            <p>NexHire analyzes resumes, skills, job requirements, and profile information.</p>
+          </article>
+          <div class="process-connector" aria-hidden="true"><i data-lucide="arrow-right"></i></div>
+
+          <article class="process-step reveal">
+            <div class="step-number">03</div>
+            <div class="step-icon"><i data-lucide="git-compare-arrows"></i></div>
+            <h3>Smart Matching</h3>
+            <p>The platform identifies relevant connections between candidates and opportunities.</p>
+          </article>
+          <div class="process-connector" aria-hidden="true"><i data-lucide="arrow-right"></i></div>
+
+          <article class="process-step reveal">
+            <div class="step-number">04</div>
+            <div class="step-icon"><i data-lucide="rocket"></i></div>
+            <h3>Take the Next Step</h3>
+            <p>Candidates can apply and prepare, while recruiters can review and manage candidates.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section features-section" id="features" aria-labelledby="features-title">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="section-kicker">PLATFORM FEATURES</span>
+          <h2 id="features-title">Built Around <span>Smarter Hiring.</span></h2>
+          <p>Purpose-built tools that bring intelligence to both sides of the hiring journey.</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card feature-wide reveal">
+            <div class="feature-icon"><i data-lucide="file-search-2"></i></div>
+            <div>
+              <h3>AI Resume Screening</h3>
+              <p>Analyze resumes and identify relevant skills and information.</p>
+            </div>
+            <span class="feature-number">01</span>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon"><i data-lucide="target"></i></div>
+            <h3>Intelligent Job Matching</h3>
+            <p>Connect candidates with jobs based on relevance rather than simple keyword searches.</p>
+            <span class="feature-number">02</span>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon"><i data-lucide="sparkles"></i></div>
+            <h3>Personalized Recommendations</h3>
+            <p>Surface opportunities that align with a candidate's profile.</p>
+            <span class="feature-number">03</span>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon"><i data-lucide="list-checks"></i></div>
+            <h3>Application Tracking</h3>
+            <p>Help candidates keep track of their applications and progress.</p>
+            <span class="feature-number">04</span>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon"><i data-lucide="messages-square"></i></div>
+            <h3>Interview Preparation</h3>
+            <p>Provide candidates with tools to prepare for interviews.</p>
+            <span class="feature-number">05</span>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon"><i data-lucide="bot"></i></div>
+            <h3>AI Career Assistant</h3>
+            <p>Offer conversational assistance for job and career-related questions.</p>
+            <span class="feature-number">06</span>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon"><i data-lucide="users"></i></div>
+            <h3>Candidate Discovery</h3>
+            <p>Help recruiters identify relevant candidates.</p>
+            <span class="feature-number">07</span>
+          </article>
+          <article class="feature-card feature-wide reveal">
+            <div class="feature-icon"><i data-lucide="layout-dashboard"></i></div>
+            <div>
+              <h3>Recruiter Dashboard</h3>
+              <p>Give recruiters a centralized place to manage hiring activities.</p>
+            </div>
+            <span class="feature-number">08</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI matching -->
+    <section class="section intelligence-section" aria-labelledby="intelligence-title">
+      <div class="container intelligence-wrap">
+        <div class="intelligence-copy reveal">
+          <span class="section-kicker">THE INTELLIGENCE LAYER</span>
+          <h2 id="intelligence-title">From Resume to <span>Relevant Opportunity.</span></h2>
+          <p>NexHire turns profile information into meaningful signals, helping connect the right skills with the right opportunities.</p>
+          <div class="signal-list">
+            <div><span>01</span><strong>Understand</strong><small>Resume & profile signals</small></div>
+            <div><span>02</span><strong>Compare</strong><small>Skills & job requirements</small></div>
+            <div><span>03</span><strong>Match</strong><small>Relevant opportunities</small></div>
+          </div>
+        </div>
+
+        <div class="flow-visual reveal reveal-delay">
+          <div class="flow-node">
+            <div class="flow-icon"><i data-lucide="file-text"></i></div>
+            <div><strong>Resume</strong><span>Candidate profile</span></div>
+          </div>
+          <div class="flow-line"><span></span></div>
+          <div class="flow-node">
+            <div class="flow-icon"><i data-lucide="brain-circuit"></i></div>
+            <div><strong>AI Analysis</strong><span>Skills & experience</span></div>
+          </div>
+          <div class="flow-line"><span></span></div>
+          <div class="flow-node active">
+            <div class="flow-icon"><i data-lucide="target"></i></div>
+            <div><strong>Match Score</strong><span>92% relevance</span></div>
+          </div>
+          <div class="flow-line"><span></span></div>
+          <div class="flow-node">
+            <div class="flow-icon"><i data-lucide="briefcase-business"></i></div>
+            <div><strong>Opportunity</strong><span>Backend Developer</span></div>
+          </div>
+
+          <div class="mini-profile-card">
+            <div class="mini-profile-head"><span>Candidate Profile</span><strong>Software Engineer</strong></div>
+            <div class="mini-skills">
+              <span>Python ✓</span><span>Java ✓</span><span>SQL ✓</span><span>ML ✓</span>
+            </div>
+            <div class="mini-match">
+              <span>AI MATCH</span>
+              <strong>92%</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section final-cta-section" aria-labelledby="cta-title">
+      <div class="container">
+        <div class="final-cta reveal">
+          <div class="cta-decoration decoration-one" aria-hidden="true"></div>
+          <div class="cta-decoration decoration-two" aria-hidden="true"></div>
+          <span class="section-kicker">READY WHEN YOU ARE</span>
+          <h2 id="cta-title">Your Next Opportunity <span>Starts Here.</span></h2>
+          <p>Whether you're looking for your next role or your next great hire, NexHire brings intelligence to the process.</p>
+          <div class="hero-actions cta-actions">
+            <a class="button button-light button-large" href="candidate-signup.html">Create Candidate Account <i data-lucide="arrow-up-right"></i></a>
+            <a class="button button-outline-light button-large" href="recruiter-signup.html">Create Recruiter Account <i data-lucide="arrow-up-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-main">
+      <div class="footer-brand">
+        <a class="brand" href="index.html" aria-label="NexHire home">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="brand-name">Nex<span>Hire</span></span>
+        </a>
+        <p>AI-powered recruitment for smarter careers and hiring.</p>
+      </div>
+
+      <div class="footer-column">
+        <h3>Platform</h3>
+        <a href="#candidates">Candidates</a>
+        <a href="#recruiters">Recruiters</a>
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+      </div>
+
+      <div class="footer-column">
+        <h3>Candidates</h3>
+        <a href="candidate-login.html">Login</a>
+        <a href="candidate-signup.html">Create Account</a>
+        <a href="candidate-signup.html">Find Jobs</a>
+        <a href="candidate-signup.html">Interview Prep</a>
+      </div>
+
+      <div class="footer-column">
+        <h3>Recruiters</h3>
+        <a href="recruiter-login.html">Login</a>
+        <a href="recruiter-signup.html">Create Account</a>
+        <a href="recruiter-signup.html">Post a Job</a>
+        <a href="recruiter-signup.html">Find Candidates</a>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      <span>© 2026 NexHire. All rights reserved.</span>
+      <span>AI-Powered Hiring. Smarter Careers.</span>
+    </div>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
