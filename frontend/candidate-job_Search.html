@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NexHire | Search Jobs</title>
+
+    <link rel="stylesheet" href="candidate-job_Search.css">
+</head>
+
+<body>
+
+    <!-- =====================================================
+         TOP NAVBAR
+    ====================================================== -->
+
+    <header class="navbar">
+
+        <a href="../dashboard/index.html" class="brand">
+            <span class="brand-icon">N</span>
+            <span class="brand-text">NexHire</span>
+        </a>
+
+        <div class="navbar-right">
+
+            <div class="profile-mini">
+
+                <div class="avatar">
+                    RK
+                </div>
+
+                <div class="profile-mini-info">
+                    <strong>Rahul Kumar</strong>
+                    <span>Candidate</span>
+                </div>
+
+            </div>
+
+            <button
+                type="button"
+                id="themeBtn"
+                class="theme-btn"
+                title="Switch to light mode"
+                aria-label="Switch to light mode"
+            >
+                ☀
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         APP LAYOUT
+    ====================================================== -->
+
+    <div class="app-layout">
+
+
+        <!-- =================================================
+             SIDEBAR
+        ================================================== -->
+
+        <aside class="sidebar">
+
+            <div class="sidebar-inner">
+
+
+                <!-- Profile -->
+
+                <a
+                    href="../profile/profile.html"
+                    class="sidebar-profile"
+                >
+
+                    <div class="sidebar-avatar">
+                        RK
+                    </div>
+
+                    <div class="sidebar-profile-info">
+
+                        <strong>
+                            Rahul Kumar
+                        </strong>
+
+                        <span>
+                            View Profile
+                        </span>
+
+                    </div>
+
+                    <span class="profile-arrow">
+                        →
+                    </span>
+
+                </a>
+
+
+                <div class="sidebar-divider"></div>
+
+
+                <!-- Main Navigation -->
+
+                <div class="nav-section">
+
+                    <span class="nav-section-title">
+                        MENU
+                    </span>
+
+
+                    <a
+                        href="../dashboard/index.html"
+                        class="sidebar-link"
+                    >
+
+                        <span class="sidebar-icon">
+                            ⌂
+                        </span>
+
+                        <span>
+                            Dashboard
+                        </span>
+
+                    </a>
+
+
+                    <a
+                        href="../upload/upload.html"
+                        class="sidebar-link"
+                    >
+
+                        <span class="sidebar-icon">
+                            ↑
+                        </span>
+
+                        <span>
+                            Upload Resume
+                        </span>
+
+                    </a>
+
+
+                    <a
+                        href="search-jobs.html"
+                        class="sidebar-link active"
+                    >
+
+                        <span class="sidebar-icon">
+                            ⌕
+                        </span>
+
+                        <span>
+                            Search Jobs
+                        </span>
+
+                        <span class="active-indicator"></span>
+
+                    </a>
+
+
+                    <a
+                        href="../recommended-jobs/recommended-jobs.html"
+                        class="sidebar-link"
+                    >
+
+                        <span class="sidebar-icon">
+                            ✦
+                        </span>
+
+                        <span>
+                            Recommended Jobs
+                        </span>
+
+                    </a>
+
+                </div>
+
+
+                <!-- AI -->
+
+                <div class="nav-section">
+
+                    <span class="nav-section-title">
+                        TOOLS
+                    </span>
+
+
+                    <a
+                        href="../ai-assistant/ai-assistant.html"
+                        class="sidebar-link ai-link"
+                    >
+
+                        <span class="sidebar-icon ai-icon">
+                            ✨
+                        </span>
+
+                        <span>
+                            AI Assistant
+                        </span>
+
+                        <span class="ai-badge">
+                            AI
+                        </span>
+
+                    </a>
+
+                </div>
+
+
+                <!-- Bottom -->
+
+                <div class="sidebar-bottom">
+
+                    <a
+                        href="#"
+                        id="logoutBtn"
+                        class="sidebar-link logout-link"
+                    >
+
+                        <span class="sidebar-icon">
+                            ↪
+                        </span>
+
+                        <span>
+                            Logout
+                        </span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =================================================
+             MAIN CONTENT
+        ================================================== -->
+
+        <main class="main-content">
+
+
+            <!-- Page Header -->
+
+            <section class="page-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        JOB DISCOVERY
+                    </span>
+
+                    <h1>
+                        Search Jobs
+                    </h1>
+
+                    <p>
+                        Find opportunities that match your
+                        skills and career goals.
+                    </p>
+
+                </div>
+
+
+                <div class="header-decoration">
+
+                    <div class="decoration-orb orb-one"></div>
+                    <div class="decoration-orb orb-two"></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 SEARCH BOX
+            ================================================== -->
+
+            <section class="search-card">
+
+                <div class="search-row">
+
+                    <div class="search-input-container">
+
+                        <span class="search-icon">
+                            ⌕
+                        </span>
+
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="Search job title, skills or company..."
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="searchBtn"
+                        class="primary-btn"
+                    >
+                        Search
+                        <span>→</span>
+                    </button>
+
+                </div>
+
+
+                <!-- Filters -->
+
+                <div class="filters">
+
+                    <!-- Location -->
+
+                    <div class="filter-item">
+
+                        <label for="locationFilter">
+                            Location
+                        </label>
+
+                        <div class="select-container">
+
+                            <span>
+                                ◎
+                            </span>
+
+                            <select id="locationFilter">
+
+                                <option value="all">
+                                    All locations
+                                </option>
+
+                                <option value="Bengaluru">
+                                    Bengaluru
+                                </option>
+
+                                <option value="Hyderabad">
+                                    Hyderabad
+                                </option>
+
+                                <option value="Pune">
+                                    Pune
+                                </option>
+
+                                <option value="Mumbai">
+                                    Mumbai
+                                </option>
+
+                                <option value="Delhi">
+                                    Delhi NCR
+                                </option>
+
+                                <option value="Chennai">
+                                    Chennai
+                                </option>
+
+                                <option value="Remote">
+                                    Remote
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Experience -->
+
+                    <div class="filter-item">
+
+                        <label for="experienceFilter">
+                            Experience
+                        </label>
+
+                        <div class="select-container">
+
+                            <span>
+                                ◷
+                            </span>
+
+                            <select id="experienceFilter">
+
+                                <option value="all">
+                                    Any experience
+                                </option>
+
+                                <option value="fresher">
+                                    Fresher
+                                </option>
+
+                                <option value="0-2">
+                                    0 - 2 years
+                                </option>
+
+                                <option value="2-5">
+                                    2 - 5 years
+                                </option>
+
+                                <option value="5+">
+                                    5+ years
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Job Type -->
+
+                    <div class="filter-item">
+
+                        <label for="jobTypeFilter">
+                            Job Type
+                        </label>
+
+                        <div class="select-container">
+
+                            <span>
+                                ◫
+                            </span>
+
+                            <select id="jobTypeFilter">
+
+                                <option value="all">
+                                    All types
+                                </option>
+
+                                <option value="Full-time">
+                                    Full-time
+                                </option>
+
+                                <option value="Part-time">
+                                    Part-time
+                                </option>
+
+                                <option value="Internship">
+                                    Internship
+                                </option>
+
+                                <option value="Contract">
+                                    Contract
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Salary -->
+
+                    <div class="filter-item">
+
+                        <label for="salaryFilter">
+                            Salary
+                        </label>
+
+                        <div class="select-container">
+
+                            <span>
+                                ₹
+                            </span>
+
+                            <select id="salaryFilter">
+
+                                <option value="all">
+                                    Any salary
+                                </option>
+
+                                <option value="0-5">
+                                    Under ₹5 LPA
+                                </option>
+
+                                <option value="5-10">
+                                    ₹5 - ₹10 LPA
+                                </option>
+
+                                <option value="10-15">
+                                    ₹10 - ₹15 LPA
+                                </option>
+
+                                <option value="15+">
+                                    ₹15+ LPA
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="filter-footer">
+
+                    <div class="result-status">
+
+                        <span class="status-dot"></span>
+
+                        <span id="resultSummary">
+                            Showing all available jobs
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="clearBtn"
+                        class="clear-btn"
+                    >
+                        Clear Filters
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 RESULTS HEADER
+            ================================================== -->
+
+            <section class="results-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        OPPORTUNITIES
+                    </span>
+
+                    <h2>
+                        Available Jobs
+                    </h2>
+
+                </div>
+
+
+                <div class="results-right">
+
+                    <span id="jobCount">
+                        0 jobs
+                    </span>
+
+                    <div class="sort-box">
+
+                        <label for="sortFilter">
+                            Sort:
+                        </label>
+
+                        <select id="sortFilter">
+
+                            <option value="match">
+                                Best Match
+                            </option>
+
+                            <option value="recent">
+                                Most Recent
+                            </option>
+
+                            <option value="salary">
+                                Highest Salary
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 JOB LIST
+            ================================================== -->
+
+            <section
+                id="jobsContainer"
+                class="jobs-container"
+            >
+            </section>
+
+
+            <!-- Empty State -->
+
+            <section
+                id="emptyState"
+                class="empty-state"
+                hidden
+            >
+
+                <div class="empty-icon">
+                    ⌕
+                </div>
+
+                <h3>
+                    No matching jobs
+                </h3>
+
+                <p>
+                    We couldn't find jobs matching your
+                    current search and filters.
+                </p>
+
+                <button
+                    type="button"
+                    id="emptyClearBtn"
+                    class="secondary-btn"
+                >
+                    Clear Filters
+                </button>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+         JOB DETAILS MODAL
+    ====================================================== -->
+
+    <div
+        id="jobModal"
+        class="modal-overlay"
+        hidden
+    >
+
+        <div
+            class="job-modal"
+            role="dialog"
+            aria-modal="true"
+        >
+
+            <button
+                type="button"
+                id="closeModal"
+                class="modal-close"
+            >
+                ×
+            </button>
+
+
+            <div
+                id="modalLogo"
+                class="modal-logo"
+            >
+                G
+            </div>
+
+
+            <span
+                id="modalCompany"
+                class="modal-company"
+            >
+                Google
+            </span>
+
+
+            <h2 id="modalTitle">
+                Software Engineer
+            </h2>
+
+
+            <div class="modal-meta">
+
+                <span id="modalLocation">
+                    Bengaluru
+                </span>
+
+                <span>•</span>
+
+                <span id="modalType">
+                    Full-time
+                </span>
+
+                <span>•</span>
+
+                <span id="modalExperience">
+                    0 - 2 years
+                </span>
+
+            </div>
+
+
+            <!-- Match -->
+
+            <div class="modal-match">
+
+                <div>
+
+                    <span>
+                        NexHire Match
+                    </span>
+
+                    <small>
+                        Based on your profile
+                    </small>
+
+                </div>
+
+                <strong id="modalMatch">
+                    94%
+                </strong>
+
+            </div>
+
+
+            <!-- Skills -->
+
+            <div class="modal-section">
+
+                <h3>
+                    Required Skills
+                </h3>
+
+                <div
+                    id="modalSkills"
+                    class="modal-skills"
+                >
+                </div>
+
+            </div>
+
+
+            <!-- Description -->
+
+            <div class="modal-section">
+
+                <h3>
+                    About the Role
+                </h3>
+
+                <p id="modalDescription">
+                </p>
+
+            </div>
+
+
+            <!-- Actions -->
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    id="applyBtn"
+                    class="apply-btn"
+                >
+                    Apply Now
+                    <span>→</span>
+                </button>
+
+                <button
+                    type="button"
+                    id="saveBtn"
+                    class="save-modal-btn"
+                >
+                    ♡ Save Job
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         LOGOUT MODAL
+    ====================================================== -->
+
+    <div
+        id="logoutModal"
+        class="logout-overlay"
+        hidden
+    >
+
+        <div class="logout-modal">
+
+            <div class="logout-icon">
+                ↪
+            </div>
+
+            <h3>
+                Logout from NexHire?
+            </h3>
+
+            <p>
+                Are you sure you want to end your session?
+            </p>
+
+            <div class="logout-actions">
+
+                <button
+                    type="button"
+                    id="cancelLogout"
+                    class="cancel-btn"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    id="confirmLogout"
+                    class="confirm-logout"
+                >
+                    Logout
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="candidate-job_Search.js"></script>
+
+</body>
+</html>
