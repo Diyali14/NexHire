@@ -1,88 +1,147 @@
 package com.airesumematcher.backend.exception;
 
-import org.springframework.http.*;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> handleNotFound(
-            ResourceNotFoundException exception
+    private ErrorResponse buildError(
+            HttpStatus status,
+            String message,
+            HttpServletRequest request
     ) {
-
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(error(
-                        HttpStatus.NOT_FOUND,
-                        exception.getMessage()
-                ));
+        return ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(status.value())
+                .error(status.getReasonPhrase())
+                .message(message)
+                .path(request.getRequestURI())
+                .build();
     }
 
-    @ExceptionHandler({
-            BadRequestException.class,
-            IllegalArgumentException.class
-    })
-    public ResponseEntity<?> handleBadRequest(
-            RuntimeException exception
+    // 400 - Validation errors
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request
     ) {
+
+        String message = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .findFirst()
+                .map(error ->
+                        error.getField() + ": " + error.getDefaultMessage()
+                )
+                .orElse("Invalid request");
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(error(
+                .body(buildError(
                         HttpStatus.BAD_REQUEST,
-                        exception.getMessage()
+                        message,
+                        request
                 ));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidation(
-            MethodArgumentNotValidException exception
+    // 400 - Illegal arguments
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException ex,
+            HttpServletRequest request
     ) {
-
-        Map<String, String> errors =
-                new HashMap<>();
-
-        exception.getBindingResult()
-                .getFieldErrors()
-                .forEach(error ->
-                        errors.put(
-                                error.getField(),
-                                error.getDefaultMessage()
-                        )
-                );
-
         return ResponseEntity
-                .badRequest()
-                .body(Map.of(
-                        "timestamp",
-                        LocalDateTime.now(),
-                        "status",
-                        400,
-                        "errors",
-                        errors
+                .status(HttpStatus.BAD_REQUEST)
+                .body(buildError(
+                        HttpStatus.BAD_REQUEST,
+                        ex.getMessage(),
+                        request
                 ));
     }
 
-    private Map<String, Object> error(
-            HttpStatus status,
-            String message
+    // 401 - Invalid credentials
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(
+            BadCredentialsException ex,
+            HttpServletRequest request
     ) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(buildError(
+                        HttpStatus.UNAUTHORIZED,
+                        "Invalid credentials",
+                        request
+                ));
+    }
 
-        return Map.of(
-                "timestamp",
-                LocalDateTime.now(),
-                "status",
-                status.value(),
-                "error",
-                status.getReasonPhrase(),
-                "message",
-                message
-        );
+    // 403 - Access denied
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(
+            AccessDeniedException ex,
+            HttpServletRequest request
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(buildError(
+                        HttpStatus.FORBIDDEN,
+                        "Access denied",
+                        request
+                ));
+    }
+
+    // 404
+    @ExceptionHandler(
+            org.springframework.web.servlet.resource.NoResourceFoundException.class
+    )
+    public ResponseEntity<ErrorResponse> handleNotFound(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(buildError(
+                        HttpStatus.NOT_FOUND,
+                        "Resource not found",
+                        request
+                ));
+    }
+
+    // 409 - Conflict
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(
+            IllegalStateException ex,
+            HttpServletRequest request
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(buildError(
+                        HttpStatus.CONFLICT,
+                        ex.getMessage(),
+                        request
+                ));
+    }
+
+    // 500 - Unexpected errors
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneralException(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(buildError(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "An unexpected error occurred",
+                        request
+                ));
     }
 }
