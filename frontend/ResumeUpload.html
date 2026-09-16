@@ -1,710 +1,483 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>NexHire | Upload Resume</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" href="ResumeUpload.css">
-
 </head>
-
 
 <body>
 
-
-    <!-- =====================================================
-         NAVBAR
-         ===================================================== -->
-
+    <!-- ================= NAVBAR ================= -->
     <header class="navbar">
 
-        <!-- BRAND -->
-
         <div class="nav-left">
-
-            <a
-                href="../dashboard/index.html"
-                class="brand">
-
-                <span class="brand-icon">
-                    N
-                </span>
-
-                <span class="brand-text">
-                    NexHire
-                </span>
-
+            <a href="../dashboard/index.html" class="brand">
+                <span class="brand-icon">N</span>
+                <span class="brand-text">NexHire</span>
             </a>
-
         </div>
-
-
-        <!-- RIGHT SIDE -->
 
         <div class="nav-right">
 
-
-            <!-- ================= PROFILE ================= -->
-
             <div class="profile">
-
-                <div class="avatar">
-                    RK
-                </div>
+                <div class="avatar">RK</div>
 
                 <div class="profile-info">
-
-                    <span class="profile-name">
-                        Rahul Kumar
-                    </span>
-
-                    <span class="profile-role">
-                        Candidate
-                    </span>
-
+                    <span class="profile-name">Rahul Kumar</span>
+                    <span class="profile-role">Candidate</span>
                 </div>
-
             </div>
 
-
-            <!-- ================= THEME TOGGLE ================= -->
-
+            <!-- Theme toggle is intentionally the last navbar item -->
             <button
                 type="button"
                 id="themeBtn"
                 class="theme-btn"
                 aria-label="Switch to light mode"
-                title="Switch to light mode">
-
-                ☾
-
+                title="Switch to light mode"
+            >
+                ☀
             </button>
-
 
         </div>
 
     </header>
 
 
-
-    <!-- =====================================================
-         MAIN CONTENT
-         ===================================================== -->
-
+    <!-- ================= MAIN ================= -->
     <main class="page-container">
 
-
-        <!-- ================= BACK ================= -->
-
-        <a
-            href="../dashboard/index.html"
-            class="back-link">
-
-            ← Back to Dashboard
-
+        <!-- Back -->
+        <a href="../dashboard/index.html" class="back-link">
+            <span>←</span>
+            Back to dashboard
         </a>
 
 
-
-        <!-- ================= PAGE HEADING ================= -->
-
+        <!-- Heading -->
         <section class="page-heading">
 
-            <span class="eyebrow">
-                RESUME ANALYSIS
-            </span>
+            <span class="eyebrow">RESUME ANALYSIS</span>
 
-
-            <h1>
-
-                Upload your
-                <span>resume.</span>
-
-            </h1>
-
+            <h1>Upload your resume.</h1>
 
             <p>
-
-                Let NexHire's AI analyze your resume
-                and build your personalized career profile.
-
+                Let NexHire analyze your experience, skills and career profile
+                to find opportunities that match you.
             </p>
 
         </section>
 
 
-
-        <!-- =================================================
-             UPLOAD CARD
-             ================================================= -->
-
+        <!-- ================= UPLOAD CARD ================= -->
         <section class="upload-card">
 
-
-            <!-- CARD HEADER -->
-
-            <div class="card-top">
-
+            <div class="upload-card-header">
 
                 <div>
+                    <span class="card-label">YOUR RESUME</span>
 
-                    <h2>
-                        Upload your resume
-                    </h2>
+                    <h2>Upload a document</h2>
 
                     <p>
-                        Upload your latest resume to get started.
+                        PDF, DOCX or TXT files up to 10 MB.
                     </p>
-
                 </div>
-
-
-                <!-- AI BADGE -->
-
-                <div class="ai-badge">
-
-                    <span class="ai-dot"></span>
-
-                    AI Ready
-
-                </div>
-
 
             </div>
 
 
-
-            <!-- =================================================
-                 DROP ZONE
-                 ================================================= -->
-
+            <!-- ================= DROP ZONE ================= -->
             <div
                 id="dropZone"
                 class="drop-zone"
                 tabindex="0"
-                role="button"
-                aria-label="Upload resume">
-
-
-                <!-- UPLOAD ICON -->
+            >
 
                 <div class="upload-icon">
-
                     ↑
-
                 </div>
 
-
-                <!-- TITLE -->
-
-                <h3>
-
-                    Drag & drop your resume here
-
-                </h3>
-
-
-                <!-- DESCRIPTION -->
+                <h3>Drop your resume here</h3>
 
                 <p>
-
-                    or click below to browse files
-
+                    or choose a document from your computer
                 </p>
-
-
-                <!-- BROWSE BUTTON -->
 
                 <button
                     type="button"
                     id="browseBtn"
-                    class="browse-btn">
-
-                    Browse Files
-
+                    class="browse-btn"
+                >
+                    <span>Browse Documents</span>
+                    <span class="browse-arrow">→</span>
                 </button>
 
-
-                <!-- FILE INFO -->
-
-                <span class="file-types">
-
-                    PDF, DOCX or TXT · Max 10 MB
-
-                </span>
-
+                <div class="upload-hint">
+                    Supported: PDF · DOCX · TXT &nbsp;•&nbsp; Max 10 MB
+                </div>
 
             </div>
 
 
-
-            <!-- =================================================
-                 FILE INPUT
-                 ================================================= -->
-
+            <!-- Hidden native file input -->
             <input
                 type="file"
                 id="resumeInput"
                 accept=".pdf,.docx,.txt"
-                hidden>
+                hidden
+            >
 
 
-
-            <!-- =================================================
-                 SELECTED FILE
-                 ================================================= -->
-
+            <!-- ================= SELECTED FILE ================= -->
             <div
                 id="selectedFile"
                 class="selected-file"
-                hidden>
+                hidden
+            >
 
+                <div class="file-left">
 
-                <!-- FILE ICON -->
+                    <div id="fileIcon" class="file-icon">
+                        📄
+                    </div>
 
-                <div class="file-icon">
-
-                    📄
-
-                </div>
-
-
-                <!-- FILE DETAILS -->
-
-                <div class="file-details">
-
-                    <strong id="fileName">
-
-                        resume.pdf
-
-                    </strong>
-
-
-                    <span id="fileSize">
-
-                        0 KB
-
-                    </span>
+                    <div class="file-info">
+                        <strong id="fileName">resume.pdf</strong>
+                        <span id="fileSize">0 KB</span>
+                    </div>
 
                 </div>
-
-
-                <!-- REMOVE -->
 
                 <button
                     type="button"
-                    id="removeFile"
-                    class="remove-btn"
-                    aria-label="Remove selected file">
-
+                    id="removeFileBtn"
+                    class="remove-file"
+                    aria-label="Remove selected file"
+                    title="Remove file"
+                >
                     ×
-
                 </button>
-
 
             </div>
 
 
-
-            <!-- =================================================
-                 ERROR MESSAGE
-                 ================================================= -->
-
+            <!-- ================= ERROR ================= -->
             <div
                 id="errorMessage"
                 class="error-message"
-                hidden>
+                hidden
+            ></div>
 
 
-                <span>
-                    !
-                </span>
-
-
-                <p id="errorText">
-
-                    Something went wrong.
-
-                </p>
-
-
-            </div>
-
-
-
-            <!-- =================================================
-                 ANALYZE BUTTON
-                 ================================================= -->
-
+            <!-- ================= ANALYZE BUTTON ================= -->
             <button
                 type="button"
                 id="analyzeBtn"
                 class="analyze-btn"
-                disabled>
-
-
-                <span>
-
-                    Analyze Resume
-
-                </span>
-
-
-                <span class="arrow">
-
-                    →
-
-                </span>
-
-
+                disabled
+            >
+                <span>Analyze Resume</span>
+                <span>→</span>
             </button>
 
 
-
-            <!-- =================================================
-                 PRIVACY NOTE
-                 ================================================= -->
-
+            <!-- Privacy -->
             <div class="privacy-note">
 
+                <span class="privacy-icon">🔒</span>
+
                 <span>
-                    🔒
+                    Your resume is securely processed and used only to build
+                    your NexHire career profile.
                 </span>
 
-
-                <p>
-
-                    Your resume is securely processed
-                    and used only to improve your job
-                    matching experience.
-
-                </p>
-
             </div>
-
 
         </section>
 
 
-
-        <!-- =================================================
-             WHAT HAPPENS NEXT
-             ================================================= -->
-
-        <section class="process-section">
-
-
-            <!-- SECTION HEADING -->
+        <!-- ================= WHAT HAPPENS NEXT ================= -->
+        <section class="next-section">
 
             <div class="section-heading">
+                <span class="eyebrow">WHAT HAPPENS NEXT?</span>
 
-                <span class="eyebrow">
-                    SIMPLE PROCESS
-                </span>
-
-
-                <h2>
-                    What happens next?
-                </h2>
-
+                <h2>From resume to career profile.</h2>
             </div>
 
-
-
-            <!-- PROCESS CARDS -->
 
             <div class="process-grid">
 
+                <article class="process-card">
 
-                <!-- ================= CARD 1 ================= -->
+                    <div class="process-number">01</div>
 
-                <div class="process-card">
+                    <div class="process-icon">◈</div>
 
-
-                    <div class="process-number">
-                        01
-                    </div>
-
-
-                    <div class="process-icon">
-                        📄
-                    </div>
-
-
-                    <h3>
-                        Resume Parsing
-                    </h3>
-
+                    <h3>Understand</h3>
 
                     <p>
-
-                        NexHire extracts your education,
-                        experience and resume information.
-
+                        NexHire reads your resume and extracts your education,
+                        experience and key information.
                     </p>
 
-
-                </div>
-
+                </article>
 
 
-                <!-- ================= CARD 2 ================= -->
+                <article class="process-card">
 
-                <div class="process-card">
+                    <div class="process-number">02</div>
 
+                    <div class="process-icon">✦</div>
 
-                    <div class="process-number">
-                        02
-                    </div>
-
-
-                    <div class="process-icon">
-                        ✦
-                    </div>
-
-
-                    <h3>
-                        AI Skill Analysis
-                    </h3>
-
+                    <h3>Identify skills</h3>
 
                     <p>
-
-                        AI identifies and normalizes
-                        your technical and professional skills.
-
+                        Your technical and professional skills are identified
+                        and organized into a structured profile.
                     </p>
 
-
-                </div>
-
+                </article>
 
 
-                <!-- ================= CARD 3 ================= -->
+                <article class="process-card">
 
-                <div class="process-card">
+                    <div class="process-number">03</div>
 
+                    <div class="process-icon">◎</div>
 
-                    <div class="process-number">
-                        03
-                    </div>
-
-
-                    <div class="process-icon">
-                        🎯
-                    </div>
-
-
-                    <h3>
-                        Career Matching
-                    </h3>
-
+                    <h3>Build your profile</h3>
 
                     <p>
-
-                        Your profile can then be matched
-                        with relevant job opportunities.
-
+                        Your career profile becomes ready for intelligent
+                        job matching and personalized recommendations.
                     </p>
 
-
-                </div>
-
+                </article>
 
             </div>
 
-
         </section>
-
 
     </main>
 
 
-
-    <!-- =====================================================
-         PROCESSING OVERLAY
-         ===================================================== -->
-
+    <!-- ================= FORMAT SELECTION MODAL ================= -->
     <div
-        id="processingOverlay"
-        class="processing-overlay"
-        hidden>
+        id="formatModal"
+        class="format-modal-overlay"
+        hidden
+    >
+
+        <div
+            class="format-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="formatModalTitle"
+        >
+
+            <button
+                type="button"
+                id="closeFormatModal"
+                class="modal-close"
+                aria-label="Close"
+            >
+                ×
+            </button>
 
 
-        <div class="processing-modal">
+            <div class="modal-icon">
+                📁
+            </div>
 
 
-            <!-- LOGO -->
+            <span class="eyebrow">DOCUMENT TYPE</span>
 
-            <div class="processing-logo">
+            <h2 id="formatModalTitle">
+                Choose document type
+            </h2>
 
-                N
+            <p>
+                Select the format of the resume you want to upload.
+            </p>
+
+
+            <div class="modal-format-options">
+
+                <!-- PDF -->
+                <button
+                    type="button"
+                    class="modal-format-btn"
+                    data-type="pdf"
+                >
+
+                    <span class="modal-format-icon">
+                        📄
+                    </span>
+
+                    <span class="modal-format-info">
+                        <strong>PDF</strong>
+                        <small>PDF document</small>
+                    </span>
+
+                    <span class="modal-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+                <!-- DOCX -->
+                <button
+                    type="button"
+                    class="modal-format-btn"
+                    data-type="docx"
+                >
+
+                    <span class="modal-format-icon">
+                        📝
+                    </span>
+
+                    <span class="modal-format-info">
+                        <strong>DOCX</strong>
+                        <small>Microsoft Word document</small>
+                    </span>
+
+                    <span class="modal-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+                <!-- TXT -->
+                <button
+                    type="button"
+                    class="modal-format-btn"
+                    data-type="txt"
+                >
+
+                    <span class="modal-format-icon">
+                        📃
+                    </span>
+
+                    <span class="modal-format-info">
+                        <strong>TXT</strong>
+                        <small>Text document</small>
+                    </span>
+
+                    <span class="modal-arrow">
+                        →
+                    </span>
+
+                </button>
 
             </div>
 
 
-            <!-- TITLE -->
+            <button
+                type="button"
+                id="cancelFormatBtn"
+                class="modal-cancel"
+            >
+                Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= PROCESSING OVERLAY ================= -->
+    <div
+        id="processingOverlay"
+        class="processing-overlay"
+        hidden
+    >
+
+        <div class="processing-modal">
+
+            <div class="processing-logo">
+                N
+            </div>
 
             <h2>
-
                 Analyzing your resume
-
             </h2>
 
-
-            <!-- STATUS -->
-
             <p id="processingText">
-
                 Reading your document...
-
             </p>
 
 
-
-            <!-- =================================================
-                 PROGRESS BAR
-                 ================================================= -->
-
             <div class="progress-container">
-
 
                 <div class="progress-bar">
 
                     <div
                         id="progressBar"
-                        class="progress-fill">
-                    </div>
+                        class="progress-fill"
+                    ></div>
 
                 </div>
 
-
                 <span id="progressPercentage">
-
                     0%
-
                 </span>
-
 
             </div>
 
-
-
-            <!-- =================================================
-                 PROCESSING STEPS
-                 ================================================= -->
 
             <div class="processing-steps">
 
-
-                <!-- STEP 1 -->
-
                 <div
                     id="step1"
-                    class="processing-step active">
-
-
-                    <span class="step-icon">
-                        ✓
-                    </span>
-
-
-                    <span>
-                        Reading document
-                    </span>
-
-
+                    class="processing-step active"
+                >
+                    <span class="step-icon">✓</span>
+                    <span>Reading document</span>
                 </div>
 
-
-
-                <!-- STEP 2 -->
 
                 <div
                     id="step2"
-                    class="processing-step">
-
-
-                    <span class="step-icon">
-                        ✓
-                    </span>
-
-
-                    <span>
-                        Extracting information
-                    </span>
-
-
+                    class="processing-step"
+                >
+                    <span class="step-icon">✓</span>
+                    <span>Extracting information</span>
                 </div>
 
-
-
-                <!-- STEP 3 -->
 
                 <div
                     id="step3"
-                    class="processing-step">
-
-
-                    <span class="step-icon">
-                        ✓
-                    </span>
-
-
-                    <span>
-                        Identifying skills
-                    </span>
-
-
+                    class="processing-step"
+                >
+                    <span class="step-icon">✓</span>
+                    <span>Identifying skills</span>
                 </div>
 
-
-
-                <!-- STEP 4 -->
 
                 <div
                     id="step4"
-                    class="processing-step">
-
-
-                    <span class="step-icon">
-                        ✓
-                    </span>
-
-
-                    <span>
-                        Building career profile
-                    </span>
-
-
+                    class="processing-step"
+                >
+                    <span class="step-icon">✓</span>
+                    <span>Building career profile</span>
                 </div>
-
 
             </div>
 
-
         </div>
-
 
     </div>
 
 
-
-    <!-- =====================================================
-         JAVASCRIPT
-         ===================================================== -->
-
     <script src="ResumeUpload.js"></script>
 
-
 </body>
-
 </html>

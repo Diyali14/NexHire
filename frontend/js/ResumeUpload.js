@@ -1,47 +1,59 @@
-document.addEventListener("DOMContentLoaded", function () {
+/* =========================================================
+   NEXHIRE - RESUME UPLOAD PAGE
+   ========================================================= */
 
-    console.log("NexHire upload.js loaded successfully");
+document.addEventListener("DOMContentLoaded", () => {
 
+    /* ================= ELEMENTS ================= */
 
-    /* =====================================================
-       GET ELEMENTS
-       ===================================================== */
+    const themeBtn = document.getElementById("themeBtn");
 
-    const resumeInput =
-        document.getElementById("resumeInput");
+    const dropZone = document.getElementById("dropZone");
 
-    const browseBtn =
-        document.getElementById("browseBtn");
+    const browseBtn = document.getElementById("browseBtn");
 
-    const dropZone =
-        document.getElementById("dropZone");
+    const resumeInput = document.getElementById("resumeInput");
 
-    const selectedFile =
-        document.getElementById("selectedFile");
+    const selectedFile = document.getElementById("selectedFile");
 
-    const fileName =
-        document.getElementById("fileName");
+    const fileName = document.getElementById("fileName");
 
-    const fileSize =
-        document.getElementById("fileSize");
+    const fileSize = document.getElementById("fileSize");
 
-    const removeFile =
-        document.getElementById("removeFile");
+    const fileIcon = document.getElementById("fileIcon");
 
-    const analyzeBtn =
-        document.getElementById("analyzeBtn");
+    const removeFileBtn =
+        document.getElementById("removeFileBtn");
 
     const errorMessage =
         document.getElementById("errorMessage");
 
-    const errorText =
-        document.getElementById("errorText");
+    const analyzeBtn =
+        document.getElementById("analyzeBtn");
 
-    const themeBtn =
-        document.getElementById("themeBtn");
+
+    /* Format modal */
+
+    const formatModal =
+        document.getElementById("formatModal");
+
+    const closeFormatModal =
+        document.getElementById("closeFormatModal");
+
+    const cancelFormatBtn =
+        document.getElementById("cancelFormatBtn");
+
+    const modalFormatButtons =
+        document.querySelectorAll(".modal-format-btn");
+
+
+    /* Processing */
 
     const processingOverlay =
         document.getElementById("processingOverlay");
+
+    const processingText =
+        document.getElementById("processingText");
 
     const progressBar =
         document.getElementById("progressBar");
@@ -49,909 +61,733 @@ document.addEventListener("DOMContentLoaded", function () {
     const progressPercentage =
         document.getElementById("progressPercentage");
 
-    const processingText =
-        document.getElementById("processingText");
 
-
-    /* =====================================================
-       CHECK ELEMENTS
-       ===================================================== */
-
-    if (!resumeInput) {
-        console.error("resumeInput not found");
-        return;
-    }
-
-    if (!browseBtn) {
-        console.error("browseBtn not found");
-        return;
-    }
-
-    if (!dropZone) {
-        console.error("dropZone not found");
-        return;
-    }
-
-    if (!themeBtn) {
-        console.error("themeBtn not found");
-        return;
-    }
-
-
-    /* =====================================================
-       VARIABLES
-       ===================================================== */
-
-    let selectedResume = null;
-
-    const allowedExtensions = [
-        "pdf",
-        "docx",
-        "txt"
+    const steps = [
+        document.getElementById("step1"),
+        document.getElementById("step2"),
+        document.getElementById("step3"),
+        document.getElementById("step4")
     ];
 
-    const maxFileSize =
+
+    /* ================= STATE ================= */
+
+    let currentFile = null;
+
+
+    const MAX_FILE_SIZE =
         10 * 1024 * 1024;
 
 
-    /* =====================================================
+    const ACCEPTED_EXTENSIONS = [
+        ".pdf",
+        ".docx",
+        ".txt"
+    ];
+
+
+    /* =========================================================
        THEME
-       ===================================================== */
+       ========================================================= */
 
-    function updateThemeButton() {
+    function applyTheme(theme) {
 
-        const isLight =
-            document.body.classList.contains(
-                "light-preview"
-            );
+        if (theme === "light") {
 
-        if (isLight) {
+            document.body.classList.add("light-preview");
 
-            themeBtn.textContent = "☀";
+            themeBtn.textContent = "☾";
 
             themeBtn.setAttribute(
                 "aria-label",
                 "Switch to dark mode"
             );
 
-            themeBtn.title =
-                "Switch to dark mode";
+            themeBtn.setAttribute(
+                "title",
+                "Switch to dark mode"
+            );
 
         } else {
 
-            themeBtn.textContent = "☾";
+            document.body.classList.remove("light-preview");
+
+            themeBtn.textContent = "☀";
 
             themeBtn.setAttribute(
                 "aria-label",
                 "Switch to light mode"
             );
 
-            themeBtn.title =
-                "Switch to light mode";
+            themeBtn.setAttribute(
+                "title",
+                "Switch to light mode"
+            );
         }
     }
 
 
-    function loadTheme() {
+    const savedTheme =
+        localStorage.getItem("nexhire-theme") || "dark";
 
-        const savedTheme =
-            localStorage.getItem(
-                "nexhire-theme"
-            );
 
-        if (savedTheme === "light") {
+    applyTheme(savedTheme);
 
-            document.body.classList.add(
-                "light-preview"
-            );
 
-        } else {
+    themeBtn.addEventListener("click", () => {
 
-            document.body.classList.remove(
-                "light-preview"
-            );
-        }
+        const isLight =
+            document.body.classList.contains("light-preview");
 
-        updateThemeButton();
+        const nextTheme =
+            isLight ? "dark" : "light";
+
+        applyTheme(nextTheme);
+
+        localStorage.setItem(
+            "nexhire-theme",
+            nextTheme
+        );
+    });
+
+
+    /* =========================================================
+       ERROR
+       ========================================================= */
+
+    function showError(message) {
+
+        errorMessage.textContent = message;
+
+        errorMessage.hidden = false;
     }
 
 
-    themeBtn.addEventListener(
+    function clearError() {
+
+        errorMessage.textContent = "";
+
+        errorMessage.hidden = true;
+    }
+
+
+    /* =========================================================
+       FORMAT MODAL
+       ========================================================= */
+
+    function openFormatModal() {
+
+        formatModal.hidden = false;
+
+        document.body.style.overflow = "hidden";
+
+        setTimeout(() => {
+
+            closeFormatModal.focus();
+
+        }, 0);
+    }
+
+
+    function closeFormatSelectionModal() {
+
+        formatModal.hidden = true;
+
+        document.body.style.overflow = "";
+    }
+
+
+    /* Browse Documents */
+
+    browseBtn.addEventListener("click", (event) => {
+
+        event.preventDefault();
+
+        event.stopPropagation();
+
+        openFormatModal();
+    });
+
+
+    /* Clicking drop zone opens format popup */
+
+    dropZone.addEventListener("click", (event) => {
+
+        /*
+         * If user clicked the Browse Documents button,
+         * don't open the modal twice.
+         */
+        if (event.target.closest("#browseBtn")) {
+            return;
+        }
+
+        openFormatModal();
+    });
+
+
+    /* Close button */
+
+    closeFormatModal.addEventListener(
         "click",
-        function (event) {
+        closeFormatSelectionModal
+    );
 
-            event.preventDefault();
 
-            const isCurrentlyLight =
-                document.body.classList.contains(
-                    "light-preview"
-                );
+    /* Cancel */
 
-            if (isCurrentlyLight) {
+    cancelFormatBtn.addEventListener(
+        "click",
+        closeFormatSelectionModal
+    );
 
-                document.body.classList.remove(
-                    "light-preview"
-                );
 
-                localStorage.setItem(
-                    "nexhire-theme",
-                    "dark"
-                );
+    /* Click outside modal */
 
-            } else {
+    formatModal.addEventListener("click", (event) => {
 
-                document.body.classList.add(
-                    "light-preview"
-                );
+        if (event.target === formatModal) {
 
-                localStorage.setItem(
-                    "nexhire-theme",
-                    "light"
-                );
+            closeFormatSelectionModal();
+        }
+    });
+
+
+    /* Escape key */
+
+    document.addEventListener("keydown", (event) => {
+
+        if (
+            event.key === "Escape" &&
+            !formatModal.hidden
+        ) {
+
+            closeFormatSelectionModal();
+        }
+    });
+
+
+    /* =========================================================
+       FORMAT SELECTION
+       ========================================================= */
+
+    modalFormatButtons.forEach((button) => {
+
+        button.addEventListener("click", () => {
+
+            const type =
+                button.dataset.type;
+
+            if (type === "pdf") {
+
+                resumeInput.accept = ".pdf";
+
+            } else if (type === "docx") {
+
+                resumeInput.accept = ".docx";
+
+            } else if (type === "txt") {
+
+                resumeInput.accept = ".txt";
+
             }
 
-            updateThemeButton();
-
-        }
-    );
-
-
-    loadTheme();
-
-
-    /* =====================================================
-       BROWSE FILES
-       ===================================================== */
-
-    browseBtn.addEventListener(
-        "click",
-        function (event) {
-
-            event.preventDefault();
-
-            event.stopPropagation();
-
-            console.log(
-                "Browse Files clicked"
-            );
-
-            resumeInput.click();
-
-        }
-    );
-
-
-    /* =====================================================
-       CLICK DROP ZONE
-       ===================================================== */
-
-    dropZone.addEventListener(
-        "click",
-        function (event) {
+            closeFormatSelectionModal();
 
             /*
-             * Agar Browse Files button par click hua hai
-             * to dobara input.click() nahi karna.
+             * Small delay ensures the modal closes visually
+             * before the native file picker opens.
              */
-
-            if (
-                event.target.closest(
-                    "#browseBtn"
-                )
-            ) {
-                return;
-            }
-
-            console.log(
-                "Drop zone clicked"
-            );
-
-            resumeInput.click();
-
-        }
-    );
-
-
-    /* =====================================================
-       KEYBOARD ACCESS
-       ===================================================== */
-
-    dropZone.addEventListener(
-        "keydown",
-        function (event) {
-
-            if (
-                event.key === "Enter" ||
-                event.key === " "
-            ) {
-
-                event.preventDefault();
+            setTimeout(() => {
 
                 resumeInput.click();
-            }
 
-        }
-    );
+            }, 100);
+        });
 
-
-    /* =====================================================
-       FILE INPUT CHANGE
-       ===================================================== */
-
-    resumeInput.addEventListener(
-        "change",
-        function () {
-
-            console.log(
-                "File selected from picker"
-            );
-
-            if (
-                resumeInput.files &&
-                resumeInput.files.length > 0
-            ) {
-
-                handleFile(
-                    resumeInput.files[0]
-                );
-            }
-
-        }
-    );
+    });
 
 
-    /* =====================================================
-       DRAG OVER
-       ===================================================== */
+    /* =========================================================
+       FILE INPUT
+       ========================================================= */
 
-    dropZone.addEventListener(
-        "dragover",
-        function (event) {
+    resumeInput.addEventListener("change", () => {
 
-            event.preventDefault();
-
-            dropZone.classList.add(
-                "dragging"
-            );
-
-        }
-    );
-
-
-    /* =====================================================
-       DRAG LEAVE
-       ===================================================== */
-
-    dropZone.addEventListener(
-        "dragleave",
-        function () {
-
-            dropZone.classList.remove(
-                "dragging"
-            );
-
-        }
-    );
-
-
-    /* =====================================================
-       DROP
-       ===================================================== */
-
-    dropZone.addEventListener(
-        "drop",
-        function (event) {
-
-            event.preventDefault();
-
-            dropZone.classList.remove(
-                "dragging"
-            );
-
-            const files =
-                event.dataTransfer.files;
-
-            if (
-                files &&
-                files.length > 0
-            ) {
-
-                handleFile(files[0]);
-            }
-
-        }
-    );
-
-
-    /* =====================================================
-       HANDLE FILE
-       ===================================================== */
-
-    function handleFile(file) {
-
-        hideError();
+        const file = resumeInput.files[0];
 
         if (!file) {
             return;
         }
 
+        handleFile(file);
+    });
 
-        /* Get extension */
 
-        const nameParts =
-            file.name.split(".");
+    /* =========================================================
+       FILE VALIDATION
+       ========================================================= */
+
+    function getExtension(file) {
+
+        const name =
+            file.name.toLowerCase();
+
+        const lastDot =
+            name.lastIndexOf(".");
+
+        if (lastDot === -1) {
+            return "";
+        }
+
+        return name.substring(lastDot);
+    }
+
+
+    function validateFile(file) {
+
+        clearError();
+
+
+        if (!file) {
+
+            showError(
+                "Please select a resume file."
+            );
+
+            return false;
+        }
+
 
         const extension =
-            nameParts.length > 1
-                ? nameParts
-                    .pop()
-                    .toLowerCase()
-                : "";
+            getExtension(file);
 
-
-        /* Validate extension */
 
         if (
-            !allowedExtensions.includes(
-                extension
-            )
+            !ACCEPTED_EXTENSIONS.includes(extension)
         ) {
 
             showError(
-                "Please upload a PDF, DOCX or TXT resume."
+                "Unsupported file type. Please upload a PDF, DOCX or TXT file."
             );
 
-            resetFile();
+            return false;
+        }
+
+
+        if (file.size > MAX_FILE_SIZE) {
+
+            showError(
+                "File size exceeds 10 MB. Please choose a smaller resume."
+            );
+
+            return false;
+        }
+
+
+        return true;
+    }
+
+
+    /* =========================================================
+       HANDLE FILE
+       ========================================================= */
+
+    function handleFile(file) {
+
+        if (!validateFile(file)) {
+
+            currentFile = null;
+
+            selectedFile.hidden = true;
+
+            analyzeBtn.disabled = true;
+
+            resumeInput.value = "";
 
             return;
         }
 
 
-        /* Validate size */
-
-        if (
-            file.size > maxFileSize
-        ) {
-
-            showError(
-                "File size must be less than 10 MB."
-            );
-
-            resetFile();
-
-            return;
-        }
+        currentFile = file;
 
 
-        /* Save file */
-
-        selectedResume = file;
-
-
-        /* Show file */
-
-        showSelectedFile(file);
+        fileName.textContent =
+            file.name;
 
 
-        console.log(
-            "Valid resume selected:",
-            file.name
-        );
+        fileSize.textContent =
+            formatFileSize(file.size);
 
+
+        fileIcon.textContent =
+            getFileIcon(file);
+
+
+        selectedFile.hidden = false;
+
+        analyzeBtn.disabled = false;
+
+        clearError();
     }
 
 
-    /* =====================================================
-       SHOW SELECTED FILE
-       ===================================================== */
+    /* File icon */
 
-    function showSelectedFile(file) {
+    function getFileIcon(file) {
 
-        if (fileName) {
+        const extension =
+            getExtension(file);
 
-            fileName.textContent =
-                file.name;
+
+        if (extension === ".pdf") {
+            return "📄";
         }
 
 
-        if (fileSize) {
-
-            fileSize.textContent =
-                formatFileSize(
-                    file.size
-                );
+        if (extension === ".docx") {
+            return "📝";
         }
 
 
-        if (selectedFile) {
-
-            selectedFile.hidden =
-                false;
+        if (extension === ".txt") {
+            return "📃";
         }
 
 
-        if (analyzeBtn) {
-
-            analyzeBtn.disabled =
-                false;
-        }
-
-
-        dropZone.hidden =
-            true;
-
+        return "📄";
     }
 
 
-    /* =====================================================
-       FORMAT FILE SIZE
-       ===================================================== */
+    /* File size */
 
     function formatFileSize(bytes) {
 
         if (bytes < 1024) {
 
-            return bytes + " B";
+            return `${bytes} B`;
         }
 
 
-        if (
-            bytes <
-            1024 * 1024
-        ) {
+        if (bytes < 1024 * 1024) {
 
-            return (
+            return `${(
                 bytes / 1024
-            ).toFixed(1) +
-            " KB";
+            ).toFixed(1)} KB`;
         }
 
 
-        return (
+        return `${(
             bytes /
             (1024 * 1024)
-        ).toFixed(1) +
-        " MB";
+        ).toFixed(2)} MB`;
     }
 
 
-    /* =====================================================
+    /* =========================================================
+       DRAG & DROP
+       ========================================================= */
+
+    dropZone.addEventListener(
+        "dragover",
+        (event) => {
+
+            event.preventDefault();
+
+            dropZone.classList.add(
+                "drag-active"
+            );
+        }
+    );
+
+
+    dropZone.addEventListener(
+        "dragenter",
+        (event) => {
+
+            event.preventDefault();
+
+            dropZone.classList.add(
+                "drag-active"
+            );
+        }
+    );
+
+
+    dropZone.addEventListener(
+        "dragleave",
+        (event) => {
+
+            /*
+             * Only remove the class when the pointer
+             * actually leaves the drop zone.
+             */
+            if (
+                !dropZone.contains(
+                    event.relatedTarget
+                )
+            ) {
+
+                dropZone.classList.remove(
+                    "drag-active"
+                );
+            }
+        }
+    );
+
+
+    dropZone.addEventListener(
+        "drop",
+        (event) => {
+
+            event.preventDefault();
+
+            dropZone.classList.remove(
+                "drag-active"
+            );
+
+
+            const files =
+                event.dataTransfer.files;
+
+
+            if (!files || files.length === 0) {
+                return;
+            }
+
+
+            handleFile(files[0]);
+        }
+    );
+
+
+    /* =========================================================
        REMOVE FILE
-       ===================================================== */
+       ========================================================= */
 
-    if (removeFile) {
+    removeFileBtn.addEventListener(
+        "click",
+        (event) => {
 
-        removeFile.addEventListener(
-            "click",
-            function () {
+            event.stopPropagation();
 
-                resetFile();
+            currentFile = null;
 
+            resumeInput.value = "";
+
+            selectedFile.hidden = true;
+
+            analyzeBtn.disabled = true;
+
+            clearError();
+        }
+    );
+
+
+    /* =========================================================
+       ANALYZE RESUME
+       ========================================================= */
+
+    analyzeBtn.addEventListener(
+        "click",
+        () => {
+
+            if (!currentFile) {
+
+                showError(
+                    "Please select a resume before continuing."
+                );
+
+                return;
             }
-        );
-
-    }
 
 
-    /* =====================================================
-       RESET FILE
-       ===================================================== */
-
-    function resetFile() {
-
-        selectedResume = null;
-
-
-        resumeInput.value = "";
-
-
-        if (selectedFile) {
-
-            selectedFile.hidden =
-                true;
+            startProcessing();
         }
+    );
 
 
-        if (analyzeBtn) {
-
-            analyzeBtn.disabled =
-                true;
-        }
-
-
-        dropZone.hidden =
-            false;
-
-
-        hideError();
-
-    }
-
-
-    /* =====================================================
-       ERROR
-       ===================================================== */
-
-    function showError(message) {
-
-        if (errorText) {
-
-            errorText.textContent =
-                message;
-        }
-
-
-        if (errorMessage) {
-
-            errorMessage.hidden =
-                false;
-        }
-
-    }
-
-
-    function hideError() {
-
-        if (errorMessage) {
-
-            errorMessage.hidden =
-                true;
-        }
-
-    }
-
-
-    /* =====================================================
-       ANALYZE BUTTON
-       ===================================================== */
-
-    if (analyzeBtn) {
-
-        analyzeBtn.addEventListener(
-            "click",
-            function () {
-
-                if (!selectedResume) {
-
-                    showError(
-                        "Please select your resume first."
-                    );
-
-                    return;
-                }
-
-
-                startProcessing();
-
-            }
-        );
-
-    }
-
-
-    /* =====================================================
-       PROCESSING
-       ===================================================== */
+    /* =========================================================
+       DEMO PROCESSING
+       ========================================================= */
 
     function startProcessing() {
 
-        if (!processingOverlay) {
-            return;
-        }
+        processingOverlay.hidden = false;
 
-
-        processingOverlay.hidden =
-            false;
-
-
-        if (analyzeBtn) {
-
-            analyzeBtn.disabled =
-                true;
-        }
+        document.body.style.overflow = "hidden";
 
 
         let progress = 0;
 
 
-        /*
-         * Reset steps
-         */
-
-        resetProcessingSteps();
-
-
-        /*
-         * Initial state
-         */
-
-        progressBar.style.width =
-            "0%";
-
-        progressPercentage.textContent =
-            "0%";
-
-
-        processingText.textContent =
-            "Reading your document...";
-
-
-        /*
-         * Demo processing
-         *
-         * Later yahan real API call lagegi:
-         *
-         * POST /api/v1/resumes/upload
-         */
-
-        const interval =
-            setInterval(
-                function () {
-
-                    progress += 5;
-
-
-                    if (progress > 100) {
-
-                        progress = 100;
-                    }
-
-
-                    progressBar.style.width =
-                        progress + "%";
-
-
-                    progressPercentage.textContent =
-                        progress + "%";
-
-
-                    updateProcessingStep(
-                        progress
-                    );
-
-
-                    if (
-                        progress >= 100
-                    ) {
-
-                        clearInterval(
-                            interval
-                        );
-
-
-                        processingText.textContent =
-                            "Resume analysis completed!";
-
-
-                        setTimeout(
-                            function () {
-
-                                /*
-                                 * DEMO ONLY
-                                 *
-                                 * Backend connect hone ke baad
-                                 * yahan result page open karna.
-                                 */
-
-                                window.location.href =
-                                    "../dashboard/index.html";
-
-                            },
-                            1000
-                        );
-
-                    }
-
-                },
-                180
-            );
-
-    }
-
-
-    /* =====================================================
-       RESET PROCESSING STEPS
-       ===================================================== */
-
-    function resetProcessingSteps() {
-
-        const steps = [
-            "step1",
-            "step2",
-            "step3",
-            "step4"
+        const messages = [
+            "Reading your document...",
+            "Extracting information...",
+            "Identifying your skills...",
+            "Building your career profile..."
         ];
 
 
-        steps.forEach(
-            function (id) {
+        steps.forEach((step, index) => {
 
-                const step =
-                    document.getElementById(
-                        id
-                    );
+            if (!step) {
+                return;
+            }
+
+            step.classList.remove(
+                "active",
+                "completed"
+            );
+
+            if (index === 0) {
+
+                step.classList.add(
+                    "active"
+                );
+            }
+        });
+
+
+        progressBar.style.width = "0%";
+
+        progressPercentage.textContent = "0%";
+
+        processingText.textContent =
+            messages[0];
+
+
+        /*
+         * Demo timer.
+         *
+         * Later this section will be replaced with:
+         *
+         * POST /api/v1/resumes/upload
+         *
+         * and Spring Boot → Python AI service.
+         */
+        const interval =
+            setInterval(() => {
+
+                progress += 5;
+
+
+                progressBar.style.width =
+                    `${progress}%`;
+
+
+                progressPercentage.textContent =
+                    `${progress}%`;
+
+
+                updateProcessingStep(
+                    progress,
+                    messages
+                );
+
+
+                if (progress >= 100) {
+
+                    clearInterval(interval);
+
+
+                    setTimeout(() => {
+
+                        /*
+                         * Demo redirect.
+                         *
+                         * Replace this with the actual
+                         * candidate dashboard / result page
+                         * once backend integration is ready.
+                         */
+                        window.location.href =
+                            "../dashboard/index.html";
+
+                    }, 600);
+                }
+
+            }, 120);
+    }
+
+
+    /* =========================================================
+       PROCESSING STEPS
+       ========================================================= */
+
+    function updateProcessingStep(
+        progress,
+        messages
+    ) {
+
+        let activeIndex = 0;
+
+
+        if (progress >= 25) {
+            activeIndex = 1;
+        }
+
+        if (progress >= 50) {
+            activeIndex = 2;
+        }
+
+        if (progress >= 75) {
+            activeIndex = 3;
+        }
+
+
+        processingText.textContent =
+            messages[activeIndex];
+
+
+        steps.forEach((step, index) => {
+
+            if (!step) {
+                return;
+            }
+
+
+            step.classList.remove(
+                "active",
+                "completed"
+            );
+
+
+            if (index < activeIndex) {
+
+                step.classList.add(
+                    "completed"
+                );
+
+            } else if (index === activeIndex) {
+
+                step.classList.add(
+                    "active"
+                );
+            }
+
+        });
+
+
+        /*
+         * At 100%, mark all steps completed.
+         */
+        if (progress >= 100) {
+
+            steps.forEach((step) => {
 
                 if (!step) {
                     return;
                 }
 
-
                 step.classList.remove(
                     "active"
                 );
 
-                step.classList.remove(
+                step.classList.add(
                     "completed"
                 );
 
-            }
-        );
-
-
-        const firstStep =
-            document.getElementById(
-                "step1"
-            );
-
-
-        if (firstStep) {
-
-            firstStep.classList.add(
-                "active"
-            );
+            });
         }
-
     }
-
-
-    /* =====================================================
-       UPDATE PROCESSING STEPS
-       ===================================================== */
-
-    function updateProcessingStep(
-        progress
-    ) {
-
-        const step1 =
-            document.getElementById(
-                "step1"
-            );
-
-        const step2 =
-            document.getElementById(
-                "step2"
-            );
-
-        const step3 =
-            document.getElementById(
-                "step3"
-            );
-
-        const step4 =
-            document.getElementById(
-                "step4"
-            );
-
-
-        /* Step 1 */
-
-        if (progress >= 20) {
-
-            step1.classList.remove(
-                "active"
-            );
-
-            step1.classList.add(
-                "completed"
-            );
-        }
-
-
-        /* Step 2 */
-
-        if (progress >= 25) {
-
-            step2.classList.add(
-                "active"
-            );
-        }
-
-
-        if (progress >= 50) {
-
-            step2.classList.remove(
-                "active"
-            );
-
-            step2.classList.add(
-                "completed"
-            );
-        }
-
-
-        /* Step 3 */
-
-        if (progress >= 50) {
-
-            step3.classList.add(
-                "active"
-            );
-        }
-
-
-        if (progress >= 75) {
-
-            step3.classList.remove(
-                "active"
-            );
-
-            step3.classList.add(
-                "completed"
-            );
-        }
-
-
-        /* Step 4 */
-
-        if (progress >= 75) {
-
-            step4.classList.add(
-                "active"
-            );
-        }
-
-
-        if (progress >= 100) {
-
-            step4.classList.remove(
-                "active"
-            );
-
-            step4.classList.add(
-                "completed"
-            );
-        }
-
-
-        /* Text */
-
-        if (progress < 25) {
-
-            processingText.textContent =
-                "Reading your document...";
-
-        } else if (
-            progress < 50
-        ) {
-
-            processingText.textContent =
-                "Extracting information...";
-
-        } else if (
-            progress < 75
-        ) {
-
-            processingText.textContent =
-                "Identifying your skills...";
-
-        } else if (
-            progress < 100
-        ) {
-
-            processingText.textContent =
-                "Building your career profile...";
-
-        } else {
-
-            processingText.textContent =
-                "Resume analysis completed!";
-        }
-
-    }
-
-
-    console.log(
-        "NexHire upload page initialized"
-    );
 
 });
