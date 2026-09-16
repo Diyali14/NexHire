@@ -1,8 +1,8 @@
 package com.airesumematcher.backend.recruiter.controller;
 
 import com.airesumematcher.backend.recruiter.dto.RecruiterProfileRequest;
-import com.airesumematcher.backend.recruiter.entity.RecruiterProfile;
-import com.airesumematcher.backend.recruiter.service.RecruiterService;
+import com.airesumematcher.backend.recruiter.dto.RecruiterProfileResponse;
+import com.airesumematcher.backend.recruiter.service.RecruiterProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -13,24 +13,22 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class RecruiterController {
 
-    private final RecruiterService recruiterService;
+    private final RecruiterProfileService recruiterService;
 
     @GetMapping("/me")
-    public RecruiterProfile getMyProfile(
+    public RecruiterProfileResponse getMyProfile(
             Authentication authentication
     ) {
-
-        return recruiterService.getProfile(
+        return recruiterService.getMyProfile(
                 authentication.getName()
         );
     }
 
     @PutMapping("/me")
-    public RecruiterProfile updateMyProfile(
+    public RecruiterProfileResponse updateMyProfile(
             Authentication authentication,
             @Valid @RequestBody RecruiterProfileRequest request
     ) {
-
         return recruiterService.updateProfile(
                 authentication.getName(),
                 request

@@ -2,11 +2,14 @@ package com.airesumematcher.backend.auth.controller;
 
 import com.airesumematcher.backend.auth.dto.*;
 import com.airesumematcher.backend.auth.service.AuthService;
+import com.airesumematcher.backend.candidate.dto.CandidateProfileResponse;
+import com.airesumematcher.backend.candidate.dto.CandidateProfileUpdateRequest;
 import com.airesumematcher.backend.user.entity.RoleName;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -71,4 +74,5 @@ public class AuthController {
                 )
         );
     }
+
 }

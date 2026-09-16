@@ -1,10 +1,12 @@
 package com.airesumematcher.backend.candidate.service;
 
 import com.airesumematcher.backend.candidate.dto.CandidateProfileResponse;
+import com.airesumematcher.backend.candidate.dto.CandidateProfileUpdateRequest;
 import com.airesumematcher.backend.candidate.entity.CandidateProfile;
 import com.airesumematcher.backend.candidate.repository.CandidateProfileRepository;
 import com.airesumematcher.backend.user.entity.User;
 import com.airesumematcher.backend.user.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -53,5 +55,39 @@ public class CandidateProfileService {
                 .bio(profile.getBio())
                 .build();
     }
+
+
+    @Transactional
+    public CandidateProfileResponse updateMyProfile(
+            String email,
+            CandidateProfileUpdateRequest request
+    ) {
+
+        User user = userRepository
+                .findByEmailIgnoreCase(email)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("User not found")
+                );
+
+        CandidateProfile profile =
+                candidateProfileRepository
+                        .findByUserId(user.getId())
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Candidate profile not found"
+                                )
+                        );
+
+        profile.setLinkedinUrl(request.getLinkedinUrl());
+        profile.setGithubUrl(request.getGithubUrl());
+        profile.setBio(request.getBio());
+
+        CandidateProfile savedProfile =
+                candidateProfileRepository.save(profile);
+
+        return toResponse(savedProfile);
+    }
+
+
 }
 
