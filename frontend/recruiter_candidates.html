@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Candidates — NexHire
+  </title>
+  <script>
+   (function(){const s=localStorage.getItem('nexhire-theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=s||(d?'dark':'light')})();
+  </script>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest">
+  </script>
+  <link href="css/recruiter.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <div class="app-shell">
+   <aside class="sidebar">
+    <a class="brand" href="recruiter_dashboard.html">
+     <span class="brand-mark">
+      <span>
+      </span>
+      <span>
+      </span>
+      <span>
+      </span>
+     </span>
+     <span class="brand-name">
+      Nex
+      <span>
+       Hire
+      </span>
+     </span>
+    </a>
+    <div class="side-label">
+     RECRUITER WORKSPACE
+    </div>
+    <nav class="side-nav">
+     <a class="side-link" href="recruiter_dashboard.html">
+      <i class="nav-icon" data-lucide="layout-dashboard">
+      </i>
+      Dashboard
+     </a>
+     <a class="side-link" href="recruiter_jobs.html">
+      <i class="nav-icon" data-lucide="briefcase-business">
+      </i>
+      My Jobs
+     </a>
+     <a class="side-link" href="recruiter_job-details.html">
+      <i class="nav-icon" data-lucide="inbox">
+      </i>
+      Applications
+     </a>
+     <a class="side-link" href="recruiter_job-details.html">
+      <i class="nav-icon" data-lucide="trophy">
+      </i>
+      Candidate Rankings
+     </a>
+     <a class="side-link active" href="recruiter_candidates.html">
+      <i class="nav-icon" data-lucide="users">
+      </i>
+      Candidates
+     </a>
+    </nav>
+    <div class="sidebar-bottom">
+     <a class="side-link" href="#">
+      <i class="nav-icon" data-lucide="settings">
+      </i>
+      Settings
+     </a>
+     <a class="side-link logout" href="../recruiter-login.html">
+      <i class="nav-icon" data-lucide="log-out">
+      </i>
+      Logout
+     </a>
+    </div>
+   </aside>
+   <div class="overlay">
+   </div>
+   <main class="main">
+    <header class="topbar">
+     <div class="top-actions">
+      <button aria-label="Open menu" class="icon-button mobile-menu" data-menu="">
+       <i data-lucide="menu">
+       </i>
+      </button>
+      <span class="crumb">
+       Recruiter Portal / Candidates
+      </span>
+     </div>
+     <div class="top-actions">
+      <button aria-label="Switch theme" class="icon-button" data-theme-toggle="">
+       <i data-lucide="moon">
+       </i>
+      </button>
+      <div class="profile-menu-wrap">
+       <button aria-expanded="false" aria-label="Open recruiter menu" class="profile-chip" data-profile-menu="">
+        <span class="avatar-sm">
+         RS
+        </span>
+        <span class="profile-chip-name">
+         Recruiter
+        </span>
+        <i data-lucide="chevron-down">
+        </i>
+       </button>
+       <div class="profile-dropdown" data-profile-dropdown="">
+        <a href="recruiter_profile.html">
+         <i data-lucide="user-round">
+         </i>
+         <span>
+          Profile
+         </span>
+        </a>
+        <a href="#">
+         <i data-lucide="settings">
+         </i>
+         <span>
+          Settings
+         </span>
+        </a>
+        <button class="dropdown-logout logout">
+         <i data-lucide="log-out">
+         </i>
+         <span>
+          Logout
+         </span>
+        </button>
+       </div>
+      </div>
+     </div>
+    </header>
+    <section class="page">
+     <div class="page-header">
+      <div>
+       <div class="kicker">
+        TALENT POOL
+       </div>
+       <h1>
+        Candidates
+       </h1>
+       <p>
+        Browse candidate profiles and review their latest matching information.
+       </p>
+      </div>
+     </div>
+     <div class="toolbar">
+      <div class="search">
+       <i data-lucide="search">
+       </i>
+       <input data-search="candidates" placeholder="Search candidates, skills or education..."/>
+      </div>
+     </div>
+     <div class="candidate-cards">
+      <article class="card candidate-card" data-search-value="candidates">
+       <div class="candidate-top">
+        <span class="avatar">
+         AS
+        </span>
+        <div>
+         <h3>
+          Aditi Sharma
+         </h3>
+         <div class="job-meta">
+          Software Intern · Infosys
+         </div>
+        </div>
+       </div>
+       <p>
+        Java-focused candidate with practical backend project experience and a B.Tech CSE background.
+       </p>
+       <div class="skill-wrap">
+        <span class="skill">
+         Java
+        </span>
+        <span class="skill">
+         Spring Boot
+        </span>
+        <span class="skill">
+         PostgreSQL
+        </span>
+        <span class="skill">
+         Redis
+        </span>
+       </div>
+       <a class="button button-secondary" href="recruiter_candidate-details.html">
+        View Profile
+        <i data-lucide="arrow-up-right">
+        </i>
+       </a>
+      </article>
+      <article class="card candidate-card" data-search-value="candidates">
+       <div class="candidate-top">
+        <span class="avatar">
+         RM
+        </span>
+        <div>
+         <h3>
+          Rohan Mehta
+         </h3>
+         <div class="job-meta">
+          Backend Developer
+         </div>
+        </div>
+       </div>
+       <p>
+        Backend-oriented candidate with Java, Spring Boot and Docker exposure.
+       </p>
+       <div class="skill-wrap">
+        <span class="skill">
+         Java
+        </span>
+        <span class="skill">
+         Spring Boot
+        </span>
+        <span class="skill">
+         Docker
+        </span>
+       </div>
+       <a class="button button-secondary" href="recruiter_candidate-details.html">
+        View Profile
+        <i data-lucide="arrow-up-right">
+        </i>
+       </a>
+      </article>
+      <article class="card candidate-card" data-search-value="candidates">
+       <div class="candidate-top">
+        <span class="avatar">
+         PN
+        </span>
+        <div>
+         <h3>
+          Priya Nair
+         </h3>
+         <div class="job-meta">
+          Software Engineer
+         </div>
+        </div>
+       </div>
+       <p>
+        Software engineering candidate with database and backend development experience.
+       </p>
+       <div class="skill-wrap">
+        <span class="skill">
+         Java
+        </span>
+        <span class="skill">
+         PostgreSQL
+        </span>
+        <span class="skill">
+         Redis
+        </span>
+       </div>
+       <a class="button button-secondary" href="recruiter_candidate-details.html">
+        View Profile
+        <i data-lucide="arrow-up-right">
+        </i>
+       </a>
+      </article>
+      <article class="card candidate-card" data-search-value="candidates">
+       <div class="candidate-top">
+        <span class="avatar">
+         AD
+        </span>
+        <div>
+         <h3>
+          Arjun Das
+         </h3>
+         <div class="job-meta">
+          Junior Backend Engineer
+         </div>
+        </div>
+       </div>
+       <p>
+        Backend candidate with Java, Spring Boot and containerization experience.
+       </p>
+       <div class="skill-wrap">
+        <span class="skill">
+         Java
+        </span>
+        <span class="skill">
+         Spring Boot
+        </span>
+        <span class="skill">
+         Docker
+        </span>
+       </div>
+       <a class="button button-secondary" href="recruiter_candidate-details.html">
+        View Profile
+        <i data-lucide="arrow-up-right">
+        </i>
+       </a>
+      </article>
+     </div>
+    </section>
+   </main>
+  </div>
+  <div class="toast">
+  </div>
+  <script src="js/recruiter.js">
+  </script>
+ </body>
+</html>
