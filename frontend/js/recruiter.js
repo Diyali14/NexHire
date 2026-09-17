@@ -186,16 +186,172 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.classList.contains('modal-backdrop')) e.currentTarget.classList.remove('open');
   });
 
-  /* ---------- Profile save ---------- */
-  document.querySelector('[data-save-profile]')?.addEventListener('click', () => {
-    const profile = {};
-    ['name', 'email', 'company', 'website', 'role', 'phone', 'company-about'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) profile[id] = el.value.trim();
-    });
-    localStorage.setItem('nexhire-recruiter-profile', JSON.stringify(profile));
-    showToast('Profile changes saved');
+  /* ---------- Recruiter Profile API ---------- */
+  const API_BASE_URL = 'https://nexhire-backend-5zv7.onrender.com/api/v1';
+
+  function getAuthHeaders() {
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+
+    // Reuse the token created by the recruiter login flow when available.
+    const tokenKeys = [
+      'nexhire-token',
+      'nexhire-access-token',
+      'accessToken',
+      'access_token',
+      'token'
+    ];
+
+    for (const key of tokenKeys) {
+      const token = localStorage.getItem(key);
+      if (token) {
+        headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+        return headers;
+      }
+    }
+
+    // Also support the recruiter session object used by the frontend.
+    try {
+      const session = JSON.parse(localStorage.getItem('nexhire-recruiter-session') || 'null');
+      const token = session?.token || session?.accessToken || session?.access_token;
+      if (token) {
+        headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      }
+    } catch (_) {}
+
+    return headers;
+  }
+
+  function setProfileField(id, value) {
+    const element = document.getElementById(id);
+    if (element && value !== null && value !== undefined) {
+      element.value = value;
+    }
+  }
+
+  function setProfileText(id, value) {
+    const element = document.getElementById(id);
+    if (element && value !== null && value !== undefined) {
+      element.textContent = value;
+    }
+  }
+
+  async function loadRecruiterProfile() {
+    if (!document.querySelector('[data-save-profile]')) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/recruiters/me`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+      });
+
+      if (!response.ok) {
+        throw new Error(`Profile request failed: ${response.status}`);
+      }
+
+      const profile = await response.json();
+      const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(' ') || 'Recruiter';
+      const designation = profile.designation || 'Recruiter';
+      const company = profile.companyName || 'Company not added';
+      const email = profile.email || '';
+      const phone = profile.phone || '';
+
+      setProfileField('name', fullName);
+      setProfileField('role', designation);
+      setProfileField('email', email);
+      setProfileField('phone', phone);
+      setProfileField('company', profile.companyName || '');
+
+      setProfileText('profile-display-name', fullName);
+      setProfileText('profile-display-designation', designation);
+      setProfileText('profile-display-company', company);
+      setProfileText('profile-display-email', email);
+      setProfileText('profile-display-phone', phone);
+
+      // Use the recruiter's initials in the profile avatar.
+      const initials = [profile.firstName, profile.lastName]
+        .filter(Boolean)
+        .map(name => name.charAt(0).toUpperCase())
+        .join('')
+        .slice(0, 2) || 'R';
+
+      document.querySelectorAll('.profile-avatar-xl, .avatar-sm').forEach(el => {
+        el.textContent = initials;
+      });
+
+      // Keep the top-right recruiter name in sync with the API response.
+      const chipName = document.querySelector('.profile-chip-name');
+      if (chipName) chipName.textContent = fullName.split(' ')[0] || 'Recruiter';
+
+    } catch (error) {
+      console.error('Unable to load recruiter profile:', error);
+      showToast('Could not load recruiter profile');
+    }
+  }
+
+  document.querySelector('[data-save-profile]')?.addEventListener('click', async () => {
+    const companyName = document.getElementById('company')?.value.trim() || '';
+    const designation = document.getElementById('role')?.value.trim() || '';
+
+    if (!companyName || !designation) {
+      showToast('Company name and designation are required');
+      return;
+    }
+
+    const saveButton = document.querySelector('[data-save-profile]');
+    const originalText = saveButton?.innerHTML;
+
+    try {
+      if (saveButton) {
+        saveButton.disabled = true;
+        saveButton.innerHTML = '<i data-lucide="loader-circle"></i> Saving...';
+        window.lucide?.createIcons();
+      }
+
+      const response = await fetch(`${API_BASE_URL}/recruiters/me`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          companyName,
+          designation
+        })
+      });
+
+      if (!response.ok) {
+        let message = `Profile update failed: ${response.status}`;
+        try {
+          const errorData = await response.json();
+          message = errorData.message || errorData.error || message;
+        } catch (_) {}
+        throw new Error(message);
+      }
+
+      const profile = await response.json();
+      const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(' ') || 'Recruiter';
+
+      setProfileField('company', profile.companyName || '');
+      setProfileField('role', profile.designation || '');
+      setProfileText('profile-display-name', fullName);
+      setProfileText('profile-display-designation', profile.designation || 'Recruiter');
+      setProfileText('profile-display-company', profile.companyName || 'Company not added');
+      setProfileText('profile-display-email', profile.email || '');
+      setProfileText('profile-display-phone', profile.phone || '');
+
+      showToast('Profile changes saved successfully');
+    } catch (error) {
+      console.error('Unable to update recruiter profile:', error);
+      showToast(error.message || 'Could not save profile changes');
+    } finally {
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.innerHTML = originalText;
+        window.lucide?.createIcons();
+      }
+    }
   });
+
+  loadRecruiterProfile();
 
   /* ---------- Utilities ---------- */
   function escapeHTML(value) {

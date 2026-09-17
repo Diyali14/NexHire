@@ -452,8 +452,8 @@
   function redirectAfterAuth(role) {
     window.location.href =
       role === "candidate"
-        ? "candidate/dashboard.html"
-        : "recruiter/dashboard.html";
+        ? "candidate-dashboard.html"
+        : "recruiter_dashboard.html";
   }
 
   /* =========================================================
