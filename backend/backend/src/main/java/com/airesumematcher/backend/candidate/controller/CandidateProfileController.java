@@ -24,7 +24,10 @@ public class CandidateProfileController {
         );
     }
 
-    @PutMapping public CandidateProfileResponse updateMyProfile( Authentication authentication, @Valid @RequestBody CandidateProfileUpdateRequest request ) { return candidateProfileService.updateMyProfile( authentication.getName(), request ); }
+    @PutMapping public CandidateProfileResponse updateMyProfile(
+            Authentication authentication, @Valid @RequestBody CandidateProfileUpdateRequest request ) {
+        return candidateProfileService.updateMyProfile( authentication.getName(), request );
+    }
 
 }
 
