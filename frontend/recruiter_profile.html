@@ -98,12 +98,8 @@
       </button>
       <div class="profile-menu-wrap">
        <button aria-expanded="false" aria-label="Open recruiter menu" class="profile-chip" data-profile-menu="">
-        <span class="avatar-sm">
-         RS
-        </span>
-        <span class="profile-chip-name">
-         Recruiter
-        </span>
+        <span class="avatar-sm"></span>
+        <span class="profile-chip-name"></span>
         <i data-lucide="chevron-down">
         </i>
        </button>
@@ -163,31 +159,23 @@
         <span class="profile-role-badge">
          RECRUITER
         </span>
-        <h2>
-         Recruiter Sharma
-        </h2>
-        <p class="profile-position">
-         Talent Acquisition Manager
-        </p>
+        <h2 id="profile-display-name"></h2>
+        <p class="profile-position" id="profile-display-designation"></p>
         <p class="profile-company">
          <i data-lucide="building-2">
          </i>
-         NexTech Solutions
+         <span id="profile-display-company"></span>
         </p>
         <div class="profile-contact">
          <div>
           <i data-lucide="mail">
           </i>
-          <span>
-           recruiter@nexhire.demo
-          </span>
+          <span id="profile-display-email"></span>
          </div>
          <div>
           <i data-lucide="phone">
           </i>
-          <span>
-           +91 98765 43210
-          </span>
+          <span id="profile-display-phone"></span>
          </div>
         </div>
        </div>
@@ -214,25 +202,25 @@
           <label for="name">
            Full Name
           </label>
-          <input id="name" value="Recruiter Sharma"/>
+          <input id="name" value="" readonly/>
          </div>
          <div class="field">
           <label for="role">
            Job Title
           </label>
-          <input id="role" value="Talent Acquisition Manager"/>
+          <input id="role" value=""/>
          </div>
          <div class="field">
           <label for="email">
            Work Email
           </label>
-          <input id="email" type="email" value="recruiter@nexhire.demo"/>
+          <input id="email" type="email" value="" readonly/>
          </div>
          <div class="field">
           <label for="phone">
            Phone Number
           </label>
-          <input id="phone" value="+91 98765 43210"/>
+          <input id="phone" value="" readonly/>
          </div>
         </div>
        </article>
@@ -257,13 +245,13 @@
           <label for="company">
            Company Name
           </label>
-          <input id="company" value="NexTech Solutions"/>
+          <input id="company" value="" autocomplete="organization"/>
          </div>
          <div class="field">
           <label for="website">
            Company Website
           </label>
-          <input id="website" value="https://nextech.example"/>
+          <input id="website" value=""/>
          </div>
          <div class="field full">
           <label for="company-about">
