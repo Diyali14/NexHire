@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Create a recruiter account on NexHire." />
+    <title>Create Recruiter Account — NexHire</title>
+    <script>
+      document.documentElement.dataset.theme =
+        localStorage.getItem("nexhire-theme") ||
+        (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+  </head>
+  <body class="auth-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="auth-topbar">
+      <nav class="auth-navbar container" aria-label="Authentication navigation">
+        <a class="brand" href="index.html" aria-label="NexHire home"
+          ><span class="brand-mark" aria-hidden="true"
+            ><span></span><span></span><span></span></span
+          ><span class="brand-name">Nex<span>Hire</span></span></a
+        >
+        <div class="auth-nav-actions">
+          <a class="auth-home-link" href="index.html"
+            ><i data-lucide="arrow-left"></i> Back to home</a
+          ><button
+            class="theme-toggle icon-button"
+            type="button"
+            aria-label="Switch to dark mode"
+            aria-pressed="false"
+          >
+            <i class="theme-sun" data-lucide="sun"></i
+            ><i class="theme-moon" data-lucide="moon"></i>
+          </button>
+        </div>
+      </nav>
+    </header>
+    <main id="main-content" class="auth-main">
+      <section class="auth-shell" aria-label="Create recruiter account">
+        <aside class="auth-showcase">
+          <div class="auth-showcase-content">
+            <div class="auth-kicker">
+              <i data-lucide="sparkles"></i> Smarter hiring starts here
+            </div>
+            <h1>Build your <span>next great team.</span></h1>
+            <p>
+              Create your recruiter workspace and use intelligent matching to
+              connect with qualified candidates.
+            </p>
+            <div class="auth-benefits">
+              <div class="auth-benefit">
+                <span class="auth-benefit-icon"
+                  ><i data-lucide="scan-search"></i></span
+                ><span>Screen resumes with AI assistance</span>
+              </div>
+              <div class="auth-benefit">
+                <span class="auth-benefit-icon"
+                  ><i data-lucide="target"></i></span
+                ><span>Surface relevant candidates faster</span>
+              </div>
+              <div class="auth-benefit">
+                <span class="auth-benefit-icon"
+                  ><i data-lucide="kanban-square"></i></span
+                ><span>Build a clearer hiring pipeline</span>
+              </div>
+            </div>
+          </div>
+          <div class="auth-showcase-footer">
+            <i data-lucide="zap"></i> Hire smarter with a more relevant
+            candidate view.
+          </div>
+        </aside>
+        <div class="auth-form-panel">
+          <div class="auth-form-wrap">
+            <header class="auth-form-header">
+              <span class="auth-portal"
+                ><i data-lucide="building-2"></i> Recruiter Portal</span
+              >
+              <h2>Create your account</h2>
+              <p>Build your hiring pipeline with smarter candidate matching.</p>
+            </header>
+            <form
+              class="auth-form"
+              data-auth-form
+              data-role="recruiter"
+              data-mode="register"
+              novalidate
+            >
+              <div class="form-field">
+                <label for="firstName">First Name</label>
+                <div class="input-wrap">
+                  <i data-lucide="user-round"></i><input class="form-input" id="firstName" name="firstName" type="text" autocomplete="given-name" placeholder="First Name" required />
+                </div>
+                <div class="field-error"></div>
+              </div>
+              <div class="form-field">
+                <label for="lastName">Last Name</label>
+                <div class="input-wrap">
+                  <i data-lucide="user-round"></i><input class="form-input" id="lastName" name="lastName" type="text" autocomplete="family-name" placeholder="Last Name" required />
+                </div>
+                <div class="field-error"></div>
+              </div>
+              <div class="form-field">
+                <label for="phone">Phone No</label>
+                <div class="input-wrap">
+                  <i data-lucide="phone"></i><input class="form-input" id="phone" name="phone" type="tel" autocomplete="tel" placeholder="Phone No" />
+                </div>
+                <div class="field-error"></div>
+              </div>
+              <div class="form-field">
+                <label for="email">Work Email</label>
+                <div class="input-wrap">
+                  <i data-lucide="mail"></i
+                  ><input
+                    class="form-input"
+                    id="email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="Email"
+                    required
+                    aria-describedby="email-error"
+                  />
+                  <div class="field-error" id="email-error"></div>
+                </div>
+              </div>
+              <!--
+              <div class="form-field">
+                <label for="companyName">Company Name</label>
+                <div class="input-wrap">
+                  <i data-lucide="building-2"></i
+                  ><input
+                    class="form-input"
+                    id="companyName"
+                    name="companyName"
+                    type="text"
+                    autocomplete="organization"
+                    placeholder="Company Name"
+                    required
+                  />
+                </div>
+                <div class="field-error"></div>
+              </div>-->
+              <div class="form-field">
+                <label for="password">Password</label>
+                <div class="input-wrap has-password-toggle">
+                  <i data-lucide="lock-keyhole"></i
+                  ><input
+                    class="form-input"
+                    id="password"
+                    name="password"
+                    type="password"
+                    autocomplete="new-password"
+                    placeholder="Password"
+                    required
+                    aria-describedby="password-error"
+                  /><button
+                    class="password-toggle"
+                    type="button"
+                    data-target="password"
+                    aria-label="Show password"
+                  >
+                    <i data-lucide="eye"></i>
+                  </button>
+                  <div class="field-error" id="password-error"></div>
+                </div>
+                <div class="password-strength">
+                  <div class="strength-track"><span></span></div>
+                  <span class="strength-text"
+                    >Use at least 8 characters with a mix of letters, numbers,
+                    and symbols.</span
+                  >
+                </div>
+              </div>
+              <div class="form-field">
+                <label for="confirmPassword">Confirm Password</label>
+                <div class="input-wrap has-password-toggle">
+                  <i data-lucide="lock"></i
+                  ><input
+                    class="form-input"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    autocomplete="new-password"
+                    placeholder="Re-enter your password"
+                    required
+                  /><button
+                    class="password-toggle"
+                    type="button"
+                    data-target="confirmPassword"
+                    aria-label="Show password"
+                  >
+                    <i data-lucide="eye"></i>
+                  </button>
+                </div>
+                <div class="field-error"></div>
+              </div>
+              <div class="form-field">
+                <label class="check-label"
+                  ><input type="checkbox" name="terms" required /><span
+                    class="terms-text"
+                    >I agree to the
+                    <a href="#terms">Terms &amp; Conditions</a> and
+                    <a href="#privacy">Privacy Policy</a>.</span
+                  ></label
+                >
+                <div class="field-error"></div>
+              </div>
+              <div class="form-message" role="status" aria-live="polite"></div>
+              <button class="button button-primary auth-submit" type="submit">
+                <i data-lucide="user-plus"></i> Create Recruiter Account
+              </button>
+            </form>
+            <div class="auth-switch">
+              Already have a recruiter account?
+              <a href="recruiter-login.html">Login</a>
+            </div>
+            <div class="auth-secondary-links">
+              <a href="candidate-login.html">Candidate Login</a><span>•</span
+              ><a href="candidate-signup.html">Candidate Sign Up</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="js/auth.js"></script>
+  </body>
+</html>
