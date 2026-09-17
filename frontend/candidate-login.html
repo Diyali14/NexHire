@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Candidate login — NexHire AI-powered recruitment platform."
+    />
+    <title>Candidate Login — NexHire</title>
+    <script>
+      document.documentElement.dataset.theme =
+        localStorage.getItem("nexhire-theme") ||
+        (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+  </head>
+  <body class="auth-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="auth-topbar">
+      <nav class="auth-navbar container" aria-label="Authentication navigation">
+        <a class="brand" href="index.html" aria-label="NexHire home"
+          ><span class="brand-mark" aria-hidden="true"
+            ><span></span><span></span><span></span></span
+          ><span class="brand-name">Nex<span>Hire</span></span></a
+        >
+        <div class="auth-nav-actions">
+          <a class="auth-home-link" href="index.html"
+            ><i data-lucide="arrow-left"></i> Back to home</a
+          ><button
+            class="theme-toggle icon-button"
+            type="button"
+            aria-label="Switch to dark mode"
+            aria-pressed="false"
+          >
+            <i class="theme-sun" data-lucide="sun"></i
+            ><i class="theme-moon" data-lucide="moon"></i>
+          </button>
+        </div>
+      </nav>
+    </header>
+    <main id="main-content" class="auth-main">
+      <section class="auth-shell" aria-label="Candidate authentication">
+        <aside class="auth-showcase">
+          <div class="auth-showcase-content">
+            <div class="auth-kicker">
+              <i data-lucide="sparkles"></i> AI-powered career matching
+            </div>
+            <h1>Find work that <span>fits you.</span></h1>
+            <p>
+              Sign in to discover opportunities matched to your skills,
+              experience, and career goals.
+            </p>
+            <div class="auth-benefits">
+              <div class="auth-benefit">
+                <span class="auth-benefit-icon"
+                  ><i data-lucide="scan-search"></i></span
+                ><span>AI-powered resume analysis</span>
+              </div>
+              <div class="auth-benefit">
+                <span class="auth-benefit-icon"
+                  ><i data-lucide="waypoints"></i></span
+                ><span>Smarter job recommendations</span>
+              </div>
+              <div class="auth-benefit">
+                <span class="auth-benefit-icon"
+                  ><i data-lucide="sparkles"></i></span
+                ><span>Personalized career assistance</span>
+              </div>
+            </div>
+          </div>
+          <div class="auth-showcase-footer">
+            <i data-lucide="shield-check"></i> Your account stays connected to
+            your NexHire journey.
+          </div>
+        </aside>
+        <div class="auth-form-panel">
+          <div class="auth-form-wrap">
+            <header class="auth-form-header">
+              <span class="auth-portal"
+                ><i data-lucide="user-round"></i> Candidate Portal</span
+              >
+              <h2>Welcome back</h2>
+              <p>Sign in to discover jobs matched to your skills.</p>
+            </header>
+            <form
+              class="auth-form"
+              data-auth-form
+              data-role="candidate"
+              data-mode="login"
+              novalidate
+            >
+              <div class="form-field">
+                <label for="email">Email</label>
+                <div class="input-wrap">
+                  <i data-lucide="mail"></i
+                  ><input
+                    class="form-input"
+                    id="email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="you@example.com"
+                    required
+                    aria-describedby="email-error"
+                  />
+                  <div class="field-error" id="email-error"></div>
+                </div>
+              </div>
+              <div class="form-field">
+                <label for="password">Password</label>
+                <div class="input-wrap has-password-toggle">
+                  <i data-lucide="lock-keyhole"></i
+                  ><input
+                    class="form-input"
+                    id="password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="Enter your password"
+                    required
+                    aria-describedby="password-error"
+                  /><button
+                    class="password-toggle"
+                    type="button"
+                    data-target="password"
+                    aria-label="Show password"
+                  >
+                    <i data-lucide="eye"></i>
+                  </button>
+                  <div class="field-error" id="password-error"></div>
+                </div>
+              </div>
+              <div class="auth-row">
+                <label class="check-label"
+                  ><input type="checkbox" name="remember" /> Remember me</label
+                ><a
+                  class="auth-link forgot-password-link"
+                  href="#forgot-password"
+                  >Forgot password?</a
+                >
+              </div>
+              <div class="form-message" role="status" aria-live="polite"></div>
+              <button class="button button-primary auth-submit" type="submit">
+                <i data-lucide="arrow-right"></i> Login
+              </button>
+            </form>
+            <div class="auth-switch">
+              Don't have a candidate account?
+              <a href="candidate-signup.html">Create Account</a>
+            </div>
+            <div class="auth-secondary-links">
+              <a href="recruiter-login.html">Recruiter Login</a><span>•</span
+              ><a href="recruiter-signup.html">Recruiter Sign Up</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="js/auth.js"></script>
+  </body>
+</html>
