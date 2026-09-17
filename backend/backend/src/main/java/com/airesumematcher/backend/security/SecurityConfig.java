@@ -43,11 +43,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(
-                                "/api/v1/auth/**","/health",
+                                "/api/v1/auth/**",
+                                "/health",
                                 "/actuator/health",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/api/v1/storage-test/**"
                         ).permitAll()
 
                         .requestMatchers(
@@ -91,8 +93,10 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(
                 List.of(
                         "http://localhost:5500",
-                        "http://127.0.0.1:5500",
-                        "http://localhost:3000"
+                        "http://127.0.0.1:5501",
+                        "http://localhost:3000",
+                        "http://localhost:5000",
+                        "http://localhost:5001"
                 )
         );
 
