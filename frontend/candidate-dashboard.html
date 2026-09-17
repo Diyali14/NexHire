@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NexHire | Candidate Dashboard</title>
+
+    <link rel="stylesheet" href="css/candidate-dashboard.css">
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="site-header">
+
+        <div class="container navbar">
+
+            <!-- Brand -->
+
+            <a href="candidate-dashboard.html" class="brand">
+
+                <span class="brand-mark">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+
+                <span class="brand-name">
+                    Nex<span>Hire</span>
+                </span>
+
+            </a>
+
+
+            
+
+
+            <!-- Right Side -->
+
+            <div class="nav-actions">
+
+                <button
+                    class="icon-button theme-toggle"
+                    id="themeToggle"
+                    type="button"
+                    aria-label="Toggle theme">
+
+                    ☼
+
+                </button>
+
+
+                <div class="profile-menu">
+
+                    <button
+                        class="profile-button"
+                        id="profileButton"
+                        type="button">
+
+                        <span class="profile-avatar">
+                            K
+                        </span>
+
+                        <span class="profile-details">
+
+                            <strong>Kaushik</strong>
+
+                            <small>Candidate</small>
+
+                        </span>
+
+                        <span class="profile-arrow">
+                            ▾
+                        </span>
+
+                    </button>
+
+
+                    <div
+                        class="profile-dropdown"
+                        id="profileDropdown">
+
+                        <a href="candidate-profile.html">
+                            View Profile
+                        </a>
+
+                        <a href="candidate-profile.html">
+                            Edit Profile
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="candidate-layout">
+
+
+        <!-- ================= SIDEBAR ================= -->
+
+        <aside class="sidebar">
+
+            <div class="sidebar-inner">
+
+                <div class="sidebar-label">
+                    CANDIDATE
+                </div>
+
+
+                <nav class="sidebar-nav">
+
+                    <a
+                        href="candidate-dashboard.html"
+                        class="sidebar-link active">
+
+                        <span class="sidebar-icon">⌂</span>
+
+                        <span>Dashboard</span>
+
+                    </a>
+
+
+                    <a
+                        href="candidate-profile.html"
+                        class="sidebar-link">
+
+                        <span class="sidebar-icon">◯</span>
+
+                        <span>Profile</span>
+
+                    </a>
+
+
+                    <a
+                        href="ResumeUpload.html"
+                        class="sidebar-link">
+
+                        <span class="sidebar-icon">↑</span>
+
+                        <span>Upload Resume</span>
+
+                    </a>
+
+
+                    <a
+                        href="candidate-job_Search.html"
+                        class="sidebar-link">
+
+                        <span class="sidebar-icon">⌕</span>
+
+                        <span>Job Search</span>
+
+                    </a>
+
+
+                    <a
+                        href="recommended-jobs.html"
+                        class="sidebar-link">
+
+                        <span class="sidebar-icon">✦</span>
+
+                        <span>Recommended Jobs</span>
+
+                    </a>
+
+
+                    <a
+                        href="ai-assistant.html"
+                        class="sidebar-link">
+
+                        <span class="sidebar-icon">✧</span>
+
+                        <span>AI Assistant</span>
+
+                    </a>
+
+                </nav>
+
+
+                <!-- Sidebar Bottom -->
+
+                <div class="sidebar-help">
+
+                    <div class="help-icon">
+                        ?
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Need help?
+                        </strong>
+
+                        <span>
+                            Ask NexHire AI
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ================= CONTENT ================= -->
+
+        <section class="dashboard-content">
+
+
+            <!-- Dashboard Header -->
+
+            <div class="dashboard-heading">
+
+                <div>
+
+                    <span class="eyebrow">
+                        CANDIDATE DASHBOARD
+                    </span>
+
+                    <h1>
+                        Good morning,
+                        <span>Kaushik.</span>
+                    </h1>
+
+                    <p>
+                        Manage your career profile, skills and job
+                        opportunities from one place.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="candidate-job_Search.html"
+                    class="button button-primary">
+
+                    Find Jobs
+
+                    <span>→</span>
+
+                </a>
+
+            </div>
+
+
+            <!-- ================= PROFILE SUMMARY ================= -->
+
+            <section class="profile-card">
+
+                <div class="profile-main">
+
+                    <div class="large-avatar">
+                        K
+                    </div>
+
+
+                    <div class="profile-info">
+
+                        <span class="mini-label">
+                            YOUR PROFILE
+                        </span>
+
+                        <h2>
+                            Kaushik Debnath
+                        </h2>
+
+                        <p>
+                            Computer Science Engineering Student
+                        </p>
+
+                        <div class="profile-meta">
+
+                            <span>
+                                📍 Kolkata, India
+                            </span>
+
+                            <span>
+                                💼 Software Engineer
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="profile-progress">
+
+                    <div class="progress-heading">
+
+                        <span>
+                            Profile completion
+                        </span>
+
+                        <strong>
+                            75%
+                        </strong>
+
+                    </div>
+
+
+                    <div class="progress-track">
+
+                        <span style="width: 75%;"></span>
+
+                    </div>
+
+
+                    <a href="candidate-profile.html">
+
+                        Complete profile →
+
+                    </a>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= STATS ================= -->
+
+            <section class="stats-grid">
+
+
+                <article class="stat-card">
+
+                    <div class="stat-icon">
+                        ↑
+                    </div>
+
+                    <div>
+
+                        <span>
+                            RESUME
+                        </span>
+
+                        <strong>
+                            Uploaded
+                        </strong>
+
+                        <small>
+                            Ready for analysis
+                        </small>
+
+                    </div>
+
+                </article>
+
+
+                <article class="stat-card">
+
+                    <div class="stat-icon">
+                        ✦
+                    </div>
+
+                    <div>
+
+                        <span>
+                            SKILLS
+                        </span>
+
+                        <strong>
+                            8 Skills
+                        </strong>
+
+                        <small>
+                            Based on your profile
+                        </small>
+
+                    </div>
+
+                </article>
+
+
+                <article class="stat-card">
+
+                    <div class="stat-icon">
+                        ◈
+                    </div>
+
+                    <div>
+
+                        <span>
+                            PROJECTS
+                        </span>
+
+                        <strong>
+                            3 Projects
+                        </strong>
+
+                        <small>
+                            Added to profile
+                        </small>
+
+                    </div>
+
+                </article>
+
+
+            </section>
+
+
+            <!-- ================= SKILLS ================= -->
+
+            <section class="dashboard-section">
+
+                <div class="section-heading-row">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            YOUR SKILLS
+                        </span>
+
+                        <h2>
+                            Technical skills
+                        </h2>
+
+                    </div>
+
+
+                    <a
+                        href="candidate-profile.html"
+                        class="text-link">
+
+                        Edit skills →
+
+                    </a>
+
+                </div>
+
+
+                <div class="skills-card">
+
+                    <span>Java</span>
+                    <span>Python</span>
+                    <span>SQL</span>
+                    <span>HTML</span>
+                    <span>CSS</span>
+                    <span>JavaScript</span>
+                    <span>Git</span>
+                    <span>OOP</span>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= PROJECTS ================= -->
+
+            <section class="dashboard-section">
+
+                <div class="section-heading-row">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            YOUR WORK
+                        </span>
+
+                        <h2>
+                            Projects
+                        </h2>
+
+                    </div>
+
+
+                    <a
+                        href="candidate-profile.html"
+                        class="text-link">
+
+                        View all →
+
+                    </a>
+
+                </div>
+
+
+                <div class="projects-grid">
+
+
+                    <article class="project-card">
+
+                        <div class="project-top">
+
+                            <div class="project-icon">
+                                ◈
+                            </div>
+
+                            <span class="project-status">
+                                Completed
+                            </span>
+
+                        </div>
+
+
+                        <h3>
+                            Quiz Application
+                        </h3>
+
+                        <p>
+                            GUI-based quiz application developed
+                            using Java Swing with MCQ logic,
+                            score calculation and question navigation.
+                        </p>
+
+
+                        <div class="project-tech">
+
+                            <span>Java</span>
+                            <span>Swing</span>
+                            <span>MySQL</span>
+
+                        </div>
+
+
+                        <a href="#" class="project-link">
+                            View project →
+                        </a>
+
+                    </article>
+
+
+                    <article class="project-card">
+
+                        <div class="project-top">
+
+                            <div class="project-icon">
+                                ◇
+                            </div>
+
+                            <span class="project-status">
+                                Completed
+                            </span>
+
+                        </div>
+
+
+                        <h3>
+                            Weather App
+                        </h3>
+
+                        <p>
+                            Weather application that displays
+                            real-time weather information using
+                            a web API.
+                        </p>
+
+
+                        <div class="project-tech">
+
+                            <span>HTML</span>
+                            <span>CSS</span>
+                            <span>JavaScript</span>
+
+                        </div>
+
+
+                        <a href="#" class="project-link">
+                            View project →
+                        </a>
+
+                    </article>
+
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= RECOMMENDED PREVIEW ================= -->
+
+            <section class="dashboard-section">
+
+                <div class="section-heading-row">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            FOR YOU
+                        </span>
+
+                        <h2>
+                            Recommended jobs
+                        </h2>
+
+                    </div>
+
+
+                    <a
+                        href="recommended-jobs.html"
+                        class="text-link">
+
+                        View recommendations →
+
+                    </a>
+
+                </div>
+
+
+                <div class="recommendation-card">
+
+                    <div class="recommend-job-icon">
+                        N
+                    </div>
+
+
+                    <div class="recommend-job-info">
+
+                        <span>
+                            SOFTWARE ENGINEER
+                        </span>
+
+                        <h3>
+                            Associate Software Engineer
+                        </h3>
+
+                        <p>
+                            Technology Company · Kolkata
+                        </p>
+
+                    </div>
+
+
+                    <div class="match-score">
+
+                        <strong>
+                            87%
+                        </strong>
+
+                        <span>
+                            Match
+                        </span>
+
+                    </div>
+
+
+                    <a
+                        href="candidate-job-details.html"
+                        class="button button-secondary">
+
+                        View Job
+
+                    </a>
+
+                </div>
+
+            </section>
+
+
+        </section>
+
+    </main>
+
+
+    <script src="js/candidate-dashboard.js"></script>
+
+</body>
+
+</html>
