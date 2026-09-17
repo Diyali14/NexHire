@@ -6,478 +6,521 @@
 
     <title>NexHire | Upload Resume</title>
 
-    <link rel="stylesheet" href="ResumeUpload.css">
+    <link rel="stylesheet" href="css/ResumeUpload.css">
 </head>
 
 <body>
 
-    <!-- ================= NAVBAR ================= -->
-    <header class="navbar">
+<header class="site-header">
 
-        <div class="nav-left">
-            <a href="../dashboard/index.html" class="brand">
-                <span class="brand-icon">N</span>
-                <span class="brand-text">NexHire</span>
-            </a>
-        </div>
+    <div class="container navbar">
 
-        <div class="nav-right">
+        <a href="candidate-dashboard.html" class="brand">
 
-            <div class="profile">
-                <div class="avatar">RK</div>
+            <span class="brand-mark">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
 
-                <div class="profile-info">
-                    <span class="profile-name">Rahul Kumar</span>
-                    <span class="profile-role">Candidate</span>
-                </div>
-            </div>
+            <span class="brand-name">
+                Nex<span>Hire</span>
+            </span>
 
-            <!-- Theme toggle is intentionally the last navbar item -->
-            <button
-                type="button"
-                id="themeBtn"
-                class="theme-btn"
-                aria-label="Switch to light mode"
-                title="Switch to light mode"
-            >
-                ☀
-            </button>
-
-        </div>
-
-    </header>
-
-
-    <!-- ================= MAIN ================= -->
-    <main class="page-container">
-
-        <!-- Back -->
-        <a href="../dashboard/index.html" class="back-link">
-            <span>←</span>
-            Back to dashboard
         </a>
 
 
-        <!-- Heading -->
-        <section class="page-heading">
+        <div class="nav-actions">
 
-            <span class="eyebrow">RESUME ANALYSIS</span>
-
-            <h1>Upload your resume.</h1>
-
-            <p>
-                Let NexHire analyze your experience, skills and career profile
-                to find opportunities that match you.
-            </p>
-
-        </section>
+            <button
+                class="icon-button theme-toggle"
+                id="themeToggle"
+                type="button"
+                aria-label="Toggle theme">
+                ☼
+            </button>
 
 
-        <!-- ================= UPLOAD CARD ================= -->
-        <section class="upload-card">
+            <div class="profile-menu">
 
-            <div class="upload-card-header">
+                <button
+                    class="profile-button"
+                    id="profileButton"
+                    type="button">
+
+                    <span class="profile-avatar">K</span>
+
+                    <span class="profile-details">
+                        <strong>Kaushik</strong>
+                        <small>Candidate</small>
+                    </span>
+
+                    <span class="profile-arrow">▾</span>
+
+                </button>
+
+
+                <div
+                    class="profile-dropdown"
+                    id="profileDropdown">
+
+                    <a href="candidate-profile.html">
+                        View Profile
+                    </a>
+
+                    <a href="candidate-profile.html">
+                        Edit Profile
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<main class="candidate-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-inner">
+
+            <div class="sidebar-label">
+                CANDIDATE
+            </div>
+
+
+            <nav class="sidebar-nav">
+
+                <a
+                    href="candidate-dashboard.html"
+                    class="sidebar-link">
+
+                    <span class="sidebar-icon">⌂</span>
+                    <span>Dashboard</span>
+
+                </a>
+
+
+                <a
+                    href="candidate-profile.html"
+                    class="sidebar-link">
+
+                    <span class="sidebar-icon">◯</span>
+                    <span>Profile</span>
+
+                </a>
+
+
+                <a
+                    href="ResumeUpload.html"
+                    class="sidebar-link active">
+
+                    <span class="sidebar-icon">↑</span>
+                    <span>Upload Resume</span>
+
+                </a>
+
+
+                <a
+                    href="candidate-job-search.html"
+                    class="sidebar-link">
+
+                    <span class="sidebar-icon">⌕</span>
+                    <span>Job Search</span>
+
+                </a>
+
+
+                <a
+                    href="candidate-recommended-jobs.html"
+                    class="sidebar-link">
+
+                    <span class="sidebar-icon">✦</span>
+                    <span>Recommended Jobs</span>
+
+                </a>
+
+
+                <a
+                    href="ai-assistant.html"
+                    class="sidebar-link">
+
+                    <span class="sidebar-icon">✧</span>
+                    <span>AI Assistant</span>
+
+                </a>
+
+            </nav>
+
+
+            <div class="sidebar-help">
+
+                <div class="help-icon">
+                    ?
+                </div>
 
                 <div>
-                    <span class="card-label">YOUR RESUME</span>
+                    <strong>Need help?</strong>
+                    <span>Ask NexHire AI</span>
+                </div>
 
-                    <h2>Upload a document</h2>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- MAIN CONTENT -->
+
+    <section class="dashboard-content">
+
+        <div class="dashboard-heading">
+
+            <div>
+
+                <span class="eyebrow">
+                    RESUME
+                </span>
+
+                <h1>
+                    Build your
+                    <span>profile.</span>
+                </h1>
+
+                <p>
+                    Upload your latest resume to help NexHire
+                    understand your skills, experience and
+                    projects for better job recommendations.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- RESUME CARD -->
+
+        <section class="resume-card">
+
+            <div class="resume-card-header">
+
+                <div>
+
+                    <span class="section-kicker">
+                        RESUME UPLOAD
+                    </span>
+
+                    <h2>
+                        Upload your resume
+                    </h2>
 
                     <p>
-                        PDF, DOCX or TXT files up to 10 MB.
+                        Supported formats: PDF, DOCX and TXT.
+                        Maximum file size: 5 MB.
                     </p>
+
                 </div>
 
             </div>
 
 
-            <!-- ================= DROP ZONE ================= -->
+
+            <!-- DROP ZONE -->
+
             <div
-                id="dropZone"
-                class="drop-zone"
-                tabindex="0"
-            >
+                class="upload-zone"
+                id="uploadZone">
 
                 <div class="upload-icon">
                     ↑
                 </div>
 
-                <h3>Drop your resume here</h3>
+                <h3>
+                    Drop your resume here
+                </h3>
 
                 <p>
-                    or choose a document from your computer
+                    or click to browse from your computer
                 </p>
 
-                <button
-                    type="button"
-                    id="browseBtn"
-                    class="browse-btn"
-                >
-                    <span>Browse Documents</span>
-                    <span class="browse-arrow">→</span>
-                </button>
+                <span class="upload-format">
+                    PDF · DOCX · TXT
+                </span>
 
-                <div class="upload-hint">
-                    Supported: PDF · DOCX · TXT &nbsp;•&nbsp; Max 10 MB
-                </div>
+
+                <input
+                    type="file"
+                    id="resumeInput"
+                    accept=".pdf,.docx,.txt"
+                    hidden>
 
             </div>
 
 
-            <!-- Hidden native file input -->
-            <input
-                type="file"
-                id="resumeInput"
-                accept=".pdf,.docx,.txt"
-                hidden
-            >
 
+            <!-- SELECTED FILE -->
 
-            <!-- ================= SELECTED FILE ================= -->
             <div
-                id="selectedFile"
                 class="selected-file"
-                hidden
-            >
+                id="selectedFile">
 
-                <div class="file-left">
+                <div class="file-icon">
+                    📄
+                </div>
 
-                    <div id="fileIcon" class="file-icon">
-                        📄
-                    </div>
+                <div class="file-info">
 
-                    <div class="file-info">
-                        <strong id="fileName">resume.pdf</strong>
-                        <span id="fileSize">0 KB</span>
-                    </div>
+                    <strong id="fileName">
+                        Resume.pdf
+                    </strong>
+
+                    <span id="fileSize">
+                        0 KB
+                    </span>
 
                 </div>
 
                 <button
                     type="button"
-                    id="removeFileBtn"
                     class="remove-file"
-                    aria-label="Remove selected file"
-                    title="Remove file"
-                >
+                    id="removeFile">
+
                     ×
+
                 </button>
 
             </div>
 
 
-            <!-- ================= ERROR ================= -->
+
+            <!-- ERROR -->
+
             <div
-                id="errorMessage"
-                class="error-message"
-                hidden
-            ></div>
+                class="upload-error"
+                id="uploadError">
+            </div>
 
 
-            <!-- ================= ANALYZE BUTTON ================= -->
-            <button
-                type="button"
-                id="analyzeBtn"
-                class="analyze-btn"
-                disabled
-            >
-                <span>Analyze Resume</span>
-                <span>→</span>
-            </button>
+
+            <!-- ACTIONS -->
+
+            <div class="upload-actions">
+
+                <button
+                    type="button"
+                    class="button button-secondary"
+                    id="formatButton">
+
+                    View Guidelines
+
+                </button>
 
 
-            <!-- Privacy -->
-            <div class="privacy-note">
+                <button
+                    type="button"
+                    class="button button-primary"
+                    id="analyzeButton"
+                    disabled>
 
-                <span class="privacy-icon">🔒</span>
+                    Upload Resume
 
-                <span>
-                    Your resume is securely processed and used only to build
-                    your NexHire career profile.
-                </span>
+                </button>
 
             </div>
 
         </section>
 
 
-        <!-- ================= WHAT HAPPENS NEXT ================= -->
-        <section class="next-section">
 
-            <div class="section-heading">
-                <span class="eyebrow">WHAT HAPPENS NEXT?</span>
+        <!-- BENEFITS -->
 
-                <h2>From resume to career profile.</h2>
+        <section class="dashboard-section">
+
+            <div class="section-heading-row">
+
+                <div>
+
+                    <span class="section-kicker">
+                        WHY UPLOAD?
+                    </span>
+
+                    <h2>
+                        Get better opportunities
+                    </h2>
+
+                </div>
+
             </div>
 
 
-            <div class="process-grid">
+            <div class="benefits-grid">
 
-                <article class="process-card">
+                <div class="benefit-card">
 
-                    <div class="process-number">01</div>
+                    <div class="benefit-icon">
+                        ✦
+                    </div>
 
-                    <div class="process-icon">◈</div>
-
-                    <h3>Understand</h3>
-
-                    <p>
-                        NexHire reads your resume and extracts your education,
-                        experience and key information.
-                    </p>
-
-                </article>
-
-
-                <article class="process-card">
-
-                    <div class="process-number">02</div>
-
-                    <div class="process-icon">✦</div>
-
-                    <h3>Identify skills</h3>
+                    <h3>
+                        Better Matches
+                    </h3>
 
                     <p>
-                        Your technical and professional skills are identified
-                        and organized into a structured profile.
+                        Your skills and experience help us
+                        identify relevant job opportunities.
                     </p>
 
-                </article>
+                </div>
 
 
-                <article class="process-card">
+                <div class="benefit-card">
 
-                    <div class="process-number">03</div>
+                    <div class="benefit-icon">
+                        ◇
+                    </div>
 
-                    <div class="process-icon">◎</div>
-
-                    <h3>Build your profile</h3>
+                    <h3>
+                        Skill Insights
+                    </h3>
 
                     <p>
-                        Your career profile becomes ready for intelligent
-                        job matching and personalized recommendations.
+                        Extract important skills from your
+                        resume for your Candidate profile.
                     </p>
 
-                </article>
+                </div>
+
+
+                <div class="benefit-card">
+
+                    <div class="benefit-icon">
+                        ✧
+                    </div>
+
+                    <h3>
+                        AI Assistance
+                    </h3>
+
+                    <p>
+                        Use NexHire AI to improve your resume
+                        and prepare for interviews.
+                    </p>
+
+                </div>
 
             </div>
 
         </section>
 
-    </main>
+    </section>
+
+</main>
 
 
-    <!-- ================= FORMAT SELECTION MODAL ================= -->
-    <div
-        id="formatModal"
-        class="format-modal-overlay"
-        hidden
-    >
 
-        <div
-            class="format-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="formatModalTitle"
-        >
+<!-- FORMAT MODAL -->
 
-            <button
-                type="button"
-                id="closeFormatModal"
-                class="modal-close"
-                aria-label="Close"
-            >
-                ×
-            </button>
+<div
+    class="modal-overlay"
+    id="formatModal">
+
+    <div class="format-modal">
+
+        <button
+            type="button"
+            class="modal-close"
+            id="modalClose">
+
+            ×
+
+        </button>
 
 
-            <div class="modal-icon">
-                📁
-            </div>
+        <span class="section-kicker">
+            RESUME GUIDELINES
+        </span>
+
+        <h2>
+            Make your resume effective
+        </h2>
 
 
-            <span class="eyebrow">DOCUMENT TYPE</span>
+        <ul>
 
-            <h2 id="formatModalTitle">
-                Choose document type
-            </h2>
+            <li>
+                Keep your resume clear and concise.
+            </li>
 
-            <p>
-                Select the format of the resume you want to upload.
-            </p>
+            <li>
+                Mention your technical skills and projects.
+            </li>
 
+            <li>
+                Include relevant education and experience.
+            </li>
 
-            <div class="modal-format-options">
+            <li>
+                Use a readable and professional format.
+            </li>
 
-                <!-- PDF -->
-                <button
-                    type="button"
-                    class="modal-format-btn"
-                    data-type="pdf"
-                >
+            <li>
+                Upload PDF, DOCX or TXT files.
+            </li>
 
-                    <span class="modal-format-icon">
-                        📄
-                    </span>
-
-                    <span class="modal-format-info">
-                        <strong>PDF</strong>
-                        <small>PDF document</small>
-                    </span>
-
-                    <span class="modal-arrow">
-                        →
-                    </span>
-
-                </button>
+        </ul>
 
 
-                <!-- DOCX -->
-                <button
-                    type="button"
-                    class="modal-format-btn"
-                    data-type="docx"
-                >
+        <button
+            type="button"
+            class="button button-primary modal-button"
+            id="modalDone">
 
-                    <span class="modal-format-icon">
-                        📝
-                    </span>
+            Got it
 
-                    <span class="modal-format-info">
-                        <strong>DOCX</strong>
-                        <small>Microsoft Word document</small>
-                    </span>
-
-                    <span class="modal-arrow">
-                        →
-                    </span>
-
-                </button>
-
-
-                <!-- TXT -->
-                <button
-                    type="button"
-                    class="modal-format-btn"
-                    data-type="txt"
-                >
-
-                    <span class="modal-format-icon">
-                        📃
-                    </span>
-
-                    <span class="modal-format-info">
-                        <strong>TXT</strong>
-                        <small>Text document</small>
-                    </span>
-
-                    <span class="modal-arrow">
-                        →
-                    </span>
-
-                </button>
-
-            </div>
-
-
-            <button
-                type="button"
-                id="cancelFormatBtn"
-                class="modal-cancel"
-            >
-                Cancel
-            </button>
-
-        </div>
+        </button>
 
     </div>
 
-
-    <!-- ================= PROCESSING OVERLAY ================= -->
-    <div
-        id="processingOverlay"
-        class="processing-overlay"
-        hidden
-    >
-
-        <div class="processing-modal">
-
-            <div class="processing-logo">
-                N
-            </div>
-
-            <h2>
-                Analyzing your resume
-            </h2>
-
-            <p id="processingText">
-                Reading your document...
-            </p>
+</div>
 
 
-            <div class="progress-container">
 
-                <div class="progress-bar">
+<!-- PROCESSING -->
 
-                    <div
-                        id="progressBar"
-                        class="progress-fill"
-                    ></div>
+<div
+    class="processing-overlay"
+    id="processingOverlay">
 
-                </div>
+    <div class="processing-card">
 
-                <span id="progressPercentage">
-                    0%
-                </span>
+        <div class="loader"></div>
 
-            </div>
+        <h3>
+            Processing your resume
+        </h3>
 
-
-            <div class="processing-steps">
-
-                <div
-                    id="step1"
-                    class="processing-step active"
-                >
-                    <span class="step-icon">✓</span>
-                    <span>Reading document</span>
-                </div>
-
-
-                <div
-                    id="step2"
-                    class="processing-step"
-                >
-                    <span class="step-icon">✓</span>
-                    <span>Extracting information</span>
-                </div>
-
-
-                <div
-                    id="step3"
-                    class="processing-step"
-                >
-                    <span class="step-icon">✓</span>
-                    <span>Identifying skills</span>
-                </div>
-
-
-                <div
-                    id="step4"
-                    class="processing-step"
-                >
-                    <span class="step-icon">✓</span>
-                    <span>Building career profile</span>
-                </div>
-
-            </div>
-
-        </div>
+        <p>
+            NexHire is preparing your profile...
+        </p>
 
     </div>
 
+</div>
 
-    <script src="ResumeUpload.js"></script>
+
+
+<script src="js/ResumeUpload.js"></script>
 
 </body>
 </html>

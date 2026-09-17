@@ -1,414 +1,278 @@
-/* =========================================================
-   NEXHIRE - RESUME UPLOAD PAGE
-   ========================================================= */
+document.addEventListener("DOMContentLoaded", function () {
 
-document.addEventListener("DOMContentLoaded", () => {
+    /* ================= THEME ================= */
 
-    /* ================= ELEMENTS ================= */
+    const themeToggle =
+        document.getElementById("themeToggle");
 
-    const themeBtn = document.getElementById("themeBtn");
-
-    const dropZone = document.getElementById("dropZone");
-
-    const browseBtn = document.getElementById("browseBtn");
-
-    const resumeInput = document.getElementById("resumeInput");
-
-    const selectedFile = document.getElementById("selectedFile");
-
-    const fileName = document.getElementById("fileName");
-
-    const fileSize = document.getElementById("fileSize");
-
-    const fileIcon = document.getElementById("fileIcon");
-
-    const removeFileBtn =
-        document.getElementById("removeFileBtn");
-
-    const errorMessage =
-        document.getElementById("errorMessage");
-
-    const analyzeBtn =
-        document.getElementById("analyzeBtn");
-
-
-    /* Format modal */
-
-    const formatModal =
-        document.getElementById("formatModal");
-
-    const closeFormatModal =
-        document.getElementById("closeFormatModal");
-
-    const cancelFormatBtn =
-        document.getElementById("cancelFormatBtn");
-
-    const modalFormatButtons =
-        document.querySelectorAll(".modal-format-btn");
-
-
-    /* Processing */
-
-    const processingOverlay =
-        document.getElementById("processingOverlay");
-
-    const processingText =
-        document.getElementById("processingText");
-
-    const progressBar =
-        document.getElementById("progressBar");
-
-    const progressPercentage =
-        document.getElementById("progressPercentage");
-
-
-    const steps = [
-        document.getElementById("step1"),
-        document.getElementById("step2"),
-        document.getElementById("step3"),
-        document.getElementById("step4")
-    ];
-
-
-    /* ================= STATE ================= */
-
-    let currentFile = null;
-
-
-    const MAX_FILE_SIZE =
-        10 * 1024 * 1024;
-
-
-    const ACCEPTED_EXTENSIONS = [
-        ".pdf",
-        ".docx",
-        ".txt"
-    ];
-
-
-    /* =========================================================
-       THEME
-       ========================================================= */
 
     function applyTheme(theme) {
 
-        if (theme === "light") {
+        if (theme === "dark") {
 
-            document.body.classList.add("light-preview");
-
-            themeBtn.textContent = "☾";
-
-            themeBtn.setAttribute(
-                "aria-label",
-                "Switch to dark mode"
+            document.documentElement.setAttribute(
+                "data-theme",
+                "dark"
             );
 
-            themeBtn.setAttribute(
-                "title",
-                "Switch to dark mode"
-            );
+            if (themeToggle) {
+
+                themeToggle.textContent = "☀";
+
+                themeToggle.setAttribute(
+                    "aria-label",
+                    "Switch to light mode"
+                );
+
+            }
 
         } else {
 
-            document.body.classList.remove("light-preview");
-
-            themeBtn.textContent = "☀";
-
-            themeBtn.setAttribute(
-                "aria-label",
-                "Switch to light mode"
+            document.documentElement.removeAttribute(
+                "data-theme"
             );
 
-            themeBtn.setAttribute(
-                "title",
-                "Switch to light mode"
-            );
+            if (themeToggle) {
+
+                themeToggle.textContent = "☼";
+
+                themeToggle.setAttribute(
+                    "aria-label",
+                    "Switch to dark mode"
+                );
+
+            }
+
         }
+
     }
 
 
     const savedTheme =
-        localStorage.getItem("nexhire-theme") || "dark";
+        localStorage.getItem("nexhire-theme");
 
 
-    applyTheme(savedTheme);
+    if (savedTheme === "dark") {
+
+        applyTheme("dark");
+
+    } else {
+
+        applyTheme("light");
+
+    }
 
 
-    themeBtn.addEventListener("click", () => {
+    if (themeToggle) {
 
-        const isLight =
-            document.body.classList.contains("light-preview");
+        themeToggle.addEventListener(
+            "click",
+            function () {
 
-        const nextTheme =
-            isLight ? "dark" : "light";
+                const currentTheme =
+                    document.documentElement.getAttribute(
+                        "data-theme"
+                    );
 
-        applyTheme(nextTheme);
 
-        localStorage.setItem(
-            "nexhire-theme",
-            nextTheme
+                if (currentTheme === "dark") {
+
+                    applyTheme("light");
+
+                    localStorage.setItem(
+                        "nexhire-theme",
+                        "light"
+                    );
+
+                } else {
+
+                    applyTheme("dark");
+
+                    localStorage.setItem(
+                        "nexhire-theme",
+                        "dark"
+                    );
+
+                }
+
+            }
         );
-    });
+
+    }
 
 
-    /* =========================================================
-       ERROR
-       ========================================================= */
+
+    /* ================= PROFILE DROPDOWN ================= */
+
+    const profileButton =
+        document.getElementById("profileButton");
+
+    const profileDropdown =
+        document.getElementById("profileDropdown");
+
+
+    if (profileButton && profileDropdown) {
+
+        profileButton.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+                profileDropdown.classList.toggle(
+                    "open"
+                );
+
+            }
+        );
+
+
+        document.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    !profileDropdown.contains(event.target) &&
+                    !profileButton.contains(event.target)
+                ) {
+
+                    profileDropdown.classList.remove(
+                        "open"
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+
+    /* ================= RESUME UPLOAD ================= */
+
+    const uploadZone =
+        document.getElementById("uploadZone");
+
+    const resumeInput =
+        document.getElementById("resumeInput");
+
+    const selectedFile =
+        document.getElementById("selectedFile");
+
+    const fileName =
+        document.getElementById("fileName");
+
+    const fileSize =
+        document.getElementById("fileSize");
+
+    const removeFile =
+        document.getElementById("removeFile");
+
+    const uploadError =
+        document.getElementById("uploadError");
+
+    const analyzeButton =
+        document.getElementById("analyzeButton");
+
+
+    const MAX_FILE_SIZE =
+        5 * 1024 * 1024;
+
+
+    const allowedExtensions = [
+        "pdf",
+        "docx",
+        "txt"
+    ];
+
+
 
     function showError(message) {
 
-        errorMessage.textContent = message;
+        uploadError.textContent = message;
 
-        errorMessage.hidden = false;
+        uploadError.classList.add("show");
+
     }
 
 
     function clearError() {
 
-        errorMessage.textContent = "";
+        uploadError.textContent = "";
 
-        errorMessage.hidden = true;
+        uploadError.classList.remove("show");
+
     }
 
 
-    /* =========================================================
-       FORMAT MODAL
-       ========================================================= */
 
-    function openFormatModal() {
+    function formatFileSize(bytes) {
 
-        formatModal.hidden = false;
+        if (bytes < 1024) {
 
-        document.body.style.overflow = "hidden";
+            return bytes + " B";
 
-        setTimeout(() => {
+        }
 
-            closeFormatModal.focus();
+        if (bytes < 1024 * 1024) {
 
-        }, 0);
+            return (
+                (bytes / 1024).toFixed(1) +
+                " KB"
+            );
+
+        }
+
+        return (
+            (bytes / (1024 * 1024)).toFixed(2) +
+            " MB"
+        );
+
     }
 
 
-    function closeFormatSelectionModal() {
 
-        formatModal.hidden = true;
-
-        document.body.style.overflow = "";
-    }
-
-
-    /* Browse Documents */
-
-    browseBtn.addEventListener("click", (event) => {
-
-        event.preventDefault();
-
-        event.stopPropagation();
-
-        openFormatModal();
-    });
-
-
-    /* Clicking drop zone opens format popup */
-
-    dropZone.addEventListener("click", (event) => {
-
-        /*
-         * If user clicked the Browse Documents button,
-         * don't open the modal twice.
-         */
-        if (event.target.closest("#browseBtn")) {
-            return;
-        }
-
-        openFormatModal();
-    });
-
-
-    /* Close button */
-
-    closeFormatModal.addEventListener(
-        "click",
-        closeFormatSelectionModal
-    );
-
-
-    /* Cancel */
-
-    cancelFormatBtn.addEventListener(
-        "click",
-        closeFormatSelectionModal
-    );
-
-
-    /* Click outside modal */
-
-    formatModal.addEventListener("click", (event) => {
-
-        if (event.target === formatModal) {
-
-            closeFormatSelectionModal();
-        }
-    });
-
-
-    /* Escape key */
-
-    document.addEventListener("keydown", (event) => {
-
-        if (
-            event.key === "Escape" &&
-            !formatModal.hidden
-        ) {
-
-            closeFormatSelectionModal();
-        }
-    });
-
-
-    /* =========================================================
-       FORMAT SELECTION
-       ========================================================= */
-
-    modalFormatButtons.forEach((button) => {
-
-        button.addEventListener("click", () => {
-
-            const type =
-                button.dataset.type;
-
-            if (type === "pdf") {
-
-                resumeInput.accept = ".pdf";
-
-            } else if (type === "docx") {
-
-                resumeInput.accept = ".docx";
-
-            } else if (type === "txt") {
-
-                resumeInput.accept = ".txt";
-
-            }
-
-            closeFormatSelectionModal();
-
-            /*
-             * Small delay ensures the modal closes visually
-             * before the native file picker opens.
-             */
-            setTimeout(() => {
-
-                resumeInput.click();
-
-            }, 100);
-        });
-
-    });
-
-
-    /* =========================================================
-       FILE INPUT
-       ========================================================= */
-
-    resumeInput.addEventListener("change", () => {
-
-        const file = resumeInput.files[0];
-
-        if (!file) {
-            return;
-        }
-
-        handleFile(file);
-    });
-
-
-    /* =========================================================
-       FILE VALIDATION
-       ========================================================= */
-
-    function getExtension(file) {
-
-        const name =
-            file.name.toLowerCase();
-
-        const lastDot =
-            name.lastIndexOf(".");
-
-        if (lastDot === -1) {
-            return "";
-        }
-
-        return name.substring(lastDot);
-    }
-
-
-    function validateFile(file) {
+    function handleFile(file) {
 
         clearError();
 
-
         if (!file) {
-
-            showError(
-                "Please select a resume file."
-            );
-
-            return false;
+            return;
         }
 
 
         const extension =
-            getExtension(file);
+            file.name
+                .split(".")
+                .pop()
+                .toLowerCase();
 
 
-        if (
-            !ACCEPTED_EXTENSIONS.includes(extension)
-        ) {
+        if (!allowedExtensions.includes(extension)) {
 
             showError(
-                "Unsupported file type. Please upload a PDF, DOCX or TXT file."
+                "Invalid file format. Please upload PDF, DOCX or TXT."
             );
 
-            return false;
+            resumeInput.value = "";
+
+            return;
+
         }
 
 
         if (file.size > MAX_FILE_SIZE) {
 
             showError(
-                "File size exceeds 10 MB. Please choose a smaller resume."
+                "File size must be less than 5 MB."
             );
-
-            return false;
-        }
-
-
-        return true;
-    }
-
-
-    /* =========================================================
-       HANDLE FILE
-       ========================================================= */
-
-    function handleFile(file) {
-
-        if (!validateFile(file)) {
-
-            currentFile = null;
-
-            selectedFile.hidden = true;
-
-            analyzeBtn.disabled = true;
 
             resumeInput.value = "";
 
             return;
+
         }
-
-
-        currentFile = file;
 
 
         fileName.textContent =
@@ -419,375 +283,269 @@ document.addEventListener("DOMContentLoaded", () => {
             formatFileSize(file.size);
 
 
-        fileIcon.textContent =
-            getFileIcon(file);
+        selectedFile.classList.add("show");
 
 
-        selectedFile.hidden = false;
+        analyzeButton.disabled = false;
 
-        analyzeBtn.disabled = false;
-
-        clearError();
     }
 
 
-    /* File icon */
 
-    function getFileIcon(file) {
+    if (uploadZone && resumeInput) {
 
-        const extension =
-            getExtension(file);
+        uploadZone.addEventListener(
+            "click",
+            function () {
 
+                resumeInput.click();
 
-        if (extension === ".pdf") {
-            return "📄";
-        }
-
-
-        if (extension === ".docx") {
-            return "📝";
-        }
-
-
-        if (extension === ".txt") {
-            return "📃";
-        }
-
-
-        return "📄";
-    }
-
-
-    /* File size */
-
-    function formatFileSize(bytes) {
-
-        if (bytes < 1024) {
-
-            return `${bytes} B`;
-        }
-
-
-        if (bytes < 1024 * 1024) {
-
-            return `${(
-                bytes / 1024
-            ).toFixed(1)} KB`;
-        }
-
-
-        return `${(
-            bytes /
-            (1024 * 1024)
-        ).toFixed(2)} MB`;
-    }
-
-
-    /* =========================================================
-       DRAG & DROP
-       ========================================================= */
-
-    dropZone.addEventListener(
-        "dragover",
-        (event) => {
-
-            event.preventDefault();
-
-            dropZone.classList.add(
-                "drag-active"
-            );
-        }
-    );
-
-
-    dropZone.addEventListener(
-        "dragenter",
-        (event) => {
-
-            event.preventDefault();
-
-            dropZone.classList.add(
-                "drag-active"
-            );
-        }
-    );
-
-
-    dropZone.addEventListener(
-        "dragleave",
-        (event) => {
-
-            /*
-             * Only remove the class when the pointer
-             * actually leaves the drop zone.
-             */
-            if (
-                !dropZone.contains(
-                    event.relatedTarget
-                )
-            ) {
-
-                dropZone.classList.remove(
-                    "drag-active"
-                );
             }
-        }
-    );
+        );
 
 
-    dropZone.addEventListener(
-        "drop",
-        (event) => {
+        resumeInput.addEventListener(
+            "change",
+            function () {
 
-            event.preventDefault();
+                if (resumeInput.files.length > 0) {
 
-            dropZone.classList.remove(
-                "drag-active"
-            );
+                    handleFile(
+                        resumeInput.files[0]
+                    );
 
-
-            const files =
-                event.dataTransfer.files;
-
-
-            if (!files || files.length === 0) {
-                return;
-            }
-
-
-            handleFile(files[0]);
-        }
-    );
-
-
-    /* =========================================================
-       REMOVE FILE
-       ========================================================= */
-
-    removeFileBtn.addEventListener(
-        "click",
-        (event) => {
-
-            event.stopPropagation();
-
-            currentFile = null;
-
-            resumeInput.value = "";
-
-            selectedFile.hidden = true;
-
-            analyzeBtn.disabled = true;
-
-            clearError();
-        }
-    );
-
-
-    /* =========================================================
-       ANALYZE RESUME
-       ========================================================= */
-
-    analyzeBtn.addEventListener(
-        "click",
-        () => {
-
-            if (!currentFile) {
-
-                showError(
-                    "Please select a resume before continuing."
-                );
-
-                return;
-            }
-
-
-            startProcessing();
-        }
-    );
-
-
-    /* =========================================================
-       DEMO PROCESSING
-       ========================================================= */
-
-    function startProcessing() {
-
-        processingOverlay.hidden = false;
-
-        document.body.style.overflow = "hidden";
-
-
-        let progress = 0;
-
-
-        const messages = [
-            "Reading your document...",
-            "Extracting information...",
-            "Identifying your skills...",
-            "Building your career profile..."
-        ];
-
-
-        steps.forEach((step, index) => {
-
-            if (!step) {
-                return;
-            }
-
-            step.classList.remove(
-                "active",
-                "completed"
-            );
-
-            if (index === 0) {
-
-                step.classList.add(
-                    "active"
-                );
-            }
-        });
-
-
-        progressBar.style.width = "0%";
-
-        progressPercentage.textContent = "0%";
-
-        processingText.textContent =
-            messages[0];
-
-
-        /*
-         * Demo timer.
-         *
-         * Later this section will be replaced with:
-         *
-         * POST /api/v1/resumes/upload
-         *
-         * and Spring Boot → Python AI service.
-         */
-        const interval =
-            setInterval(() => {
-
-                progress += 5;
-
-
-                progressBar.style.width =
-                    `${progress}%`;
-
-
-                progressPercentage.textContent =
-                    `${progress}%`;
-
-
-                updateProcessingStep(
-                    progress,
-                    messages
-                );
-
-
-                if (progress >= 100) {
-
-                    clearInterval(interval);
-
-
-                    setTimeout(() => {
-
-                        /*
-                         * Demo redirect.
-                         *
-                         * Replace this with the actual
-                         * candidate dashboard / result page
-                         * once backend integration is ready.
-                         */
-                        window.location.href =
-                            "../dashboard/index.html";
-
-                    }, 600);
                 }
 
-            }, 120);
+            }
+        );
+
+
+        uploadZone.addEventListener(
+            "dragover",
+            function (event) {
+
+                event.preventDefault();
+
+                uploadZone.classList.add(
+                    "dragover"
+                );
+
+            }
+        );
+
+
+        uploadZone.addEventListener(
+            "dragleave",
+            function () {
+
+                uploadZone.classList.remove(
+                    "dragover"
+                );
+
+            }
+        );
+
+
+        uploadZone.addEventListener(
+            "drop",
+            function (event) {
+
+                event.preventDefault();
+
+                uploadZone.classList.remove(
+                    "dragover"
+                );
+
+
+                const files =
+                    event.dataTransfer.files;
+
+
+                if (files.length > 0) {
+
+                    handleFile(files[0]);
+
+                }
+
+            }
+        );
+
     }
 
 
-    /* =========================================================
-       PROCESSING STEPS
-       ========================================================= */
 
-    function updateProcessingStep(
-        progress,
-        messages
-    ) {
+    /* ================= REMOVE FILE ================= */
 
-        let activeIndex = 0;
+    if (removeFile) {
 
+        removeFile.addEventListener(
+            "click",
+            function () {
 
-        if (progress >= 25) {
-            activeIndex = 1;
-        }
+                resumeInput.value = "";
 
-        if (progress >= 50) {
-            activeIndex = 2;
-        }
-
-        if (progress >= 75) {
-            activeIndex = 3;
-        }
-
-
-        processingText.textContent =
-            messages[activeIndex];
-
-
-        steps.forEach((step, index) => {
-
-            if (!step) {
-                return;
-            }
-
-
-            step.classList.remove(
-                "active",
-                "completed"
-            );
-
-
-            if (index < activeIndex) {
-
-                step.classList.add(
-                    "completed"
+                selectedFile.classList.remove(
+                    "show"
                 );
 
-            } else if (index === activeIndex) {
+                analyzeButton.disabled = true;
 
-                step.classList.add(
-                    "active"
-                );
+                clearError();
+
             }
+        );
 
-        });
+    }
 
 
-        /*
-         * At 100%, mark all steps completed.
-         */
-        if (progress >= 100) {
 
-            steps.forEach((step) => {
+    /* ================= UPLOAD / PROCESS ================= */
 
-                if (!step) {
+    const processingOverlay =
+        document.getElementById(
+            "processingOverlay"
+        );
+
+
+    if (analyzeButton) {
+
+        analyzeButton.addEventListener(
+            "click",
+            function () {
+
+                if (
+                    !resumeInput.files ||
+                    resumeInput.files.length === 0
+                ) {
+
+                    showError(
+                        "Please select a resume first."
+                    );
+
                     return;
+
                 }
 
-                step.classList.remove(
-                    "active"
+
+                processingOverlay.classList.add(
+                    "show"
                 );
 
-                step.classList.add(
-                    "completed"
+
+                /*
+                 * Frontend demonstration only.
+                 *
+                 * Later this section will send
+                 * the resume to the backend API.
+                 */
+
+                setTimeout(
+                    function () {
+
+                        processingOverlay.classList.remove(
+                            "show"
+                        );
+
+                        alert(
+                            "Resume uploaded successfully!"
+                        );
+
+                    },
+                    1500
                 );
 
-            });
-        }
+            }
+        );
+
+    }
+
+
+
+    /* ================= GUIDELINES MODAL ================= */
+
+    const formatButton =
+        document.getElementById(
+            "formatButton"
+        );
+
+    const formatModal =
+        document.getElementById(
+            "formatModal"
+        );
+
+    const modalClose =
+        document.getElementById(
+            "modalClose"
+        );
+
+    const modalDone =
+        document.getElementById(
+            "modalDone"
+        );
+
+
+    function closeModal() {
+
+        formatModal.classList.remove(
+            "show"
+        );
+
+    }
+
+
+    if (formatButton) {
+
+        formatButton.addEventListener(
+            "click",
+            function () {
+
+                formatModal.classList.add(
+                    "show"
+                );
+
+            }
+        );
+
+    }
+
+
+    if (modalClose) {
+
+        modalClose.addEventListener(
+            "click",
+            closeModal
+        );
+
+    }
+
+
+    if (modalDone) {
+
+        modalDone.addEventListener(
+            "click",
+            closeModal
+        );
+
+    }
+
+
+    if (formatModal) {
+
+        formatModal.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target === formatModal
+                ) {
+
+                    closeModal();
+
+                }
+
+            }
+        );
+
     }
 
 });

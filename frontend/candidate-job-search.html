@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NexHire | Job Search</title>
+
+    <link rel="stylesheet" href="css/candidate-job-search.css">
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+    <header class="site-header">
+
+        <div class="container navbar">
+
+            <!-- Logo -->
+            <a href="candidate-dashboard.html" class="brand">
+
+                <span class="brand-mark">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+
+                <span class="brand-name">
+                    Nex<span>Hire</span>
+                </span>
+
+            </a>
+
+
+            <!-- Header Actions -->
+            <div class="nav-actions">
+
+                <!-- Theme Button -->
+                <button
+                    class="icon-button theme-toggle"
+                    id="themeToggle"
+                    type="button"
+                    aria-label="Toggle dark mode"
+                >
+                    ☼
+                </button>
+
+
+                <!-- Profile -->
+                <div class="profile-menu">
+
+                    <button
+                        class="profile-button"
+                        id="profileButton"
+                        type="button"
+                    >
+
+                        <span class="profile-avatar">
+                            K
+                        </span>
+
+                        <span class="profile-details">
+
+                            <strong>Kaushik</strong>
+
+                            <small>
+                                Candidate
+                            </small>
+
+                        </span>
+
+                        <span class="profile-arrow">
+                            ▾
+                        </span>
+
+                    </button>
+
+
+                    <!-- Profile Dropdown -->
+                    <div
+                        class="profile-dropdown"
+                        id="profileDropdown"
+                    >
+
+                        <a href="#">
+                            View Profile
+                        </a>
+
+                        <a href="#">
+                            Edit Profile
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- ================= MAIN LAYOUT ================= -->
+
+    <main class="candidate-layout">
+
+
+        <!-- ================= SIDEBAR ================= -->
+
+        <aside class="sidebar">
+
+            <div class="sidebar-inner">
+
+                <div class="sidebar-label">
+                    CANDIDATE
+                </div>
+
+
+                <nav class="sidebar-nav">
+
+
+                    <!-- Dashboard -->
+
+                    <a
+                        href="candidate-dashboard.html"
+                        class="sidebar-link"
+                    >
+
+                        <span class="sidebar-icon">
+                            ⌂
+                        </span>
+
+                        <span>
+                            Dashboard
+                        </span>
+
+                    </a>
+
+
+
+                    <!-- Profile -->
+
+                    <a
+                        href="#"
+                        class="sidebar-link"
+                    >
+
+                        <span class="sidebar-icon">
+                            ◯
+                        </span>
+
+                        <span>
+                            Profile
+                        </span>
+
+                    </a>
+
+
+
+                    <!-- Resume -->
+
+                    <a
+                        href="ResumeUpload.html"
+                        class="sidebar-link"
+                    >
+
+                        <span class="sidebar-icon">
+                            ↑
+                        </span>
+
+                        <span>
+                            Upload Resume
+                        </span>
+
+                    </a>
+
+
+
+                    <!-- Job Search -->
+
+                    <a
+                        href="candidate-job-search.html"
+                        class="sidebar-link active"
+                    >
+
+                        <span class="sidebar-icon">
+                            ⌕
+                        </span>
+
+                        <span>
+                            Job Search
+                        </span>
+
+                    </a>
+
+
+
+                    <!-- Recommended Jobs -->
+
+                    <a
+                        href="candidate-recommended-jobs.html"
+                        class="sidebar-link"
+                    >
+
+                        <span class="sidebar-icon">
+                            ✦
+                        </span>
+
+                        <span>
+                            Recommended Jobs
+                        </span>
+
+                    </a>
+
+
+
+                    <!-- AI Assistant -->
+
+                    <a
+                        href="#"
+                        class="sidebar-link"
+                    >
+
+                        <span class="sidebar-icon">
+                            ✧
+                        </span>
+
+                        <span>
+                            AI Assistant
+                        </span>
+
+                    </a>
+
+                </nav>
+
+
+
+                <!-- Help -->
+
+                <div class="sidebar-help">
+
+                    <div class="help-icon">
+                        ?
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Need help?
+                        </strong>
+
+                        <span>
+                            Ask NexHire AI
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+
+        <!-- ================= JOB CONTENT ================= -->
+
+        <section class="job-content">
+
+
+            <!-- Page Heading -->
+
+            <div class="job-heading">
+
+                <span class="eyebrow">
+                    JOB SEARCH
+                </span>
+
+                <h1>
+                    Find your next
+                    <span>opportunity.</span>
+                </h1>
+
+                <p>
+                    Search for jobs that match your skills,
+                    experience and career goals.
+                </p>
+
+            </div>
+
+
+
+            <!-- ================= SEARCH CARD ================= -->
+
+            <section class="search-card">
+
+
+                <!-- Search -->
+
+                <div class="search-field">
+
+                    <label for="searchInput">
+                        Search jobs
+                    </label>
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Job title, skills, company..."
+                    >
+
+                </div>
+
+
+
+                <!-- Location -->
+
+                <div class="search-field">
+
+                    <label for="locationInput">
+                        Location
+                    </label>
+
+                    <input
+                        type="text"
+                        id="locationInput"
+                        placeholder="Kolkata, Bangalore..."
+                    >
+
+                </div>
+
+
+
+                <!-- Job Type -->
+
+                <div class="search-field">
+
+                    <label for="jobType">
+                        Job Type
+                    </label>
+
+                    <select id="jobType">
+
+                        <option value="all">
+                            All Types
+                        </option>
+
+                        <option value="Full Time">
+                            Full Time
+                        </option>
+
+                        <option value="Internship">
+                            Internship
+                        </option>
+
+                        <option value="Part Time">
+                            Part Time
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- Search Button -->
+
+                <button
+                    class="search-btn"
+                    id="searchBtn"
+                    type="button"
+                >
+                    Search Jobs
+                </button>
+
+            </section>
+
+
+
+            <!-- ================= RESULTS HEADER ================= -->
+
+            <div class="results-header">
+
+                <div>
+
+                    <span class="section-kicker">
+                        OPPORTUNITIES
+                    </span>
+
+                    <h2>
+                        Available Jobs
+                    </h2>
+
+                    <p id="resultCount">
+                        0 jobs found
+                    </p>
+
+                </div>
+
+
+                <!-- Sorting -->
+
+                <select id="sortJobs">
+
+                    <option value="default">
+                        Sort by
+                    </option>
+
+                    <option value="salary">
+                        Salary
+                    </option>
+
+                    <option value="recent">
+                        Most Recent
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- ================= JOB LIST ================= -->
+
+            <div
+                class="job-list"
+                id="jobList"
+            ></div>
+
+
+
+            <!-- ================= NO RESULTS ================= -->
+
+            <div
+                class="no-results"
+                id="noResults"
+            >
+
+                <div class="no-results-icon">
+                    ⌕
+                </div>
+
+                <h3>
+                    No jobs found
+                </h3>
+
+                <p>
+                    Try changing your search keywords or location.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- ================= JOB MODAL ================= -->
+
+    <div
+        class="modal-overlay"
+        id="jobModal"
+    >
+
+        <div class="job-modal">
+
+            <button
+                class="close-modal"
+                id="closeModal"
+                type="button"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+            <div id="modalContent"></div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- JavaScript -->
+
+    <script src="js/candidate-job-search.js"></script>
+
+</body>
+</html>
