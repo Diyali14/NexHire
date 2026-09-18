@@ -1242,3 +1242,20 @@ textarea {
         width:100%;
     }
 }
+.profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-actions button[hidden] {
+  display: none;
+}
+
+.profile-page.profile-loading {
+  opacity: 0.7;
+}
+
+.profile-page.profile-loading .profile-content {
+  pointer-events: none;
+}
