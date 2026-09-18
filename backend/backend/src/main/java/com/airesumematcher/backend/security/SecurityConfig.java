@@ -102,7 +102,8 @@ public class SecurityConfig {
                         "http://127.0.0.1:5501",
                         "http://localhost:3000",
                         "http://localhost:5000",
-                        "http://localhost:5001"
+                        "http://localhost:5001",
+                        "https://nex-hire-11i2-git-main-diyali-s-projects.vercel.app"
                 )
         );
 

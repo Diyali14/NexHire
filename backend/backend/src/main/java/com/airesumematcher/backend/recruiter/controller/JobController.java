@@ -33,31 +33,31 @@ public class JobController {
         );
     }
 
-    @GetMapping
-    public ResponseEntity<List<JobResponse>> getMyJobs(
-            Authentication authentication
-    ) {
-
-        return ResponseEntity.ok(
-                jobService.getMyJobs(
-                        authentication
-                )
-        );
-    }
-
-    @GetMapping("/{jobId}")
-    public ResponseEntity<JobResponse> getMyJob(
-            @PathVariable Long jobId,
-            Authentication authentication
-    ) {
-
-        return ResponseEntity.ok(
-                jobService.getMyJob(
-                        jobId,
-                        authentication
-                )
-        );
-    }
+//    @GetMapping
+//    public ResponseEntity<List<JobResponse>> getMyJobs(
+//            Authentication authentication
+//    ) {
+//
+//        return ResponseEntity.ok(
+//                jobService.getMyJobs(
+//                        authentication
+//                )
+//        );
+//    }
+//
+//    @GetMapping("/{jobId}")
+//    public ResponseEntity<JobResponse> getMyJob(
+//            @PathVariable Long jobId,
+//            Authentication authentication
+//    ) {
+//
+//        return ResponseEntity.ok(
+//                jobService.getMyJob(
+//                        jobId,
+//                        authentication
+//                )
+//        );
+//    }
 
     @GetMapping("/{jobId}/status")
     public ResponseEntity<JobStatusResponse> getJobStatus(

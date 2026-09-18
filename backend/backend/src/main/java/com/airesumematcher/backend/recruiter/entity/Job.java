@@ -52,17 +52,7 @@ public class Job {
     )
     private String jobDescription;
 
-    @Column(
-            name = "storage_object_name",
-            length = 500
-    )
-    private String storageObjectName;
 
-    @Column(
-            name = "storage_url",
-            length = 2000
-    )
-    private String storageUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(
@@ -71,24 +61,21 @@ public class Job {
             length = 20
     )
     @Builder.Default
-    private JobProcessingStatus processingStatus =
-            JobProcessingStatus.STORED;
+    private JobProcessingStatus processingStatus = JobProcessingStatus.STORED;
 
     @Column(
             name = "created_at",
             nullable = false
     )
     @Builder.Default
-    private LocalDateTime createdAt =
-            LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(
             name = "updated_at",
             nullable = false
     )
     @Builder.Default
-    private LocalDateTime updatedAt =
-            LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @PreUpdate
     public void preUpdate() {

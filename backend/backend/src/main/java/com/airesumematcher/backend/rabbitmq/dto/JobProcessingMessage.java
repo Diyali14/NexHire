@@ -13,7 +13,7 @@ public class JobProcessingMessage {
 
     private Long recruiterId;
 
-    private String storageObjectName;
+    private String jobTitle;
 
-    private String storageUrl;
+    private String jobDescription;
 }

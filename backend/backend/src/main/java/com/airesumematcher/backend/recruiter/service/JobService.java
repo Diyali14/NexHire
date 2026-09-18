@@ -31,185 +31,78 @@ public class JobService {
     private final JobMessageProducer jobMessageProducer;
 
     @Transactional
-    public JobResponse createJob(
-            JobCreateRequest request,
-            Authentication authentication
-    ) {
+    public JobResponse createJob(JobCreateRequest request, Authentication authentication) {
 
-        User recruiter =
-                getAuthenticatedRecruiter(
-                        authentication
-                );
+        User recruiter = getAuthenticatedRecruiter(authentication);
 
-        Job job =
-                Job.builder()
+        Job job = Job.builder()
                         .recruiter(recruiter)
-                        .jobTitle(
-                                request.getJobTitle().trim()
-                        )
-                        .jobDescription(
-                                request.getJobDescription().trim()
-                        )
-                        .processingStatus(
-                                JobProcessingStatus.STORED
-                        )
+                        .jobTitle(request.getJobTitle().trim())
+                        .jobDescription(request.getJobDescription().trim())
+                        .processingStatus(JobProcessingStatus.STORED)
                         .build();
 
         job = jobRepository.saveAndFlush(job);
 
-        Long jobId = job.getId();
+        JobProcessingMessage message = JobProcessingMessage.builder()
+                .jobId(job.getId())
+                .jobTitle(job.getJobTitle())
+                .jobDescription(job.getJobDescription())
+                .recruiterId(recruiter.getId()).build();
 
-        String publicId =
-                "nexhire/recruiters/"
-                        + recruiter.getId()
-                        + "/jobs/"
-                        + jobId
-                        + "/jd";
 
-        byte[] pdfBytes;
-
-        try {
-
-            pdfBytes =
-                    documentConversionService
-                            .convertTextToPdf(
-                                    job.getJobDescription()
-                            );
-
-        } catch (Exception e) {
-
-            job.setProcessingStatus(
-                    JobProcessingStatus.FAILED
-            );
-
-            jobRepository.save(job);
-
-            throw new RuntimeException(
-                    "Failed to convert job description to PDF",
-                    e
-            );
-        }
-
-        Map<String, Object> uploadResult;
-
-        try {
-
-            uploadResult =
-                    cloudinaryStorageService.uploadPdf(
-                            pdfBytes,
-                            publicId
-                    );
-
-        } catch (Exception e) {
-
-            job.setProcessingStatus(
-                    JobProcessingStatus.FAILED
-            );
-
-            jobRepository.save(job);
-
-            throw new RuntimeException(
-                    "Failed to upload job description to Cloudinary",
-                    e
-            );
-        }
-
-        job.setStorageObjectName(
-                publicId
-        );
-
-        Object secureUrl =
-                uploadResult.get("secure_url");
-
-        if (secureUrl != null) {
-
-            job.setStorageUrl(
-                    secureUrl.toString()
-            );
-        }
-
-        /*
-         * Cloudinary upload succeeded.
-         * Now put the job into the RabbitMQ processing queue.
-         */
-        job.setProcessingStatus(
-                JobProcessingStatus.QUEUED
-        );
-
-        Job savedJob =
-                jobRepository.save(job);
-
-        /*
-         * Create the message that will be sent to RabbitMQ.
-         */
-        JobProcessingMessage message =
-                JobProcessingMessage.builder()
-                        .jobId(
-                                savedJob.getId()
-                        )
-                        .recruiterId(
-                                recruiter.getId()
-                        )
-                        .storageObjectName(
-                                savedJob.getStorageObjectName()
-                        )
-                        .storageUrl(
-                                savedJob.getStorageUrl()
-                        )
-                        .build();
-
-        /*
-         * Publish the job to RabbitMQ.
-         */
         jobMessageProducer.publish(message);
 
-        return toResponse(savedJob);
-    }
-
-    @Transactional(readOnly = true)
-    public List<JobResponse> getMyJobs(
-            Authentication authentication
-    ) {
-
-        User recruiter =
-                getAuthenticatedRecruiter(
-                        authentication
-                );
-
-        return jobRepository
-                .findAllByRecruiterIdOrderByCreatedAtDesc(
-                        recruiter.getId()
-                )
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public JobResponse getMyJob(
-            Long jobId,
-            Authentication authentication
-    ) {
-
-        User recruiter =
-                getAuthenticatedRecruiter(
-                        authentication
-                );
-
-        Job job =
-                jobRepository
-                        .findByIdAndRecruiterId(
-                                jobId,
-                                recruiter.getId()
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Job not found"
-                                )
-                        );
+        job.setProcessingStatus(JobProcessingStatus.QUEUED);
+        job = jobRepository.save(job);
 
         return toResponse(job);
     }
+
+//    @Transactional(readOnly = true)
+//    public List<JobResponse> getMyJobs(
+//            Authentication authentication
+//    ) {
+//
+//        User recruiter =
+//                getAuthenticatedRecruiter(
+//                        authentication
+//                );
+//
+//        return jobRepository
+//                .findAllByRecruiterIdOrderByCreatedAtDesc(
+//                        recruiter.getId()
+//                )
+//                .stream()
+//                .map(this::toResponse)
+//                .toList();
+//    }
+
+//    @Transactional(readOnly = true)
+//    public JobResponse getMyJob(
+//            Long jobId,
+//            Authentication authentication
+//    ) {
+//
+//        User recruiter =
+//                getAuthenticatedRecruiter(
+//                        authentication
+//                );
+//
+//        Job job =
+//                jobRepository
+//                        .findByIdAndRecruiterId(
+//                                jobId,
+//                                recruiter.getId()
+//                        )
+//                        .orElseThrow(() ->
+//                                new RuntimeException(
+//                                        "Job not found"
+//                                )
+//                        );
+//
+//        return toResponse(job);
+//    }
 
     @Transactional(readOnly = true)
     public JobStatusResponse getJobStatus(
@@ -329,27 +222,13 @@ public class JobService {
 
         return JobResponse.builder()
                 .jobId(job.getId())
-                .recruiterId(
-                        job.getRecruiter().getId()
-                )
-                .jobTitle(
-                        job.getJobTitle()
-                )
-                .jobDescription(
-                        job.getJobDescription()
-                )
-                .storageUrl(
-                        job.getStorageUrl()
-                )
-                .processingStatus(
-                        job.getProcessingStatus().name()
-                )
-                .createdAt(
-                        job.getCreatedAt()
-                )
-                .updatedAt(
-                        job.getUpdatedAt()
-                )
+                .recruiterId(job.getRecruiter().getId())
+                .jobTitle(job.getJobTitle())
+                .jobDescription(job.getJobDescription())
+                .storageUrl("")
+                .processingStatus(job.getProcessingStatus().name())
+                .createdAt(job.getCreatedAt())
+                .updatedAt(job.getUpdatedAt())
                 .build();
     }
 }
