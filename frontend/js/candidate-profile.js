@@ -132,3 +132,30 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 });
+
+// ================= LOGOUT =================
+
+const logoutButton = document.getElementById("logoutButton");
+
+if (logoutButton) {
+
+    logoutButton.addEventListener("click", function () {
+
+        const confirmLogout = confirm(
+            "Are you sure you want to logout?"
+        );
+
+        if (!confirmLogout) {
+            return;
+        }
+
+        // Remove temporary login/session data
+        localStorage.removeItem("candidateId");
+        localStorage.removeItem("candidateName");
+
+        sessionStorage.clear();
+
+        // Redirect to login page
+        window.location.href = "candidate-login.html";
+    });
+}

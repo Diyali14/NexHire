@@ -1153,3 +1153,41 @@ input {
         padding: 18px;
     }
 }
+
+/* ================= LOGOUT ================= */
+
+.dropdown-divider {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 8px 0;
+}
+
+.logout-button {
+    width: 100%;
+    border: none;
+    background: transparent;
+
+    padding: 10px 14px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    font-family: inherit;
+    font-size: 14px;
+    text-align: left;
+
+    cursor: pointer;
+
+    color: #dc2626;
+
+    border-radius: 8px;
+}
+
+.logout-button:hover {
+    background: #fef2f2;
+}
+
+.logout-button span {
+    font-size: 16px;
+}
