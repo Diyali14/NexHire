@@ -293,4 +293,34 @@ def skill_gap(request: MatchRequest):
 
 @app.post("/ai/v1/interview-questions")
 async def interview_questions(request: Request):
-    pass
+    """Generate a set of expected interview questions for a job role.
+
+    Accepts the raw JD analysis JSON from /ai/v1/analyze-jd directly as the body —
+    no wrapper object needed. Returns at least 10 questions tailored to the role's
+    skills and seniority, formatted as numbered text for the candidate to read.
+    """
+    try:
+        jd = await request.json()
+    except Exception:
+        raise HTTPException(status_code=422, detail="Request body must be a valid JSON object (the output of /ai/v1/analyze-jd).")
+
+    if not isinstance(jd, dict) or not jd.get("skills"):
+        raise HTTPException(status_code=422, detail="Invalid input: expected a JD analysis object with a 'skills' field.")
+
+    try:
+        questions = generate_interview_questions_with_lm_studio(jd)
+    except (RuntimeError, ValueError) as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=f"Unexpected error generating interview questions: {error}") from error
+
+    job_title = jd.get("jobTitle") or "the role"
+    formatted = "\n".join(f"{i}. {q}" for i, q in enumerate(questions, start=1))
+
+    return {
+        "status": "COMPLETED",
+        "jobTitle": job_title,
+        "totalQuestions": len(questions),
+        "questionsText": formatted,
+        "questions": questions,
+    }
