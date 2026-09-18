@@ -63,6 +63,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/resumes/**")
                         .hasRole("CANDIDATE")
 
+                        .requestMatchers("/api/v1/jobs/**")
+                        .hasRole("RECRUITER")
+
                         .anyRequest()
                         .authenticated()
                 )

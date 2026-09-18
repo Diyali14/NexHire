@@ -246,6 +246,159 @@ public class DocumentConversionService {
         return text.substring(0, 1);
     }
 
+    /**
+     * Plain text String -> PDF
+     */
+    public byte[] convertTextToPdf(String text) {
+
+        if (text == null || text.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Text cannot be empty"
+            );
+        }
+
+        try (
+                ByteArrayOutputStream outputStream =
+                        new ByteArrayOutputStream();
+
+                PDDocument document =
+                        new PDDocument()
+        ) {
+
+            PDType1Font font =
+                    new PDType1Font(
+                            Standard14Fonts.FontName.HELVETICA
+                    );
+
+            float fontSize = 10;
+            float leading = 14;
+            float margin = 50;
+            float bottomMargin = 50;
+
+            PDPage page =
+                    new PDPage(PDRectangle.A4);
+
+            document.addPage(page);
+
+            PDPageContentStream contentStream =
+                    new PDPageContentStream(
+                            document,
+                            page
+                    );
+
+            contentStream.beginText();
+
+            contentStream.setFont(
+                    font,
+                    fontSize
+            );
+
+            float y =
+                    PDRectangle.A4.getHeight()
+                            - margin;
+
+            contentStream.newLineAtOffset(
+                    margin,
+                    y
+            );
+
+            for (String line : text.split("\\R", -1)) {
+
+                String remaining = line;
+
+                if (remaining.isEmpty()) {
+
+                    contentStream.newLineAtOffset(
+                            0,
+                            -leading
+                    );
+
+                    y -= leading;
+
+                } else {
+
+                    while (!remaining.isEmpty()) {
+
+                        String lineToWrite =
+                                fitLine(
+                                        remaining,
+                                        font,
+                                        fontSize,
+                                        PDRectangle.A4.getWidth()
+                                                - (2 * margin)
+                                );
+
+                        contentStream.showText(
+                                sanitizeText(lineToWrite)
+                        );
+
+                        remaining =
+                                remaining.substring(
+                                        lineToWrite.length()
+                                );
+
+                        if (!remaining.isEmpty()) {
+                            remaining =
+                                    remaining.stripLeading();
+                        }
+
+                        y -= leading;
+
+                        if (y <= bottomMargin) {
+
+                            contentStream.endText();
+                            contentStream.close();
+
+                            page =
+                                    new PDPage(
+                                            PDRectangle.A4
+                                    );
+
+                            document.addPage(page);
+
+                            contentStream =
+                                    new PDPageContentStream(
+                                            document,
+                                            page
+                                    );
+
+                            contentStream.beginText();
+
+                            contentStream.setFont(
+                                    font,
+                                    fontSize
+                            );
+
+                            y =
+                                    PDRectangle.A4.getHeight()
+                                            - margin;
+
+                            contentStream.newLineAtOffset(
+                                    margin,
+                                    y
+                            );
+                        }
+                    }
+                }
+            }
+
+            contentStream.endText();
+            contentStream.close();
+
+            document.save(outputStream);
+
+            return outputStream.toByteArray();
+
+        } catch (Exception e) {
+
+            throw new RuntimeException(
+                    "Text to PDF conversion failed: "
+                            + e.getMessage(),
+                    e
+            );
+        }
+    }
+
     private String sanitizeText(String text) {
 
         return text
