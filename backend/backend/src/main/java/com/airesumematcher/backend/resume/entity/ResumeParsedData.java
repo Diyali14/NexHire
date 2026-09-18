@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import tools.jackson.databind.JsonNode;
+
 @Entity
 @Table(
         name = "resume_parsed_data",
@@ -40,18 +42,52 @@ public class ResumeParsedData {
     )
     private Resume resume;
 
+    // =========================================================
+    // COMPLETE ORIGINAL PARSER RESPONSE
+    // =========================================================
+
     @Column(
             name = "parsed_json",
             nullable = false,
             columnDefinition = "jsonb"
     )
-    private String parsedJson;
+    private JsonNode parsedJson;
+
+    // =========================================================
+    // EXTRACTED PROFILE DATA
+    // =========================================================
+
+    @Column(name = "candidate_name")
+    private String candidateName;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "years_of_experience")
+    private Integer yearsOfExperience;
+
+    @Column(name = "language")
+    private String language;
+
+    @Column(name = "certifications")
+    private String certifications;
+
+    // =========================================================
+    // PARSER INFORMATION
+    // =========================================================
 
     @Column(
             name = "parser_version",
             length = 50
     )
     private String parserVersion;
+
+    // =========================================================
+    // TIMESTAMPS
+    // =========================================================
 
     @Column(
             name = "created_at",

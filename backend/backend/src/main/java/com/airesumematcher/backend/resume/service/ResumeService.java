@@ -8,7 +8,6 @@ import com.airesumematcher.backend.resume.dto.ResumeStatusResponse;
 import com.airesumematcher.backend.resume.dto.ResumeUploadResponse;
 import com.airesumematcher.backend.resume.entity.ProcessingStatus;
 import com.airesumematcher.backend.resume.entity.Resume;
-import com.airesumematcher.backend.resume.entity.ResumeParsedData;
 import com.airesumematcher.backend.resume.repository.ResumeParsedDataRepository;
 import com.airesumematcher.backend.resume.repository.ResumeRepository;
 import com.airesumematcher.backend.storage.service.FileProcessingService;
@@ -40,20 +39,22 @@ public class ResumeService {
     private final UserRepository userRepository;
     private final FileProcessingService fileProcessingService;
     private final ResumeMessageProducer resumeMessageProducer;
+    private final ResumeParsedDataService resumeParsedDataService;
 
     public ResumeService(
             ResumeRepository resumeRepository,
             ResumeParsedDataRepository resumeParsedDataRepository,
             UserRepository userRepository,
             FileProcessingService fileProcessingService,
-            ResumeMessageProducer resumeMessageProducer
+            ResumeMessageProducer resumeMessageProducer,
+            ResumeParsedDataService resumeParsedDataService
     ) {
         this.resumeRepository = resumeRepository;
-        this.resumeParsedDataRepository =
-                resumeParsedDataRepository;
+        this.resumeParsedDataRepository = resumeParsedDataRepository;
         this.userRepository = userRepository;
         this.fileProcessingService = fileProcessingService;
         this.resumeMessageProducer = resumeMessageProducer;
+        this.resumeParsedDataService = resumeParsedDataService;
     }
 
     // =========================================================
@@ -124,7 +125,6 @@ public class ResumeService {
                         resume
                 );
 
-        // Resume ID now exists
         Long resumeId = resume.getId();
 
         // 6. Generate Cloudinary public ID
@@ -381,40 +381,10 @@ public class ResumeService {
                         authentication
                 );
 
-        // First verify that this resume belongs
-        // to the currently authenticated candidate.
-        Resume resume =
-                resumeRepository
-                        .findByIdAndCandidateId(
-                                resumeId,
-                                candidate.getId()
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Resume not found"
-                                )
-                        );
-
-        ResumeParsedData parsedData =
-                resumeParsedDataRepository
-                        .findByResumeId(
-                                resume.getId()
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Parsed resume data is not available yet"
-                                )
-                        );
-
-        return ResumeParsedDataResponse.builder()
-                .resumeId(resume.getId())
-                .parserVersion(
-                        parsedData.getParserVersion()
-                )
-                .parsedJson(
-                        parsedData.getParsedJson()
-                )
-                .build();
+        return resumeParsedDataService.getParsedData(
+                resumeId,
+                candidate.getId()
+        );
     }
 
     // =========================================================
