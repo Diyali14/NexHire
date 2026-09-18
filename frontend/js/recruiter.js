@@ -890,13 +890,13 @@ document.addEventListener("DOMContentLoaded", () => {
      * Run this on the recruiter dashboard
      * and recruiter profile page.
      */
-    const isDashboard = document.querySelector("[data-recruiter-greeting]");
+    // const isDashboard = document.querySelector("[data-recruiter-greeting]");
 
-    const isProfilePage = document.querySelector("[data-save-profile]");
+    // const isProfilePage = document.querySelector("[data-save-profile]");
 
-    if (!isDashboard && !isProfilePage) {
-      return;
-    }
+    // if (!isDashboard && !isProfilePage) {
+    //   return;
+    // }
 
     const profilePage = document.querySelector(".profile-page");
 
