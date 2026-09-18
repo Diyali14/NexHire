@@ -502,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dashboardJobs.innerHTML =
       jobs.length
         ? jobs
-            .map((job) => `
+          .map((job) => `
               <div class="job-row">
 
                 <div>
@@ -530,7 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
               </div>
             `)
-            .join('')
+          .join('')
         : `
           <div class="empty-state">
             No active jobs yet.
@@ -742,6 +742,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentProfile = null;
 
+  function updateRecruiterGreeting(profile) {
+
+  const greeting =
+    document.querySelector(
+      '[data-recruiter-greeting]'
+    );
+
+  if (!greeting) {
+    return;
+  }
+
+  /*
+   * Get current system time.
+   */
+  const hour = new Date().getHours();
+
+  let greetingText;
+
+  if (hour >= 5 && hour < 12) {
+    greetingText = 'Good morning';
+  } else if (hour >= 12 && hour < 17) {
+    greetingText = 'Good afternoon';
+  } else if (hour >= 17 && hour < 21) {
+    greetingText = 'Good evening';
+  } else {
+    greetingText = 'Good night';
+  }
+
+  /*
+   * Get recruiter's name from API.
+   */
+  const firstName =
+    profile.firstName?.trim() || '';
+
+  const lastName =
+    profile.lastName?.trim() || '';
+
+  const fullName =
+    `${firstName} ${lastName}`.trim();
+
+  const recruiterName =
+    fullName || 'Recruiter';
+
+  greeting.textContent =
+    `${greetingText}, ${recruiterName}!`;
+}
 
   /* =========================================================
      UPDATE PROFILE UI
@@ -937,116 +983,110 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadRecruiterProfile() {
 
+  /*
+   * Run this on the recruiter dashboard
+   * and recruiter profile page.
+   */
+  const isDashboard =
+    document.querySelector('[data-recruiter-greeting]');
+
+  const isProfilePage =
+    document.querySelector('[data-save-profile]');
+
+  if (!isDashboard && !isProfilePage) {
+    return;
+  }
+
+  const profilePage =
+    document.querySelector('.profile-page');
+
+  try {
+
+    profilePage?.classList.add('profile-loading');
+
+    const response = await fetch(
+      `${API_BASE_URL}/recruiters/me`,
+      {
+        method: 'GET',
+        headers: getAuthHeaders()
+      }
+    );
+
     /*
-     * Only run this API logic on the profile page.
+     * Authentication failed.
      */
-    if (
-      !document.querySelector(
-        '[data-save-profile]'
-      )
-    ) {
+    if (response.status === 401) {
+
+      showToast(
+        'Session expired. Please login again.'
+      );
+
+      setTimeout(() => {
+        window.location.href =
+          'recruiter-login.html';
+      }, 900);
+
       return;
     }
 
-
-    const profilePage =
-      document.querySelector(
-        '.profile-page'
-      );
-
-
-    try {
-
-      profilePage?.classList.add(
-        'profile-loading'
-      );
-
-
-      const response =
-        await fetch(
-          `${API_BASE_URL}/recruiters/me`,
-          {
-            method: 'GET',
-            headers: getAuthHeaders()
-          }
-        );
-
-
-      /*
-       * Authentication failed.
-       */
-      if (response.status === 401) {
-
-        showToast(
-          'Session expired. Please login again.'
-        );
-
-        setTimeout(() => {
-          window.location.href =
-            '../recruiter-login.html';
-        }, 900);
-
-        return;
-      }
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          `Profile request failed: ${response.status}`
-        );
-      }
-
-
-      const profile =
-        await response.json();
-
-
-      console.log(
-        'Recruiter profile loaded:',
-        profile
-      );
-
-
-      renderRecruiterProfile(
-        profile
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        'Unable to load recruiter profile:',
-        error
-      );
-
-
-      if (
-        error.message.includes(
-          'authentication token'
-        )
-      ) {
-
-        showToast(
-          'Please login as a recruiter first.'
-        );
-
-      } else {
-
-        showToast(
-          'Could not load recruiter profile'
-        );
-      }
-
-
-    } finally {
-
-      profilePage?.classList.remove(
-        'profile-loading'
+    if (!response.ok) {
+      throw new Error(
+        `Profile request failed: ${response.status}`
       );
     }
-  }
 
+    const profile = await response.json();
+
+    console.log(
+      'Recruiter profile loaded:',
+      profile
+    );
+
+    /*
+     * Store/render profile.
+     * This also updates:
+     * - profile chip
+     * - avatar
+     * - profile page fields
+     */
+    renderRecruiterProfile(profile);
+
+    /*
+     * Update dashboard greeting.
+     */
+    updateRecruiterGreeting(profile);
+
+  } catch (error) {
+
+    console.error(
+      'Unable to load recruiter profile:',
+      error
+    );
+
+    if (
+      error.message.includes(
+        'authentication token'
+      )
+    ) {
+
+      showToast(
+        'Please login as a recruiter first.'
+      );
+
+    } else {
+
+      showToast(
+        'Could not load recruiter profile'
+      );
+    }
+
+  } finally {
+
+    profilePage?.classList.remove(
+      'profile-loading'
+    );
+  }
+}
 
   /* =========================================================
      EDIT PROFILE BUTTON
