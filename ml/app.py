@@ -228,7 +228,62 @@ def match(request: MatchRequest):
 
 @app.post("/ai/v1/skill-gap")
 def skill_gap(request: MatchRequest):
-    pass
+    """Identify which skills a candidate is missing for a specific job.
+
+    Internally runs the same matching logic as /ai/v1/match and extracts
+    the gap. Returns a plain-English statement the candidate can read directly,
+    plus a structured list of missing skills grouped by importance.
+    """
+    try:
+        result = match_candidate_with_lm_studio(request.candidate, request.jobRequirements)
+    except (RuntimeError, ValueError) as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=f"Unexpected error during skill gap analysis: {error}") from error
+
+    job_title = request.jobRequirements.get("jobTitle") or "this role"
+    missing = result.get("missingSkills", [])
+    experience_met = result.get("experienceMet", True)
+    exp_line = ""
+
+    if not experience_met:
+        # Extract years info from the summary for the message
+        exp_line = result.get("summary", "You do not meet the minimum experience requirement for this role.")
+
+    # Group missing skills by importance
+    high   = [s["name"] for s in missing if s.get("importance") == "HIGH"]
+    medium = [s["name"] for s in missing if s.get("importance") == "MEDIUM"]
+    low    = [s["name"] for s in missing if s.get("importance") == "LOW"]
+
+    # Build the statement
+    if not experience_met and not missing:
+        message = exp_line
+    elif not missing:
+        message = f"Great news! You have all the required skills for the {job_title} role."
+    else:
+        parts = []
+        if high:
+            parts.append(f"mandatory skills: {', '.join(high)}")
+        if medium:
+            parts.append(f"important skills: {', '.join(medium)}")
+        if low:
+            parts.append(f"preferred skills: {', '.join(low)}")
+
+        skill_sentence = "To strengthen your application for the " + job_title + " role, you should work on the following — " + "; ".join(parts) + "."
+
+        if not experience_met:
+            message = exp_line + " Additionally, " + skill_sentence[0].lower() + skill_sentence[1:]
+        else:
+            message = skill_sentence
+
+    return {
+        "status": "COMPLETED",
+        "jobTitle": job_title,
+        "hasGap": bool(missing) or not experience_met,
+        "experienceMet": experience_met,
+        "message": message,
+        "missingSkills": missing,
+    }
 
 
 
