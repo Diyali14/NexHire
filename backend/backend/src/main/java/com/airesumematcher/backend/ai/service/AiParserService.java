@@ -21,6 +21,10 @@ public class AiParserService {
                 .build();
     }
 
+    // ===============================
+    // RESUME PARSER
+    // ===============================
+
     public String parseResume(
             byte[] pdfBytes,
             String fileName
@@ -44,6 +48,23 @@ public class AiParserService {
                 .uri("/ai/v1/parse-resume-file")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(body)
+                .retrieve()
+                .body(String.class);
+    }
+
+
+    // ===============================
+    // JOB DESCRIPTION PARSER
+    // ===============================
+
+    public String analyzeJobDescription(
+            String jobDescription
+    ) {
+
+        return restClient.post()
+                .uri("/ai/v1/analyze-jd")
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(jobDescription)
                 .retrieve()
                 .body(String.class);
     }

@@ -1,6 +1,7 @@
 package com.airesumematcher.backend.recruiter.controller;
 
 import com.airesumematcher.backend.recruiter.dto.JobCreateRequest;
+import com.airesumematcher.backend.recruiter.dto.JobParsedDataResponse;
 import com.airesumematcher.backend.recruiter.dto.JobResponse;
 import com.airesumematcher.backend.recruiter.dto.JobStatusResponse;
 import com.airesumematcher.backend.recruiter.service.JobService;
@@ -10,14 +11,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/jobs")
 @RequiredArgsConstructor
 public class JobController {
 
     private final JobService jobService;
+
+
+    // =========================================================
+    // CREATE JOB
+    // =========================================================
 
     @PostMapping
     public ResponseEntity<JobResponse> createJob(
@@ -33,31 +37,10 @@ public class JobController {
         );
     }
 
-//    @GetMapping
-//    public ResponseEntity<List<JobResponse>> getMyJobs(
-//            Authentication authentication
-//    ) {
-//
-//        return ResponseEntity.ok(
-//                jobService.getMyJobs(
-//                        authentication
-//                )
-//        );
-//    }
-//
-//    @GetMapping("/{jobId}")
-//    public ResponseEntity<JobResponse> getMyJob(
-//            @PathVariable Long jobId,
-//            Authentication authentication
-//    ) {
-//
-//        return ResponseEntity.ok(
-//                jobService.getMyJob(
-//                        jobId,
-//                        authentication
-//                )
-//        );
-//    }
+
+    // =========================================================
+    // GET JOB STATUS
+    // =========================================================
 
     @GetMapping("/{jobId}/status")
     public ResponseEntity<JobStatusResponse> getJobStatus(
@@ -72,6 +55,30 @@ public class JobController {
                 )
         );
     }
+
+
+    // =========================================================
+    // GET PARSED JOB DATA
+    // =========================================================
+
+    @GetMapping("/{jobId}/parsed-data")
+    public ResponseEntity<JobParsedDataResponse> getParsedJobData(
+            @PathVariable Long jobId,
+            Authentication authentication
+    ) {
+
+        return ResponseEntity.ok(
+                jobService.getParsedJobData(
+                        jobId,
+                        authentication
+                )
+        );
+    }
+
+
+    // =========================================================
+    // DELETE JOB
+    // =========================================================
 
     @DeleteMapping("/{jobId}")
     public ResponseEntity<Void> deleteJob(
