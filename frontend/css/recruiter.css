@@ -275,6 +275,34 @@ h3 {
     transform:translateY(-1px);
     filter:brightness(1.04);
 }
+/* Post Job loading state */
+.button-primary.loading,
+.button-primary:disabled {
+    cursor:wait;
+    opacity:.82;
+    transform:none;
+    filter:none;
+}
+
+.button-primary.loading:hover,
+.button-primary:disabled:hover {
+    transform:none;
+    filter:none;
+}
+
+.button-primary.loading svg {
+    animation:button-spinner .9s linear infinite;
+}
+
+@keyframes button-spinner {
+    from {
+        transform:rotate(0deg);
+    }
+
+    to {
+        transform:rotate(360deg);
+    }
+}
 .button-secondary {
     background:var(--bg-secondary);
     border:1px solid var(--border-color);
