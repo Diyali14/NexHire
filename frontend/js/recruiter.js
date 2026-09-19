@@ -402,6 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (postButton) {
         postButton.disabled = true;
+        postButton.classList.add("loading");
 
         postButton.innerHTML = '<i data-lucide="loader-circle"></i> Posting...';
 
@@ -471,7 +472,12 @@ document.addEventListener("DOMContentLoaded", () => {
          */
 
         showToast("Job submitted. Preparing job details...");
+        if (postButton) {
+          postButton.innerHTML =
+            '<i data-lucide="loader-circle"></i> Preparing Job...';
 
+          window.lucide?.createIcons();
+        }
         /*
          * Wait for AI parser to finish.
          *
@@ -562,6 +568,12 @@ document.addEventListener("DOMContentLoaded", () => {
         /* -----------------------------------------
          SUCCESS
       ----------------------------------------- */
+        if (postButton) {
+          postButton.classList.remove("loading");
+          postButton.innerHTML = '<i data-lucide="check"></i> Job Posted';
+
+          window.lucide?.createIcons();
+        }
 
         showToast("Job posted successfully");
 
@@ -593,7 +605,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (postButton) {
           postButton.disabled = false;
-
+          postButton.classList.remove("loading");
           postButton.innerHTML = originalButtonText;
 
           window.lucide?.createIcons();
