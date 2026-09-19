@@ -227,6 +227,120 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   /* =========================================================
+   JOB PARSER
+========================================================= */
+
+  /*
+   * Wait until the backend confirms that parsed job data
+   * is available.
+   *
+   * IMPORTANT:
+   * Backend processing statuses such as QUEUED,
+   * PROCESSING and COMPLETED are NOT shown in the UI.
+   */
+
+  async function waitForParsedJob(jobId) {
+    const checkInterval = 5000; // 5 seconds
+    const maxAttempts = 24; // 2 minutes maximum
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      console.log(
+        `Checking parsed data for job ${jobId} (${attempt}/${maxAttempts})`,
+      );
+
+      const response = await fetch(`${API_BASE_URL}/jobs/${jobId}/status`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      /*
+       * Authentication failure
+       */
+
+      if (response.status === 401) {
+        throw new Error("Your session has expired. Please login again.");
+      }
+
+      /*
+       * Other backend errors
+       */
+
+      if (!response.ok) {
+        throw new Error(`Job status request failed: ${response.status}`);
+      }
+
+      const statusData = await response.json();
+
+      console.log("Job processing check:", statusData);
+
+      /*
+       * THIS is the only thing the frontend
+       * actually cares about.
+       *
+       * We do NOT display statusData.status.
+       */
+
+      if (statusData.parsedDataAvailable === true) {
+        console.log(`Parsed data is ready for job ${jobId}`);
+
+        return true;
+      }
+
+      /*
+       * Parser is not finished yet.
+       *
+       * Wait before checking again.
+       */
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, checkInterval);
+      });
+    }
+
+    /*
+     * Parser took longer than our maximum
+     * waiting period.
+     */
+
+    throw new Error(
+      "Job processing is taking longer than expected. Please check your jobs later.",
+    );
+  }
+
+  /* =========================================================
+   FETCH PARSED JOB DATA
+========================================================= */
+
+  async function getParsedJobData(jobId) {
+    const response = await fetch(`${API_BASE_URL}/jobs/${jobId}/parsed-data`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+
+    /*
+     * Authentication failure
+     */
+
+    if (response.status === 401) {
+      throw new Error("Your session has expired. Please login again.");
+    }
+
+    /*
+     * Backend error
+     */
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch parsed job data: ${response.status}`);
+    }
+
+    const parsedData = await response.json();
+
+    console.log("Parsed job data received:", parsedData);
+
+    return parsedData;
+  }
+
+  /* =========================================================
    CREATE JOB
 ========================================================= */
 
@@ -342,8 +456,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const createdJob = await response.json();
 
-        console.log("Job created successfully:", createdJob);
+        console.log("Job accepted by backend:", createdJob);
 
+        const jobId = createdJob.jobId;
+
+        if (!jobId) {
+          throw new Error("Backend did not return a job ID.");
+        }
+
+        /*
+         * DO NOT add the job to the dashboard yet.
+         *
+         * The AI parser still needs to process it.
+         */
+
+        showToast("Job submitted. Preparing job details...");
+
+        /*
+         * Wait for AI parser to finish.
+         *
+         * Backend processing states remain completely
+         * hidden from the frontend UI.
+         */
+        await waitForParsedJob(jobId);
+        const parsedJob = await getParsedJobData(jobId);
+
+        console.log("Final parsed job:", parsedJob);
+
+        let parsedJson = null;
+
+        try {
+          if (parsedJob.parsedJson) {
+            parsedJson =
+              typeof parsedJob.parsedJson === "string"
+                ? JSON.parse(parsedJob.parsedJson)
+                : parsedJob.parsedJson;
+          }
+        } catch (error) {
+          console.error("Unable to parse parsedJson:", error);
+
+          throw new Error(
+            "Job was processed, but the parsed data could not be read.",
+          );
+        }
         /* -----------------------------------------
          OPTIONAL LOCAL STORAGE
          Keeps your existing dashboard UI working
@@ -398,7 +553,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         localStorage.setItem(
           "nexhire-last-created-job",
-          JSON.stringify(createdJob),
+          JSON.stringify({
+            job: createdJob,
+            parsedData: parsedJob,
+          }),
         );
 
         /* -----------------------------------------
