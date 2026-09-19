@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import tools.jackson.databind.JsonNode;
 
 @Entity
 @Table(
@@ -54,20 +53,19 @@ public class ResumeExperience {
             name = "responsibilities",
             columnDefinition = "jsonb"
     )
-    private JsonNode responsibilities;
+    private String responsibilities;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(
             name = "technologies",
             columnDefinition = "jsonb"
     )
-    private JsonNode technologies;
+    private String technologies;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(
             name = "additional_information",
             columnDefinition = "jsonb"
     )
-    private JsonNode additionalInformation;
+    private String additionalInformation;
 }
-
