@@ -15,26 +15,20 @@ public class CandidateJobController {
 
     private final CandidateJobService candidateJobService;
 
-    /**
-     * Returns all completed jobs available to candidates.
-     * Newest jobs appear first.
-     */
     @GetMapping
-    public ResponseEntity<List<CandidateJobResponse>> getAvailableJobs() {
-
+    public ResponseEntity<List<CandidateJobResponse>> getAvailableJobs(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false, defaultValue = "recent") String sortBy
+    ) {
         return ResponseEntity.ok(
-                candidateJobService.getAvailableJobs()
+                candidateJobService.getAvailableJobs(query, sortBy)
         );
     }
 
-    /**
-     * Returns details of one completed job.
-     */
     @GetMapping("/{jobId}")
     public ResponseEntity<CandidateJobResponse> getJobDetails(
             @PathVariable Long jobId
     ) {
-
         return ResponseEntity.ok(
                 candidateJobService.getJobDetails(jobId)
         );

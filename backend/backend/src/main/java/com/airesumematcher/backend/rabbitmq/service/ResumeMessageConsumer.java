@@ -4,16 +4,16 @@ import com.airesumematcher.backend.ai.service.AiParserService;
 import com.airesumematcher.backend.rabbitmq.config.RabbitMQConfig;
 import com.airesumematcher.backend.rabbitmq.dto.ResumeProcessingMessage;
 import com.airesumematcher.backend.resume.dto.ParsedResumeDto;
-import com.airesumematcher.backend.resume.entity.Resume;
 import com.airesumematcher.backend.resume.entity.ProcessingStatus;
+import com.airesumematcher.backend.resume.entity.Resume;
 import com.airesumematcher.backend.resume.repository.ResumeRepository;
 import com.airesumematcher.backend.resume.service.ResumeParsedDataService;
 import com.airesumematcher.backend.storage.service.CloudinaryStorageService;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class ResumeMessageConsumer {
 
@@ -21,28 +21,24 @@ public class ResumeMessageConsumer {
     private final CloudinaryStorageService cloudinaryStorageService;
     private final AiParserService aiParserService;
     private final ResumeParsedDataService resumeParsedDataService;
-    private final ObjectMapper objectMapper;
 
     public ResumeMessageConsumer(
             ResumeRepository resumeRepository,
             CloudinaryStorageService cloudinaryStorageService,
             AiParserService aiParserService,
-            ResumeParsedDataService resumeParsedDataService,
-            ObjectMapper objectMapper
+            ResumeParsedDataService resumeParsedDataService
     ) {
         this.resumeRepository = resumeRepository;
         this.cloudinaryStorageService = cloudinaryStorageService;
         this.aiParserService = aiParserService;
         this.resumeParsedDataService = resumeParsedDataService;
-        this.objectMapper = objectMapper;
     }
 
     @RabbitListener(queues = RabbitMQConfig.RESUME_QUEUE)
     public void processResume(ResumeProcessingMessage message) {
 
-        System.out.println("======================================");
-        System.out.println("RESUME PROCESSING STARTED");
-        System.out.println("Resume ID: " + message.getResumeId());
+        log.info("RESUME PROCESSING STARTED - Resume ID: {}, Candidate ID: {}",
+                message.getResumeId(), message.getCandidateId());
 
         Resume resume = resumeRepository
                 .findByIdAndCandidateId(
@@ -50,95 +46,61 @@ public class ResumeMessageConsumer {
                         message.getCandidateId()
                 )
                 .orElseThrow(() ->
-                        new RuntimeException("Resume not found")
+                        new RuntimeException("Resume not found for ID: " + message.getResumeId())
                 );
+
+        // Idempotency check: if already completed, do not re-process
+        if (resume.getProcessingStatus() == ProcessingStatus.COMPLETED) {
+            log.info("Resume ID {} already completed processing. Skipping.", message.getResumeId());
+            return;
+        }
 
         try {
 
             // 1. Mark PROCESSING
-
             resume.setProcessingStatus(ProcessingStatus.PROCESSING);
             resumeRepository.save(resume);
 
-            System.out.println("Status: PROCESSING");
+            log.info("Resume ID {} status updated to PROCESSING", message.getResumeId());
 
-
-            // 2. Download PDF from Cloudinary
-
+            // 2. Download file from Cloudinary
             byte[] fileBytes =
                     cloudinaryStorageService.downloadFile(
                             message.getStorageObjectName()
                     );
 
-            System.out.println("File downloaded from Cloudinary");
-            System.out.println(
-                    "Downloaded bytes: " + fileBytes.length
-            );
+            log.info("Downloaded {} bytes from Cloudinary for resume ID {}", fileBytes.length, message.getResumeId());
 
-
-            // 3. Send PDF to AI parser
-
-            ParsedResumeDto parsedJson =
+            // 3. Send file to AI parser
+            String fileName = "resume." + (message.getFileType() != null ? message.getFileType().toLowerCase() : "pdf");
+            ParsedResumeDto parsedDto =
                     aiParserService.parseResume(
                             fileBytes,
-                            "resume.pdf"
+                            fileName
                     );
-            System.out.println(parsedJson);
-            System.out.println("AI parser response received");
 
+            log.info("AI parser response received for resume ID {}", message.getResumeId());
 
-            // 4. Extract parser version
-
-//            JsonNode root =
-//                    objectMapper.readTree(parsedJson);
-//
-//            String parserVersion =
-//                    root.path("parserVersion")
-//                            .asText(null);
-//
-//
-//            // 5. Save parsed data
-//
-//            resumeParsedDataService.saveParsedData(
-//                    message.getResumeId(),
-//                    parsedJson,
-//                    parserVersion
-//            );
-//
-//            System.out.println("Parsed data saved");
-//
-//
-//            // 6. Mark COMPLETED
-//
-//            resume.setProcessingStatus(
-//                    ProcessingStatus.COMPLETED
-//            );
-//
-//            resumeRepository.save(resume);
-
-            System.out.println("Status: COMPLETED");
-            System.out.println("======================================");
-
-        }
-        catch (Exception e) {
-
-            System.err.println(
-                    "Resume processing failed: "
-                            + message.getResumeId()
+            // 4. Save parsed data
+            resumeParsedDataService.saveParsedData(
+                    message.getResumeId(),
+                    parsedDto
             );
 
-            e.printStackTrace();
+            log.info("Parsed resume data saved to database for resume ID {}", message.getResumeId());
 
-            resume.setProcessingStatus(
-                    ProcessingStatus.FAILED
-            );
-
+            // 5. Mark COMPLETED
+            resume.setProcessingStatus(ProcessingStatus.COMPLETED);
             resumeRepository.save(resume);
 
-            throw new RuntimeException(
-                    "Resume processing failed",
-                    e
-            );
+            log.info("RESUME PROCESSING COMPLETED - Resume ID: {}", message.getResumeId());
+
+        } catch (Exception e) {
+
+            log.error("Resume processing failed for Resume ID: {}", message.getResumeId(), e);
+
+            resume.setProcessingStatus(ProcessingStatus.FAILED);
+            resumeRepository.save(resume);
         }
     }
 }

@@ -2,10 +2,7 @@ package com.airesumematcher.backend.resume.service;
 
 import com.airesumematcher.backend.rabbitmq.dto.ResumeProcessingMessage;
 import com.airesumematcher.backend.rabbitmq.service.ResumeMessageProducer;
-import com.airesumematcher.backend.resume.dto.ResumeParsedDataResponse;
-import com.airesumematcher.backend.resume.dto.ResumeResponse;
-import com.airesumematcher.backend.resume.dto.ResumeStatusResponse;
-import com.airesumematcher.backend.resume.dto.ResumeUploadResponse;
+import com.airesumematcher.backend.resume.dto.*;
 import com.airesumematcher.backend.resume.entity.ProcessingStatus;
 import com.airesumematcher.backend.resume.entity.Resume;
 import com.airesumematcher.backend.resume.repository.ResumeParsedDataRepository;
@@ -29,7 +26,7 @@ import java.util.Set;
 public class ResumeService {
 
     private static final Set<String> ALLOWED_EXTENSIONS =
-            Set.of("pdf", "docx", "txt");
+            Set.of("pdf", "jpg", "jpeg", "txt", "docx");
 
     private static final long MAX_FILE_SIZE =
             10 * 1024 * 1024; // 10 MB
@@ -189,7 +186,7 @@ public class ResumeService {
                         )
                         .build();
 
-        // 10. Publish message to RabbitMQ
+        // 10. Publish message to RabbitMQ asynchronously
         try {
 
             resumeMessageProducer.publish(
@@ -479,7 +476,7 @@ public class ResumeService {
         if (!ALLOWED_EXTENSIONS.contains(extension)) {
 
             throw new IllegalArgumentException(
-                    "Only PDF, DOCX and TXT files are supported"
+                    "Only PDF, JPG, JPEG, TXT and DOCX files are supported"
             );
         }
     }

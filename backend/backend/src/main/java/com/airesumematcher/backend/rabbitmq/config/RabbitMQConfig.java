@@ -6,7 +6,7 @@ import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -213,9 +213,9 @@ public class RabbitMQConfig {
     // =========================================================
 
     @Bean
-    public JacksonJsonMessageConverter jacksonJsonMessageConverter() {
+    public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
 
-        return new JacksonJsonMessageConverter();
+        return new Jackson2JsonMessageConverter();
     }
 
 
@@ -226,7 +226,7 @@ public class RabbitMQConfig {
     @Bean
     public RabbitTemplate rabbitTemplate(
             ConnectionFactory connectionFactory,
-            JacksonJsonMessageConverter messageConverter
+            Jackson2JsonMessageConverter messageConverter
     ) {
 
         RabbitTemplate rabbitTemplate =

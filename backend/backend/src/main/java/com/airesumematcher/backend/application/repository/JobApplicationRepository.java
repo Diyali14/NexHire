@@ -23,6 +23,10 @@ public interface JobApplicationRepository
             Long jobId
     );
 
+    List<JobApplication> findAllByCandidateIdOrderByCreatedAtDesc(
+            Long candidateId
+    );
+
     Optional<JobApplication> findByIdAndCandidateId(
             Long applicationId,
             Long candidateId

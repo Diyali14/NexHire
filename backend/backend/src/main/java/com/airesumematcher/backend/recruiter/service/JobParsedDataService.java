@@ -6,8 +6,8 @@ import com.airesumematcher.backend.recruiter.repository.JobParsedDataRepository;
 import com.airesumematcher.backend.recruiter.repository.JobRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class JobParsedDataService {

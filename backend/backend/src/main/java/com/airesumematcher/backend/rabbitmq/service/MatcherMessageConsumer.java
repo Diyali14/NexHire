@@ -13,8 +13,8 @@ import com.airesumematcher.backend.resume.entity.ResumeParsedData;
 import com.airesumematcher.backend.resume.repository.ResumeParsedDataRepository;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class MatcherMessageConsumer {
@@ -166,8 +166,7 @@ public class MatcherMessageConsumer {
             }
 
             String status =
-                    result.path("status")
-                            .asText(null);
+                    result.hasNonNull("status") ? result.get("status").asText() : null;
 
             if (status == null
                     || status.isBlank()) {
@@ -200,9 +199,7 @@ public class MatcherMessageConsumer {
             // =================================================
 
             String modelVersion =
-                    result
-                            .path("modelVersion")
-                            .asText(null);
+                    result.hasNonNull("modelVersion") ? result.get("modelVersion").asText() : null;
 
 
             // =================================================
