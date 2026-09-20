@@ -11,13 +11,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/jobs")
 @RequiredArgsConstructor
 public class JobController {
 
     private final JobService jobService;
-
 
     // =========================================================
     // CREATE JOB
@@ -28,7 +29,6 @@ public class JobController {
             @Valid @RequestBody JobCreateRequest request,
             Authentication authentication
     ) {
-
         return ResponseEntity.ok(
                 jobService.createJob(
                         request,
@@ -37,6 +37,47 @@ public class JobController {
         );
     }
 
+    // =========================================================
+    // GET RECRUITER'S OWN JOBS
+    // =========================================================
+
+    @GetMapping
+    public ResponseEntity<List<JobResponse>> getMyJobs(
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(
+                jobService.getMyJobs(authentication)
+        );
+    }
+
+    // =========================================================
+    // GET SINGLE JOB DETAILS FOR RECRUITER
+    // =========================================================
+
+    @GetMapping("/{jobId}")
+    public ResponseEntity<JobResponse> getJob(
+            @PathVariable Long jobId,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(
+                jobService.getJob(jobId, authentication)
+        );
+    }
+
+    // =========================================================
+    // UPDATE JOB
+    // =========================================================
+
+    @PutMapping("/{jobId}")
+    public ResponseEntity<JobResponse> updateJob(
+            @PathVariable Long jobId,
+            @Valid @RequestBody JobCreateRequest request,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(
+                jobService.updateJob(jobId, request, authentication)
+        );
+    }
 
     // =========================================================
     // GET JOB STATUS
@@ -47,7 +88,6 @@ public class JobController {
             @PathVariable Long jobId,
             Authentication authentication
     ) {
-
         return ResponseEntity.ok(
                 jobService.getJobStatus(
                         jobId,
@@ -55,7 +95,6 @@ public class JobController {
                 )
         );
     }
-
 
     // =========================================================
     // GET PARSED JOB DATA
@@ -66,7 +105,6 @@ public class JobController {
             @PathVariable Long jobId,
             Authentication authentication
     ) {
-
         return ResponseEntity.ok(
                 jobService.getParsedJobData(
                         jobId,
@@ -74,7 +112,6 @@ public class JobController {
                 )
         );
     }
-
 
     // =========================================================
     // DELETE JOB
@@ -85,7 +122,6 @@ public class JobController {
             @PathVariable Long jobId,
             Authentication authentication
     ) {
-
         jobService.deleteJob(
                 jobId,
                 authentication

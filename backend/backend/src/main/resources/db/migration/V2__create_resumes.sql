@@ -1,4 +1,4 @@
-CREATE TABLE resumes (
+CREATE TABLE IF NOT EXISTS resumes (
                          id BIGSERIAL PRIMARY KEY,
 
                          candidate_id BIGINT NOT NULL,
@@ -27,8 +27,8 @@ CREATE TABLE resumes (
                                  ON DELETE CASCADE
 );
 
-CREATE INDEX idx_resumes_candidate_id
+CREATE INDEX IF NOT EXISTS idx_resumes_candidate_id
     ON resumes(candidate_id);
 
-CREATE INDEX idx_resumes_processing_status
+CREATE INDEX IF NOT EXISTS idx_resumes_processing_status
     ON resumes(processing_status);

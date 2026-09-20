@@ -1,0 +1,1371 @@
+============================================================
+NEXHIRE BACKEND FINAL ENDPOINT DOCUMENTATION
+============================================================
+
+Total Endpoints: 37
+Framework: Spring Boot 3.4
+Security: JWT Authentication (24 hours validity)
+Database: PostgreSQL / NeonDB
+Messaging: RabbitMQ
+Storage: Cloudinary
+
+============================================================
+ENDPOINT 1: CANDIDATE REGISTRATION
+============================================================
+
+METHOD:
+POST
+
+URL:
+/api/v1/auth/candidate/register
+
+AUTH:
+NONE
+
+ROLE:
+PUBLIC
+
+PURPOSE:
+Register a new candidate account.
+
+REQUEST BODY:
+{
+  "email": "candidate@example.com",
+  "password": "Password123!",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1234567890"
+}
+
+SUCCESS RESPONSE (201 CREATED):
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "type": "Bearer",
+  "id": 1,
+  "email": "candidate@example.com",
+  "firstName": "John",
+  "roles": ["ROLE_CANDIDATE"]
+}
+
+ERROR RESPONSES:
+400 BAD REQUEST:
+{
+  "message": "Email is already taken",
+  "timestamp": "2026-09-20T20:00:00Z"
+}
+
+============================================================
+ENDPOINT 2: CANDIDATE LOGIN
+============================================================
+
+METHOD:
+POST
+
+URL:
+/api/v1/auth/candidate/login
+
+AUTH:
+NONE
+
+ROLE:
+PUBLIC
+
+PURPOSE:
+Authenticate candidate and return 24-hour JWT token.
+
+REQUEST BODY:
+{
+  "email": "candidate@example.com",
+  "password": "Password123!"
+}
+
+SUCCESS RESPONSE (200 OK):
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "type": "Bearer",
+  "id": 1,
+  "email": "candidate@example.com",
+  "firstName": "John",
+  "roles": ["ROLE_CANDIDATE"]
+}
+
+ERROR RESPONSES:
+401 UNAUTHORIZED:
+{
+  "message": "Invalid email or password"
+}
+
+============================================================
+ENDPOINT 3: RECRUITER REGISTRATION
+============================================================
+
+METHOD:
+POST
+
+URL:
+/api/v1/auth/recruiter/register
+
+AUTH:
+NONE
+
+ROLE:
+PUBLIC
+
+PURPOSE:
+Register a new recruiter account.
+
+REQUEST BODY:
+{
+  "email": "recruiter@company.com",
+  "password": "Password123!",
+  "firstName": "Alice",
+  "lastName": "Smith",
+  "phone": "+1987654321"
+}
+
+SUCCESS RESPONSE (201 CREATED):
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "type": "Bearer",
+  "id": 2,
+  "email": "recruiter@company.com",
+  "firstName": "Alice",
+  "roles": ["ROLE_RECRUITER"]
+}
+
+ERROR RESPONSES:
+400 BAD REQUEST:
+{
+  "message": "Email is already taken"
+}
+
+============================================================
+ENDPOINT 4: RECRUITER LOGIN
+============================================================
+
+METHOD:
+POST
+
+URL:
+/api/v1/auth/recruiter/login
+
+AUTH:
+NONE
+
+ROLE:
+PUBLIC
+
+PURPOSE:
+Authenticate recruiter and return 24-hour JWT token.
+
+REQUEST BODY:
+{
+  "email": "recruiter@company.com",
+  "password": "Password123!"
+}
+
+SUCCESS RESPONSE (200 OK):
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "type": "Bearer",
+  "id": 2,
+  "email": "recruiter@company.com",
+  "firstName": "Alice",
+  "roles": ["ROLE_RECRUITER"]
+}
+
+ERROR RESPONSES:
+401 UNAUTHORIZED:
+{
+  "message": "Invalid email or password"
+}
+
+============================================================
+ENDPOINT 5: GET CANDIDATE PROFILE
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/candidates/me
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Retrieve authenticated candidate profile details.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "id": 1,
+  "userId": 1,
+  "email": "candidate@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1234567890",
+  "linkedinUrl": "https://linkedin.com/in/johndoe",
+  "githubUrl": "https://github.com/johndoe",
+  "bio": "Software Engineer"
+}
+
+ERROR RESPONSES:
+401 UNAUTHORIZED
+403 FORBIDDEN
+
+============================================================
+ENDPOINT 6: UPDATE CANDIDATE PROFILE
+============================================================
+
+METHOD:
+PUT
+
+URL:
+/api/v1/candidates/me
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Update candidate name, email, phone, LinkedIn, GitHub, and bio.
+
+REQUEST BODY:
+{
+  "firstName": "Johnathan",
+  "lastName": "Doe",
+  "email": "candidate@example.com",
+  "phone": "+1234567899",
+  "linkedinUrl": "https://linkedin.com/in/johnathan-doe",
+  "githubUrl": "https://github.com/johnathan-doe",
+  "bio": "Senior Software Engineer"
+}
+
+SUCCESS RESPONSE (200 OK):
+{
+  "id": 1,
+  "userId": 1,
+  "email": "candidate@example.com",
+  "firstName": "Johnathan",
+  "lastName": "Doe",
+  "phone": "+1234567899",
+  "linkedinUrl": "https://linkedin.com/in/johnathan-doe",
+  "githubUrl": "https://github.com/johnathan-doe",
+  "bio": "Senior Software Engineer"
+}
+
+ERROR RESPONSES:
+400 BAD REQUEST
+
+============================================================
+ENDPOINT 7: CANDIDATE CHANGE PASSWORD
+============================================================
+
+METHOD:
+POST
+
+URL:
+/api/v1/candidates/me/change-password
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Change candidate account password.
+
+REQUEST BODY:
+{
+  "oldPassword": "Password123!",
+  "newPassword": "NewPassword123!"
+}
+
+SUCCESS RESPONSE (200 OK):
+{
+  "message": "Password changed successfully"
+}
+
+ERROR RESPONSES:
+400 BAD REQUEST:
+{
+  "message": "Invalid old password"
+}
+
+============================================================
+ENDPOINT 8: CANDIDATE PASSWORD RESET
+============================================================
+
+METHOD:
+POST
+
+URL:
+/api/v1/candidates/me/password-reset
+
+AUTH:
+NONE / Bearer JWT
+
+ROLE:
+CANDIDATE / PUBLIC
+
+PURPOSE:
+Reset password for candidate account.
+
+REQUEST BODY:
+{
+  "email": "candidate@example.com",
+  "newPassword": "ResetPassword123!"
+}
+
+SUCCESS RESPONSE (200 OK):
+{
+  "message": "Password reset successfully"
+}
+
+ERROR RESPONSES:
+400 BAD REQUEST:
+{
+  "message": "User not found for provided email"
+}
+
+============================================================
+ENDPOINT 9: UPLOAD RESUME
+============================================================
+
+METHOD:
+POST
+
+URL:
+/api/v1/resumes
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Upload candidate resume file (PDF, JPG, JPEG, TXT, DOCX), store in Cloudinary, save DB record, and publish RabbitMQ message asynchronously.
+
+REQUEST BODY:
+form-data:
+file: [binary file]
+
+SUCCESS RESPONSE (200 OK / 202 ACCEPTED):
+{
+  "resumeId": 10,
+  "fileName": "john_doe_resume.pdf",
+  "fileType": "PDF",
+  "status": "QUEUED",
+  "message": "Resume uploaded and queued for processing."
+}
+
+ERROR RESPONSES:
+400 BAD REQUEST:
+{
+  "message": "Only PDF, JPG, JPEG, TXT and DOCX files are supported"
+}
+
+============================================================
+ENDPOINT 10: GET ALL RESUMES
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/resumes
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Retrieve list of all resumes uploaded by the authenticated candidate.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+[
+  {
+    "resumeId": 10,
+    "fileName": "john_doe_resume.pdf",
+    "fileType": "PDF",
+    "fileSize": 102400,
+    "processingStatus": "COMPLETED",
+    "storageUrl": "https://res.cloudinary.com/...",
+    "createdAt": "2026-09-20T20:00:00Z",
+    "updatedAt": "2026-09-20T20:01:00Z"
+  }
+]
+
+============================================================
+ENDPOINT 11: GET SINGLE RESUME
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/resumes/{resumeId}
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Retrieve single resume metadata for authenticated candidate.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "resumeId": 10,
+  "fileName": "john_doe_resume.pdf",
+  "fileType": "PDF",
+  "fileSize": 102400,
+  "processingStatus": "COMPLETED",
+  "storageUrl": "https://res.cloudinary.com/...",
+  "createdAt": "2026-09-20T20:00:00Z",
+  "updatedAt": "2026-09-20T20:01:00Z"
+}
+
+ERROR RESPONSES:
+404 NOT FOUND:
+{
+  "message": "Resume not found"
+}
+
+============================================================
+ENDPOINT 12: GET RESUME PROCESSING STATUS
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/resumes/{resumeId}/status
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Check asynchronous AI parsing processing status of a resume.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "resumeId": 10,
+  "status": "COMPLETED",
+  "parsedDataAvailable": true,
+  "message": "Resume processing completed."
+}
+
+============================================================
+ENDPOINT 13: GET PARSED RESUME DATA
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/resumes/{resumeId}/parsed-data
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Retrieve complete parsed resume JSON and structured profile, skills, education, and experience fields.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "resumeId": 10,
+  "parserVersion": "2.0.0",
+  "profile": {
+    "name": "John Doe",
+    "email": "candidate@example.com",
+    "phone": "+1234567890",
+    "yearsOfExperience": 5,
+    "language": "en"
+  },
+  "skills": [
+    {
+      "name": "Java",
+      "normalizedName": "java",
+      "confidence": 1.0
+    }
+  ],
+  "education": [],
+  "experience": [],
+  "projects": [],
+  "certifications": "",
+  "links": {
+    "linkedin": "",
+    "website": ""
+  },
+  "parsedData": { ... }
+}
+
+============================================================
+ENDPOINT 14: CANDIDATE SEARCH & LIST JOBS
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/candidates/jobs?query=python&sortBy=recent
+
+AUTH:
+NONE / Bearer JWT
+
+ROLE:
+CANDIDATE / PUBLIC
+
+PURPOSE:
+Retrieve available completed jobs with optional search filtering and sorting (recent or title).
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+[
+  {
+    "jobId": 5,
+    "jobTitle": "Junior Python Developer",
+    "companyName": "Tech Corp",
+    "jobDescription": "We are looking for a Python developer...",
+    "experienceRequired": "0-2 years",
+    "educationRequired": "Bachelor's in CS",
+    "skills": [
+      {
+        "name": "Python",
+        "normalizedName": "python",
+        "importance": "HIGH",
+        "category": "technical"
+      }
+    ],
+    "processingStatus": "COMPLETED",
+    "createdAt": "2026-09-20T19:00:00Z",
+    "updatedAt": "2026-09-20T19:05:00Z"
+  }
+]
+
+============================================================
+ENDPOINT 15: CANDIDATE GET JOB DETAILS
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/candidates/jobs/{jobId}
+
+AUTH:
+NONE / Bearer JWT
+
+ROLE:
+CANDIDATE / PUBLIC
+
+PURPOSE:
+Retrieve detailed job information including parsed requirements, skills, education, and experience expectations.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "jobId": 5,
+  "jobTitle": "Junior Python Developer",
+  "companyName": "Tech Corp",
+  "jobDescription": "We are looking for a Python developer...",
+  "experienceRequired": "0-2 years",
+  "educationRequired": "Bachelor's in CS",
+  "skills": [ ... ],
+  "parsedRequirements": { ... },
+  "processingStatus": "COMPLETED",
+  "createdAt": "2026-09-20T19:00:00Z",
+  "updatedAt": "2026-09-20T19:05:00Z"
+}
+
+ERROR RESPONSES:
+400 BAD REQUEST / 404 NOT FOUND:
+{
+  "message": "This job is not available to candidates yet"
+}
+
+============================================================
+ENDPOINT 16: CANDIDATE APPLY TO JOB
+============================================================
+
+METHOD:
+POST
+
+URL:
+/api/v1/jobs/{jobId}/apply
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Apply to a job using a selected processed resume. Triggers asynchronous RabbitMQ matching workflow.
+
+REQUEST BODY:
+{
+  "resumeId": 10
+}
+
+SUCCESS RESPONSE (200 OK):
+{
+  "applicationId": 100,
+  "jobId": 5,
+  "resumeId": 10,
+  "status": "MATCHING_PENDING",
+  "message": "Application submitted successfully. Matching is being processed."
+}
+
+ERROR RESPONSES:
+400 BAD REQUEST / 409 CONFLICT:
+{
+  "message": "You have already applied for this job"
+}
+
+============================================================
+ENDPOINT 17: CANDIDATE GET APPLICATION STATUS FOR JOB
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/candidates/jobs/{jobId}/application
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Retrieve application status and overall score for a specific job.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "applicationId": 100,
+  "jobId": 5,
+  "jobTitle": "Junior Python Developer",
+  "resumeId": 10,
+  "status": "MATCHED",
+  "overallScore": 86,
+  "createdAt": "2026-09-20T19:10:00Z"
+}
+
+============================================================
+ENDPOINT 18: CANDIDATE LIST ALL APPLICATIONS
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/candidates/applications
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Retrieve all job applications submitted by the candidate.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+[
+  {
+    "applicationId": 100,
+    "jobId": 5,
+    "jobTitle": "Junior Python Developer",
+    "resumeId": 10,
+    "status": "MATCHED",
+    "overallScore": 86,
+    "createdAt": "2026-09-20T19:10:00Z"
+  }
+]
+
+============================================================
+ENDPOINT 19: CANDIDATE GET MATCH RESULT
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/candidates/applications/{applicationId}/match-result
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Retrieve complete AI matcher analysis, matched skills, missing skills, and summary for an application.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "applicationId": 100,
+  "jobId": 5,
+  "jobTitle": "Junior Python Developer",
+  "status": "MATCHED",
+  "overallScore": 86,
+  "matcherVersion": "2.0.0-lm-studio",
+  "matcherResult": {
+    "status": "COMPLETED",
+    "overallScore": 86,
+    "experienceMet": true,
+    "educationMet": true,
+    "matchedSkills": [ ... ],
+    "missingSkills": [ ... ],
+    "summary": "..."
+  }
+}
+
+============================================================
+ENDPOINT 20: GENERATE INTERVIEW QUESTIONS
+============================================================
+
+METHOD:
+POST
+
+URL:
+/api/v1/candidates/jobs/{jobId}/interview-questions
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Generate AI interview questions based on parsed job requirements.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "status": "COMPLETED",
+  "jobTitle": "Junior Python Developer",
+  "totalQuestions": 12,
+  "questionsText": "...",
+  "questions": [
+    "What experience do you have with Python?",
+    "Explain OOP concepts in Python."
+  ]
+}
+
+============================================================
+ENDPOINT 21: RETRIEVE INTERVIEW QUESTIONS
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/candidates/jobs/{jobId}/interview-questions
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Retrieve previously generated interview questions for a job.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "status": "COMPLETED",
+  "jobTitle": "Junior Python Developer",
+  "totalQuestions": 12,
+  "questionsText": "...",
+  "questions": [ ... ]
+}
+
+============================================================
+ENDPOINT 22: ANALYZE SKILL GAP
+============================================================
+
+METHOD:
+POST
+
+URL:
+/api/v1/candidates/jobs/{jobId}/skill-gap
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Analyze candidate's parsed resume against job requirements to identify missing skills and qualification gaps.
+
+REQUEST BODY:
+NONE (optional query param ?resumeId=10)
+
+SUCCESS RESPONSE (200 OK):
+{
+  "status": "COMPLETED",
+  "jobTitle": "Junior Python Developer",
+  "hasGap": true,
+  "experienceMet": true,
+  "message": "Candidate has 2 missing technical skills.",
+  "missingSkills": [
+    {
+      "name": "Docker",
+      "normalizedName": "docker",
+      "importance": "HIGH"
+    }
+  ]
+}
+
+============================================================
+ENDPOINT 23: RETRIEVE SKILL GAP ANALYSIS
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/candidates/jobs/{jobId}/skill-gap
+
+AUTH:
+Bearer JWT
+
+ROLE:
+CANDIDATE
+
+PURPOSE:
+Retrieve previously generated skill gap analysis for a job.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "status": "COMPLETED",
+  "jobTitle": "Junior Python Developer",
+  "hasGap": true,
+  "experienceMet": true,
+  "message": "...",
+  "missingSkills": [ ... ]
+}
+
+============================================================
+ENDPOINT 24: GET RECRUITER PROFILE
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/recruiters/me
+
+AUTH:
+Bearer JWT
+
+ROLE:
+RECRUITER
+
+PURPOSE:
+Retrieve authenticated recruiter profile.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "id": 1,
+  "userId": 2,
+  "email": "recruiter@company.com",
+  "firstName": "Alice",
+  "lastName": "Smith",
+  "phone": "+1987654321",
+  "companyName": "Tech Corp",
+  "designation": "Hiring Manager"
+}
+
+============================================================
+ENDPOINT 25: UPDATE RECRUITER PROFILE
+============================================================
+
+METHOD:
+PUT
+
+URL:
+/api/v1/recruiters/me
+
+AUTH:
+Bearer JWT
+
+ROLE:
+RECRUITER
+
+PURPOSE:
+Update recruiter profile fields (name, email, phone, companyName, designation).
+
+REQUEST BODY:
+{
+  "firstName": "Alice",
+  "lastName": "Smith-Jones",
+  "email": "recruiter@company.com",
+  "phone": "+1987654322",
+  "companyName": "Tech Corp Global",
+  "designation": "Senior Talent Acquisition Manager"
+}
+
+SUCCESS RESPONSE (200 OK):
+{
+  "id": 1,
+  "userId": 2,
+  "email": "recruiter@company.com",
+  "firstName": "Alice",
+  "lastName": "Smith-Jones",
+  "phone": "+1987654322",
+  "companyName": "Tech Corp Global",
+  "designation": "Senior Talent Acquisition Manager"
+}
+
+============================================================
+ENDPOINT 26: RECRUITER CHANGE PASSWORD
+============================================================
+
+METHOD:
+POST
+
+URL:
+/api/v1/recruiters/me/change-password
+
+AUTH:
+Bearer JWT
+
+ROLE:
+RECRUITER
+
+PURPOSE:
+Change recruiter account password.
+
+REQUEST BODY:
+{
+  "oldPassword": "Password123!",
+  "newPassword": "NewPassword123!"
+}
+
+SUCCESS RESPONSE (200 OK):
+{
+  "message": "Password changed successfully"
+}
+
+============================================================
+ENDPOINT 27: RECRUITER PASSWORD RESET
+============================================================
+
+METHOD:
+POST
+
+URL:
+/api/v1/recruiters/me/password-reset
+
+AUTH:
+NONE / Bearer JWT
+
+ROLE:
+RECRUITER / PUBLIC
+
+PURPOSE:
+Reset password for recruiter account.
+
+REQUEST BODY:
+{
+  "email": "recruiter@company.com",
+  "newPassword": "ResetPassword123!"
+}
+
+SUCCESS RESPONSE (200 OK):
+{
+  "message": "Password reset successfully"
+}
+
+============================================================
+ENDPOINT 28: RECRUITER CREATE JOB
+============================================================
+
+METHOD:
+POST
+
+URL:
+/api/v1/jobs
+
+AUTH:
+Bearer JWT
+
+ROLE:
+RECRUITER
+
+PURPOSE:
+Create a new job with title and plain-text JD. Stores original JD, sets status QUEUED, and triggers asynchronous RabbitMQ parsing.
+
+REQUEST BODY:
+{
+  "jobTitle": "Junior Python Developer",
+  "jobDescription": "We are looking for a Python developer with experience in Django, REST APIs, and SQL."
+}
+
+SUCCESS RESPONSE (200 OK):
+{
+  "jobId": 5,
+  "recruiterId": 2,
+  "jobTitle": "Junior Python Developer",
+  "jobDescription": "We are looking for a Python developer...",
+  "storageUrl": null,
+  "processingStatus": "QUEUED",
+  "createdAt": "2026-09-20T19:00:00Z",
+  "updatedAt": "2026-09-20T19:00:00Z"
+}
+
+============================================================
+ENDPOINT 29: RECRUITER LIST OWN JOBS
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/jobs
+
+AUTH:
+Bearer JWT
+
+ROLE:
+RECRUITER
+
+PURPOSE:
+Retrieve all jobs created by the authenticated recruiter.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+[
+  {
+    "jobId": 5,
+    "recruiterId": 2,
+    "jobTitle": "Junior Python Developer",
+    "jobDescription": "We are looking for...",
+    "processingStatus": "COMPLETED",
+    "createdAt": "2026-09-20T19:00:00Z",
+    "updatedAt": "2026-09-20T19:05:00Z"
+  }
+]
+
+============================================================
+ENDPOINT 30: RECRUITER GET SINGLE JOB
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/jobs/{jobId}
+
+AUTH:
+Bearer JWT
+
+ROLE:
+RECRUITER
+
+PURPOSE:
+Retrieve single job details created by the recruiter.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "jobId": 5,
+  "recruiterId": 2,
+  "jobTitle": "Junior Python Developer",
+  "jobDescription": "We are looking for...",
+  "processingStatus": "COMPLETED",
+  "createdAt": "2026-09-20T19:00:00Z",
+  "updatedAt": "2026-09-20T19:05:00Z"
+}
+
+============================================================
+ENDPOINT 31: RECRUITER UPDATE JOB
+============================================================
+
+METHOD:
+PUT
+
+URL:
+/api/v1/jobs/{jobId}
+
+AUTH:
+Bearer JWT
+
+ROLE:
+RECRUITER
+
+PURPOSE:
+Update job title or description. Re-queues job for parsing if description changes.
+
+REQUEST BODY:
+{
+  "jobTitle": "Junior Python Engineer",
+  "jobDescription": "Updated JD content..."
+}
+
+SUCCESS RESPONSE (200 OK):
+{
+  "jobId": 5,
+  "recruiterId": 2,
+  "jobTitle": "Junior Python Engineer",
+  "jobDescription": "Updated JD content...",
+  "processingStatus": "QUEUED",
+  "createdAt": "2026-09-20T19:00:00Z",
+  "updatedAt": "2026-09-20T20:00:00Z"
+}
+
+============================================================
+ENDPOINT 32: RECRUITER DELETE JOB
+============================================================
+
+METHOD:
+DELETE
+
+URL:
+/api/v1/jobs/{jobId}
+
+AUTH:
+Bearer JWT
+
+ROLE:
+RECRUITER
+
+PURPOSE:
+Delete a job created by the authenticated recruiter.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (204 NO CONTENT)
+
+============================================================
+ENDPOINT 33: RECRUITER GET JOB STATUS
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/jobs/{jobId}/status
+
+AUTH:
+Bearer JWT
+
+ROLE:
+RECRUITER
+
+PURPOSE:
+Check parsing processing status of a job.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "jobId": 5,
+  "status": "COMPLETED",
+  "parsedDataAvailable": true,
+  "message": "Job description processing completed."
+}
+
+============================================================
+ENDPOINT 34: RECRUITER GET PARSED JOB DATA
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/jobs/{jobId}/parsed-data
+
+AUTH:
+Bearer JWT
+
+ROLE:
+RECRUITER
+
+PURPOSE:
+Retrieve exact raw parsed JD JSON and parser version.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "jobId": 5,
+  "parserVersion": "2.0.0-lm-studio",
+  "parsedJson": "{ \"status\": \"COMPLETED\", \"jobTitle\": \"Junior Python Developer\", ... }"
+}
+
+============================================================
+ENDPOINT 35: RECRUITER LIST APPLICANTS FOR JOB
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/recruiters/jobs/{jobId}/applications
+
+AUTH:
+Bearer JWT
+
+ROLE:
+RECRUITER
+
+PURPOSE:
+Retrieve all applicants for a recruiter's job, sorted deterministically by overallScore DESC, createdAt ASC.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+[
+  {
+    "applicationId": 100,
+    "candidateId": 1,
+    "resumeId": 10,
+    "candidateName": "John Doe",
+    "candidateEmail": "candidate@example.com",
+    "candidatePhone": "+1234567890",
+    "resumeFileName": "john_doe_resume.pdf",
+    "resumeUrl": "https://res.cloudinary.com/...",
+    "status": "MATCHED",
+    "overallScore": 86,
+    "matcherVersion": "2.0.0-lm-studio",
+    "experienceMet": true,
+    "educationMet": true,
+    "matchedSkills": [ ... ],
+    "missingSkills": [ ... ],
+    "summary": "Candidate matches requirements well."
+  }
+]
+
+============================================================
+ENDPOINT 36: RECRUITER GET APPLICANT DETAILS
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/recruiters/jobs/{jobId}/applications/{applicationId}
+
+AUTH:
+Bearer JWT
+
+ROLE:
+RECRUITER
+
+PURPOSE:
+Retrieve detailed applicant profile, parsed resume JSON, and match analysis.
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+{
+  "applicationSummary": { ... },
+  "candidateProfile": {
+    "linkedinUrl": "https://linkedin.com/in/johndoe",
+    "githubUrl": "https://github.com/johndoe",
+    "bio": "Software Engineer"
+  },
+  "parsedResume": { ... }
+}
+
+============================================================
+ENDPOINT 37: SECURE CANDIDATE RESUME DOWNLOAD
+============================================================
+
+METHOD:
+GET
+
+URL:
+/api/v1/recruiters/applications/{applicationId}/resume/download
+
+AUTH:
+Bearer JWT
+
+ROLE:
+RECRUITER
+
+PURPOSE:
+Securely download the candidate's resume for an application (verifies recruiter owns the job and candidate applied).
+
+REQUEST BODY:
+NONE
+
+SUCCESS RESPONSE (200 OK):
+[Binary File Stream: Content-Type application/octet-stream, Content-Disposition attachment; filename="john_doe_resume.pdf"]
+
+ERROR RESPONSES:
+403 FORBIDDEN:
+{
+  "message": "Forbidden: You do not own the job for this application"
+}
