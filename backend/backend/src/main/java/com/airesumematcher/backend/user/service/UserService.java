@@ -23,9 +23,7 @@ public class UserService {
 
         User user = userRepository
                 .findByEmailIgnoreCase(email)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("User not found")
-                );
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (!passwordEncoder.matches(
                 request.getCurrentPassword(),
@@ -44,11 +42,7 @@ public class UserService {
             );
         }
 
-        user.setPasswordHash(
-                passwordEncoder.encode(
-                        request.getNewPassword()
-                )
-        );
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
 
         userRepository.save(user);
     }
