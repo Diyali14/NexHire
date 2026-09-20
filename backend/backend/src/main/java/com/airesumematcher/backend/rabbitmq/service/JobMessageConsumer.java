@@ -7,11 +7,13 @@ import com.airesumematcher.backend.recruiter.entity.Job;
 import com.airesumematcher.backend.recruiter.entity.JobProcessingStatus;
 import com.airesumematcher.backend.recruiter.repository.JobRepository;
 import com.airesumematcher.backend.recruiter.service.JobParsedDataService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+@Slf4j
 @Service
 public class JobMessageConsumer {
 
@@ -35,114 +37,64 @@ public class JobMessageConsumer {
     @RabbitListener(queues = RabbitMQConfig.JOB_QUEUE)
     public void processJob(JobProcessingMessage message) {
 
-        System.out.println("======================================");
-        System.out.println("JD PROCESSING STARTED");
-        System.out.println("Job ID: " + message.getJobId());
-        System.out.println("Job Title: " + message.getJobTitle());
+        log.info("JD PROCESSING STARTED - Job ID: {}, Title: {}", message.getJobId(), message.getJobTitle());
 
         Job job = jobRepository
                 .findById(message.getJobId())
                 .orElseThrow(() ->
-                        new RuntimeException("Job not found")
+                        new RuntimeException("Job not found for ID: " + message.getJobId())
                 );
+
+        // Idempotency check: if already completed, do not re-process
+        if (job.getProcessingStatus() == JobProcessingStatus.COMPLETED) {
+            log.info("Job ID {} already completed processing. Skipping.", message.getJobId());
+            return;
+        }
 
         try {
 
             // 1. Mark job as PROCESSING
-
-            job.setProcessingStatus(
-                    JobProcessingStatus.PROCESSING
-            );
-
+            job.setProcessingStatus(JobProcessingStatus.PROCESSING);
             jobRepository.save(job);
 
-            System.out.println("Status: PROCESSING");
-
+            log.info("Job ID {} status updated to PROCESSING", message.getJobId());
 
             // 2. Get plain-text job description
-            // directly from RabbitMQ message
-
-            String jobDescription =
-                    message.getJobDescription();
-
-            if (jobDescription == null ||
-                    jobDescription.isBlank()) {
-
-                throw new IllegalArgumentException(
-                        "Job description cannot be empty"
-                );
+            String jobDescription = message.getJobDescription();
+            if (jobDescription == null || jobDescription.isBlank()) {
+                throw new IllegalArgumentException("Job description cannot be empty");
             }
 
-            System.out.println(
-                    "Job description received from RabbitMQ"
-            );
-
-
             // 3. Send plain text JD to AI parser
+            String parsedJson = aiParserService.analyzeJobDescription(jobDescription);
 
-            String parsedJson =
-                    aiParserService.analyzeJobDescription(
-                            jobDescription
-                    );
-
-            System.out.println(
-                    "AI JD parser response received"
-            );
-
+            log.info("AI JD parser response received for Job ID {}", message.getJobId());
 
             // 4. Parse AI response
-
-            JsonNode root =
-                    objectMapper.readTree(parsedJson);
-
-            String parserVersion =
-                    root.path("modelVersion")
-                            .asText(null);
-
+            JsonNode root = objectMapper.readTree(parsedJson);
+            String parserVersion = root.hasNonNull("modelVersion") ? root.get("modelVersion").asText() : null;
 
             // 5. Save complete parsed JSON
-
             jobParsedDataService.saveParsedData(
                     message.getJobId(),
                     parsedJson,
                     parserVersion
             );
 
-            System.out.println(
-                    "Parsed JD data saved successfully"
-            );
-
+            log.info("Parsed JD data saved successfully for Job ID {}", message.getJobId());
 
             // 6. Mark job as COMPLETED
-
-            job.setProcessingStatus(
-                    JobProcessingStatus.COMPLETED
-            );
-
+            job.setProcessingStatus(JobProcessingStatus.COMPLETED);
             jobRepository.save(job);
 
-            System.out.println("Status: COMPLETED");
-            System.out.println("======================================");
+            log.info("JD PROCESSING COMPLETED - Job ID: {}", message.getJobId());
 
         } catch (Exception e) {
 
-            System.err.println(
-                    "JD processing failed for Job ID: "
-                            + message.getJobId()
-            );
+            log.error("JD processing failed for Job ID: {}", message.getJobId(), e);
 
-            e.printStackTrace();
-
-            job.setProcessingStatus(
-                    JobProcessingStatus.FAILED
-            );
-
+            job.setProcessingStatus(JobProcessingStatus.FAILED);
             jobRepository.save(job);
-
-            throw new RuntimeException(
-                    "Job description processing failed",
-                    e
-            );
         }
     }
 }

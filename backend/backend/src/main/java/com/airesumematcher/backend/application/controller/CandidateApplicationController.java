@@ -5,23 +5,28 @@ import com.airesumematcher.backend.application.repository.JobApplicationReposito
 import com.airesumematcher.backend.user.entity.User;
 import com.airesumematcher.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/candidates")
 @RequiredArgsConstructor
+
 public class CandidateApplicationController {
 
     private final JobApplicationRepository applicationRepository;
-
     private final UserRepository userRepository;
-
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/jobs/{jobId}/application")
     public ResponseEntity<?> getApplication(
@@ -29,22 +34,13 @@ public class CandidateApplicationController {
             Authentication authentication
     ) {
 
-        // =========================================================
-        // 1. GET AUTHENTICATED CANDIDATE
-        // =========================================================
-
         User candidate = userRepository.findByEmailIgnoreCase(authentication.getName())
-                        .orElseThrow(() ->
-                                new ResponseStatusException(
-                                        HttpStatus.NOT_FOUND,
-                                        "Authenticated candidate not found"
-                                )
-                        );
-
-
-        // =========================================================
-        // 2. GET APPLICATION
-        // =========================================================
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Authenticated candidate not found"
+                        )
+                );
 
         JobApplication application =
                 applicationRepository
@@ -59,37 +55,106 @@ public class CandidateApplicationController {
                                 )
                         );
 
+        return ResponseEntity.ok(buildApplicationMap(application));
+    }
 
-        // =========================================================
-        // 3. RETURN APPLICATION STATUS
-        // =========================================================
+    @GetMapping("/applications")
+    public ResponseEntity<List<Map<String, Object>>> getMyApplications(
+            Authentication authentication
+    ) {
+        User candidate = userRepository.findByEmailIgnoreCase(authentication.getName())
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Authenticated candidate not found"
+                        )
+                );
+
+        List<JobApplication> applications =
+                applicationRepository.findAllByCandidateIdOrderByCreatedAtDesc(candidate.getId());
+
+        List<Map<String, Object>> response = new ArrayList<>();
+        for (JobApplication app : applications) {
+            response.add(buildApplicationMap(app));
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/applications/{applicationId}/match-result")
+    public ResponseEntity<?> getMatchResult(
+            @PathVariable Long applicationId,
+            Authentication authentication
+    ) {
+        User candidate = userRepository.findByEmailIgnoreCase(authentication.getName())
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Authenticated candidate not found"
+                        )
+                );
+
+        JobApplication application = applicationRepository.findById(applicationId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Application not found"
+                        )
+                );
+
+        if (!application.getCandidate().getId().equals(candidate.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You are not authorized to view this application"
+            );
+        }
+
+        JsonNode matcherResultNode = null;
+
+        if (application.getMatcherResult() != null
+                && !application.getMatcherResult().isBlank()) {
+
+            try {
+                matcherResultNode =
+                        objectMapper.readTree(application.getMatcherResult());
+            } catch (Exception ignored) {
+            }
+        }
 
         return ResponseEntity.ok(
                 Map.of(
-                        "applicationId",
-                        application.getId(),
-
-                        "jobId",
-                        application
-                                .getJob()
-                                .getId(),
-
-                        "resumeId",
-                        application
-                                .getResume()
-                                .getId(),
-
-                        "status",
-                        application
-                                .getStatus()
-                                .name(),
-
+                        "applicationId", application.getId(),
+                        "jobId", application.getJob().getId(),
+                        "jobTitle", application.getJob().getJobTitle(),
+                        "status", application.getStatus().name(),
                         "overallScore",
-                        application.getOverallScore()
-                                != null
+                        application.getOverallScore() != null
                                 ? application.getOverallScore()
-                                : 0
+                                : 0,
+                        "matcherVersion",
+                        application.getMatcherVersion() != null
+                                ? application.getMatcherVersion()
+                                : "",
+                        "matcherResult",
+                        matcherResultNode != null
+                                ? matcherResultNode
+                                : Map.of()
                 )
+        );
+    }
+
+    private Map<String, Object> buildApplicationMap(JobApplication app) {
+        return Map.of(
+                "applicationId", app.getId(),
+                "jobId", app.getJob().getId(),
+                "jobTitle", app.getJob().getJobTitle(),
+                "resumeId", app.getResume().getId(),
+                "status", app.getStatus().name(),
+                "overallScore",
+                app.getOverallScore() != null
+                        ? app.getOverallScore()
+                        : 0,
+                "createdAt", app.getCreatedAt()
         );
     }
 }

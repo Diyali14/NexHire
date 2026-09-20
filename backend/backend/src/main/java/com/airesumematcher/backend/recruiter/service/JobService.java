@@ -18,6 +18,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class JobService {
@@ -219,6 +221,54 @@ public class JobService {
     // =========================================================
     // DELETE JOB
     // =========================================================
+
+    @Transactional(readOnly = true)
+    public List<JobResponse> getMyJobs(Authentication authentication) {
+        User recruiter = getAuthenticatedRecruiter(authentication);
+        return jobRepository.findAllByRecruiterIdOrderByCreatedAtDesc(recruiter.getId())
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public JobResponse getJob(Long jobId, Authentication authentication) {
+        User recruiter = getAuthenticatedRecruiter(authentication);
+        Job job = jobRepository.findByIdAndRecruiterId(jobId, recruiter.getId())
+                .orElseThrow(() -> new RuntimeException("Job not found or unauthorized"));
+        return toResponse(job);
+    }
+
+    @Transactional
+    public JobResponse updateJob(Long jobId, JobCreateRequest request, Authentication authentication) {
+        User recruiter = getAuthenticatedRecruiter(authentication);
+        Job job = jobRepository.findByIdAndRecruiterId(jobId, recruiter.getId())
+                .orElseThrow(() -> new RuntimeException("Job not found or unauthorized"));
+
+        if (request.getJobTitle() != null && !request.getJobTitle().isBlank()) {
+            job.setJobTitle(request.getJobTitle().trim());
+        }
+        if (request.getJobDescription() != null && !request.getJobDescription().isBlank()) {
+            job.setJobDescription(request.getJobDescription().trim());
+            // Re-trigger parsing if JD content changed
+            job.setProcessingStatus(JobProcessingStatus.STORED);
+            job = jobRepository.saveAndFlush(job);
+
+            jobMessageProducer.publish(
+                    JobProcessingMessage.builder()
+                            .jobId(job.getId())
+                            .recruiterId(recruiter.getId())
+                            .jobTitle(job.getJobTitle())
+                            .jobDescription(job.getJobDescription())
+                            .build()
+            );
+
+            job.setProcessingStatus(JobProcessingStatus.QUEUED);
+        }
+
+        job = jobRepository.save(job);
+        return toResponse(job);
+    }
 
     @Transactional
     public void deleteJob(
