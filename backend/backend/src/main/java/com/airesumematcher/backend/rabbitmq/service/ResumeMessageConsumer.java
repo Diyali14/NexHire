@@ -3,6 +3,7 @@ package com.airesumematcher.backend.rabbitmq.service;
 import com.airesumematcher.backend.ai.service.AiParserService;
 import com.airesumematcher.backend.rabbitmq.config.RabbitMQConfig;
 import com.airesumematcher.backend.rabbitmq.dto.ResumeProcessingMessage;
+import com.airesumematcher.backend.resume.dto.ParsedResumeDto;
 import com.airesumematcher.backend.resume.entity.Resume;
 import com.airesumematcher.backend.resume.entity.ProcessingStatus;
 import com.airesumematcher.backend.resume.repository.ResumeRepository;
@@ -77,48 +78,49 @@ public class ResumeMessageConsumer {
 
             // 3. Send PDF to AI parser
 
-            String parsedJson =
+            ParsedResumeDto parsedJson =
                     aiParserService.parseResume(
                             fileBytes,
                             "resume.pdf"
                     );
-
+            System.out.println(parsedJson);
             System.out.println("AI parser response received");
 
 
             // 4. Extract parser version
 
-            JsonNode root =
-                    objectMapper.readTree(parsedJson);
-
-            String parserVersion =
-                    root.path("parserVersion")
-                            .asText(null);
-
-
-            // 5. Save parsed data
-
-            resumeParsedDataService.saveParsedData(
-                    message.getResumeId(),
-                    parsedJson,
-                    parserVersion
-            );
-
-            System.out.println("Parsed data saved");
-
-
-            // 6. Mark COMPLETED
-
-            resume.setProcessingStatus(
-                    ProcessingStatus.COMPLETED
-            );
-
-            resumeRepository.save(resume);
+//            JsonNode root =
+//                    objectMapper.readTree(parsedJson);
+//
+//            String parserVersion =
+//                    root.path("parserVersion")
+//                            .asText(null);
+//
+//
+//            // 5. Save parsed data
+//
+//            resumeParsedDataService.saveParsedData(
+//                    message.getResumeId(),
+//                    parsedJson,
+//                    parserVersion
+//            );
+//
+//            System.out.println("Parsed data saved");
+//
+//
+//            // 6. Mark COMPLETED
+//
+//            resume.setProcessingStatus(
+//                    ProcessingStatus.COMPLETED
+//            );
+//
+//            resumeRepository.save(resume);
 
             System.out.println("Status: COMPLETED");
             System.out.println("======================================");
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
 
             System.err.println(
                     "Resume processing failed: "

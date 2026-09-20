@@ -17,8 +17,11 @@ import com.airesumematcher.backend.resume.repository.ResumeRepository;
 import com.airesumematcher.backend.resume.repository.ResumeSkillRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+//point of breakage
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+//point of breakage
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +130,9 @@ public class ResumeParsedDataService {
          * Therefore the entity field must receive JsonNode,
          * not the original String.
          */
-        parsedData.setParsedJson(root);
+        parsedData.setParsedJson(
+                objectMapper.writeValueAsString(root)
+        );
 
         parsedData.setParserVersion(parserVersion);
 
@@ -295,14 +300,16 @@ public class ResumeParsedDataService {
          * parsed_json is already JsonNode.
          * No need to parse it again.
          */
-        JsonNode root =
-                parsedData.getParsedJson();
+        JsonNode root;
 
-        if (root == null
-                || !root.isObject()) {
-
+        try {
+            root = objectMapper.readTree(
+                    parsedData.getParsedJson()
+            );
+        } catch (Exception e) {
             throw new RuntimeException(
-                    "Stored parsed resume data is invalid"
+                    "Stored parsed resume JSON is invalid",
+                    e
             );
         }
 
@@ -721,18 +728,24 @@ public class ResumeParsedDataService {
                                     )
                             )
                             .responsibilities(
-                                    experienceNodeItem.path(
-                                            "responsibilities"
+                                    toJsonString(
+                                            experienceNodeItem.path(
+                                                    "responsibilities"
+                                            )
                                     )
                             )
                             .technologies(
-                                    experienceNodeItem.path(
-                                            "technologies"
+                                    toJsonString(
+                                            experienceNodeItem.path(
+                                                    "technologies"
+                                            )
                                     )
                             )
                             .additionalInformation(
-                                    experienceNodeItem.path(
-                                            "additional_information"
+                                    toJsonString(
+                                            experienceNodeItem.path(
+                                                    "additional_information"
+                                            )
                                     )
                             )
                             .build();
@@ -996,26 +1009,22 @@ public class ResumeParsedDataService {
     // JSON SERIALIZATION HELPER
     // =========================================================
 
-    private String toJsonString(
-            JsonNode node
-    ) {
+    private String toJsonString(JsonNode node) {
 
         if (node == null
                 || node.isMissingNode()
                 || node.isNull()) {
 
-            return "[]";
+            return null;
         }
 
         try {
-
-            return objectMapper.writeValueAsString(
-                    node
-            );
-
+            return objectMapper.writeValueAsString(node);
         } catch (Exception e) {
-
-            return "[]";
+            throw new IllegalArgumentException(
+                    "Failed to serialize JSON data",
+                    e
+            );
         }
     }
 }

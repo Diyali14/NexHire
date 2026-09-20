@@ -2,10 +2,9 @@ package com.airesumematcher.backend.resume.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.time.LocalDateTime;
-
-import tools.jackson.databind.JsonNode;
 
 @Entity
 @Table(
@@ -46,12 +45,13 @@ public class ResumeParsedData {
     // COMPLETE ORIGINAL PARSER RESPONSE
     // =========================================================
 
+    @JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     @Column(
             name = "parsed_json",
             nullable = false,
             columnDefinition = "jsonb"
     )
-    private JsonNode parsedJson;
+    private String parsedJson;
 
     // =========================================================
     // EXTRACTED PROFILE DATA
