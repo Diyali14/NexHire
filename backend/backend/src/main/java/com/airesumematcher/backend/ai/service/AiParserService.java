@@ -1,5 +1,6 @@
 package com.airesumematcher.backend.ai.service;
 
+import com.airesumematcher.backend.resume.dto.ParsedResumeDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -25,7 +26,7 @@ public class AiParserService {
     // RESUME PARSER
     // ===============================
 
-    public String parseResume(
+    public ParsedResumeDto parseResume(
             byte[] pdfBytes,
             String fileName
     ) {
@@ -44,12 +45,14 @@ public class AiParserService {
 
         body.add("file", fileResource);
 
-        return restClient.post()
+         ParsedResumeDto obj=restClient.post()
                 .uri("/ai/v1/parse-resume-file")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(body)
                 .retrieve()
-                .body(String.class);
+                .body(ParsedResumeDto.class);
+        System.out.println(obj);
+        return obj;
     }
 
 

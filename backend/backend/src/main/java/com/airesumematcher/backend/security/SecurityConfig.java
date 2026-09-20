@@ -2,6 +2,7 @@ package com.airesumematcher.backend.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.*;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -42,6 +43,10 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
+                        // =================================================
+                        // PUBLIC
+                        // =================================================
+
                         .requestMatchers(
                                 "/api/v1/auth/**",
                                 "/health",
@@ -52,19 +57,39 @@ public class SecurityConfig {
                                 "/api/v1/storage-test/**"
                         ).permitAll()
 
+                        // =================================================
+                        // CANDIDATE
+                        // =================================================
+
                         .requestMatchers(
                                 "/api/v1/candidates/**"
                         ).hasRole("CANDIDATE")
 
                         .requestMatchers(
+                                "/api/v1/resumes/**"
+                        ).hasRole("CANDIDATE")
+
+                        // Candidate applies to recruiter job
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/v1/jobs/*/apply"
+                        ).hasRole("CANDIDATE")
+
+                        // =================================================
+                        // RECRUITER
+                        // =================================================
+
+                        .requestMatchers(
                                 "/api/v1/recruiters/**"
                         ).hasRole("RECRUITER")
 
-                        .requestMatchers("/api/v1/resumes/**")
-                        .hasRole("CANDIDATE")
+                        .requestMatchers(
+                                "/api/v1/jobs/**"
+                        ).hasRole("RECRUITER")
 
-                        .requestMatchers("/api/v1/jobs/**")
-                        .hasRole("RECRUITER")
+                        // =================================================
+                        // EVERYTHING ELSE
+                        // =================================================
 
                         .anyRequest()
                         .authenticated()
@@ -87,6 +112,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration
     ) throws Exception {
+
         return configuration.getAuthenticationManager();
     }
 
