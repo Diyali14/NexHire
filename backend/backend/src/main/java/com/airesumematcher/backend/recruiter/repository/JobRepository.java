@@ -1,6 +1,7 @@
 package com.airesumematcher.backend.recruiter.repository;
 
 import com.airesumematcher.backend.recruiter.entity.Job;
+import com.airesumematcher.backend.recruiter.entity.JobProcessingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -16,5 +17,9 @@ public interface JobRepository
     Optional<Job> findByIdAndRecruiterId(
             Long id,
             Long recruiterId
+    );
+
+    List<Job> findAllByProcessingStatusOrderByCreatedAtDesc(
+            JobProcessingStatus processingStatus
     );
 }

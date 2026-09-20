@@ -45,7 +45,6 @@ public class RabbitMQConfig {
 
     // =========================================================
     // JOB / JD
-    // Keep these for later
     // =========================================================
 
     public static final String JOB_EXCHANGE =
@@ -59,7 +58,22 @@ public class RabbitMQConfig {
 
 
     // =========================================================
-    // RESUME INPUT RABBITMQ
+    // MATCHER
+    // Spring Boot Application -> Matcher Consumer
+    // =========================================================
+
+    public static final String MATCHER_EXCHANGE =
+            "resume.matcher.exchange";
+
+    public static final String MATCHER_QUEUE =
+            "resume.matcher.queue";
+
+    public static final String MATCHER_ROUTING_KEY =
+            "resume.matcher";
+
+
+    // =========================================================
+    // RESUME INPUT
     // =========================================================
 
     @Bean
@@ -93,7 +107,7 @@ public class RabbitMQConfig {
 
 
     // =========================================================
-    // RESUME RESULT RABBITMQ
+    // RESUME RESULT
     // =========================================================
 
     @Bean
@@ -127,8 +141,7 @@ public class RabbitMQConfig {
 
 
     // =========================================================
-    // JOB RABBITMQ
-    // Leave this untouched for now
+    // JOB / JD
     // =========================================================
 
     @Bean
@@ -158,6 +171,40 @@ public class RabbitMQConfig {
                 .bind(jobQueue)
                 .to(jobExchange)
                 .with(JOB_ROUTING_KEY);
+    }
+
+
+    // =========================================================
+    // MATCHER
+    // =========================================================
+
+    @Bean
+    public DirectExchange matcherExchange() {
+
+        return new DirectExchange(
+                MATCHER_EXCHANGE
+        );
+    }
+
+    @Bean
+    public Queue matcherQueue() {
+
+        return new Queue(
+                MATCHER_QUEUE,
+                true
+        );
+    }
+
+    @Bean
+    public Binding matcherBinding(
+            Queue matcherQueue,
+            DirectExchange matcherExchange
+    ) {
+
+        return BindingBuilder
+                .bind(matcherQueue)
+                .to(matcherExchange)
+                .with(MATCHER_ROUTING_KEY);
     }
 
 
@@ -194,4 +241,3 @@ public class RabbitMQConfig {
         return rabbitTemplate;
     }
 }
-
