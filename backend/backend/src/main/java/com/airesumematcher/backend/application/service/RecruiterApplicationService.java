@@ -191,13 +191,24 @@ public class RecruiterApplicationService {
             resumeUrl = application.getResume().getStorageUrl();
         }
 
-        return RecruiterApplicationResponse.builder().applicationId(application.getId())
-                .candidateId(candidate.getId()).resumeId(application.getResume() != null ? application.getResume().getId() : null)
-                .candidateName(candidateName).candidateEmail(candidate.getEmail())
-                .candidatePhone(candidate.getPhone()).resumeFileName(resumeFileName).resumeUrl(resumeUrl)
-                .status(application.getStatus().name()).overallScore(application.getOverallScore())
-                .matcherVersion(application.getMatcherVersion()).experienceMet(experienceMet).educationMet(educationMet)
-                .matchedSkills(matchedSkills).missingSkills(missingSkills).summary(summary).matcherResult(matcherResultObj)
+        return RecruiterApplicationResponse.builder()
+                .applicationId(application.getId())
+                .candidateId(candidate.getId())
+                .resumeId(application.getResume() != null ? application.getResume()
+                        .getId() : null)
+                .candidateName(candidateName)
+                .candidateEmail(candidate.getEmail())
+                .candidatePhone(candidate.getPhone())
+                .resumeFileName(resumeFileName).resumeUrl(resumeUrl)
+                .status(application.getStatus().name())
+                .overallScore(application.getOverallScore())
+                .matcherVersion(application.getMatcherVersion())
+                .experienceMet(experienceMet)
+                .educationMet(educationMet)
+                .matchedSkills(matchedSkills)
+                .missingSkills(missingSkills)
+                .summary(summary)
+                .matcherResult(matcherResultObj)
                 .build();
     }
 

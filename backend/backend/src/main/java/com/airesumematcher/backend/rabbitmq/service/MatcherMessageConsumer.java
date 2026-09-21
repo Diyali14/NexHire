@@ -31,52 +31,28 @@ public class MatcherMessageConsumer {
 
     private final ObjectMapper objectMapper;
 
-    public MatcherMessageConsumer(
-            JobApplicationRepository applicationRepository,
-            ResumeParsedDataRepository resumeParsedDataRepository,
-            JobParsedDataRepository jobParsedDataRepository,
-            MatcherPayloadService matcherPayloadService,
-            AiMatcherService aiMatcherService,
-            ObjectMapper objectMapper
-    ) {
+    public MatcherMessageConsumer(JobApplicationRepository applicationRepository, ResumeParsedDataRepository resumeParsedDataRepository,
+            JobParsedDataRepository jobParsedDataRepository, MatcherPayloadService matcherPayloadService,
+            AiMatcherService aiMatcherService, ObjectMapper objectMapper) {
 
-        this.applicationRepository =
-                applicationRepository;
+        this.applicationRepository = applicationRepository;
 
-        this.resumeParsedDataRepository =
-                resumeParsedDataRepository;
+        this.resumeParsedDataRepository = resumeParsedDataRepository;
 
-        this.jobParsedDataRepository =
-                jobParsedDataRepository;
+        this.jobParsedDataRepository = jobParsedDataRepository;
 
-        this.matcherPayloadService =
-                matcherPayloadService;
+        this.matcherPayloadService = matcherPayloadService;
 
-        this.aiMatcherService =
-                aiMatcherService;
+        this.aiMatcherService = aiMatcherService;
 
-        this.objectMapper =
-                objectMapper;
+        this.objectMapper = objectMapper;
     }
 
-    @RabbitListener(
-            queues = RabbitMQConfig.MATCHER_QUEUE
-    )
-    public void processMatcher(
-            MatcherProcessingMessage message
-    ) {
+    @RabbitListener(queues = RabbitMQConfig.MATCHER_QUEUE)
+    public void processMatcher(MatcherProcessingMessage message) {
 
-        JobApplication application =
-                applicationRepository
-                        .findById(
-                                message.getApplicationId()
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Application not found: "
-                                                + message.getApplicationId()
-                                )
-                        );
+        JobApplication application = applicationRepository.findById(message.getApplicationId())
+                        .orElseThrow(() -> new RuntimeException("Application not found: " + message.getApplicationId()));
 
         try {
 
@@ -84,9 +60,7 @@ public class MatcherMessageConsumer {
             // 1. MARK AS MATCHING
             // =================================================
 
-            application.setStatus(
-                    JobApplicationStatus.MATCHING
-            );
+            application.setStatus(JobApplicationStatus.MATCHING);
 
             application.setErrorMessage(null);
 
@@ -97,83 +71,48 @@ public class MatcherMessageConsumer {
             // 2. GET PARSED RESUME
             // =================================================
 
-            ResumeParsedData resumeParsedData =
-                    resumeParsedDataRepository
-                            .findByResumeId(
-                                    message.getResumeId()
-                            )
-                            .orElseThrow(() ->
-                                    new RuntimeException(
-                                            "Parsed resume data not found for resume: "
-                                                    + message.getResumeId()
-                                    )
-                            );
+            ResumeParsedData resumeParsedData = resumeParsedDataRepository.findByResumeId(message.getResumeId())
+                            .orElseThrow(() -> new RuntimeException("Parsed resume data not found for resume: " + message.getResumeId()));
 
 
             // =================================================
             // 3. GET PARSED JOB
             // =================================================
 
-            JobParsedData jobParsedData =
-                    jobParsedDataRepository
-                            .findByJobId(
-                                    message.getJobId()
-                            )
-                            .orElseThrow(() ->
-                                    new RuntimeException(
-                                            "Parsed job data not found for job: "
-                                                    + message.getJobId()
-                                    )
-                            );
+            JobParsedData jobParsedData = jobParsedDataRepository.findByJobId(message.getJobId())
+                            .orElseThrow(() -> new RuntimeException("Parsed job data not found for job: " + message.getJobId()));
 
 
             // =================================================
             // 4. BUILD EXACT MATCHER PAYLOAD
             // =================================================
 
-            String matcherPayload =
-                    matcherPayloadService.buildPayload(
-                            resumeParsedData,
-                            jobParsedData
-                    );
+            String matcherPayload = matcherPayloadService.buildPayload(resumeParsedData, jobParsedData);
 
 
             // =================================================
             // 5. CALL PYTHON AI MATCHER
             // =================================================
 
-            String matcherResponse =
-                    aiMatcherService.match(
-                            matcherPayload
-                    );
+            String matcherResponse = aiMatcherService.match(matcherPayload);
 
 
             // =================================================
             // 6. VALIDATE MATCHER RESPONSE
             // =================================================
 
-            JsonNode result =
-                    objectMapper.readTree(
-                            matcherResponse
-                    );
+            JsonNode result = objectMapper.readTree(matcherResponse);
 
-            if (result == null
-                    || !result.isObject()) {
+            if (result == null || !result.isObject()) {
 
-                throw new IllegalArgumentException(
-                        "Matcher returned invalid JSON"
-                );
+                throw new IllegalArgumentException("Matcher returned invalid JSON");
             }
 
-            String status =
-                    result.hasNonNull("status") ? result.get("status").asText() : null;
+            String status = result.hasNonNull("status") ? result.get("status").asText() : null;
 
-            if (status == null
-                    || status.isBlank()) {
+            if (status == null || status.isBlank()) {
 
-                throw new IllegalArgumentException(
-                        "Matcher response does not contain status"
-                );
+                throw new IllegalArgumentException("Matcher response does not contain status");
             }
 
 
@@ -183,14 +122,9 @@ public class MatcherMessageConsumer {
 
             Integer overallScore = null;
 
-            if (result
-                    .path("overallScore")
-                    .isNumber()) {
+            if (result.path("overallScore").isNumber()) {
 
-                overallScore =
-                        result
-                                .path("overallScore")
-                                .asInt();
+                overallScore = result.path("overallScore").asInt();
             }
 
 
@@ -198,37 +132,24 @@ public class MatcherMessageConsumer {
             // 8. EXTRACT MATCHER VERSION
             // =================================================
 
-            String modelVersion =
-                    result.hasNonNull("modelVersion") ? result.get("modelVersion").asText() : null;
+            String modelVersion = result.hasNonNull("modelVersion") ? result.get("modelVersion").asText() : null;
 
 
             // =================================================
             // 9. SAVE COMPLETE MATCHER RESPONSE
             // =================================================
 
-            application.setMatcherResult(
-                    objectMapper.writeValueAsString(
-                            result
-                    )
-            );
+            application.setMatcherResult(objectMapper.writeValueAsString(result));
 
-            application.setOverallScore(
-                    overallScore
-            );
+            application.setOverallScore(overallScore);
 
-            application.setMatcherVersion(
-                    modelVersion
-            );
+            application.setMatcherVersion(modelVersion);
 
-            application.setStatus(
-                    JobApplicationStatus.MATCHED
-            );
+            application.setStatus(JobApplicationStatus.MATCHED);
 
             application.setErrorMessage(null);
 
-            applicationRepository.save(
-                    application
-            );
+            applicationRepository.save(application);
 
         } catch (Exception e) {
 
@@ -236,17 +157,11 @@ public class MatcherMessageConsumer {
             // MATCHING FAILED
             // =================================================
 
-            application.setStatus(
-                    JobApplicationStatus.FAILED
-            );
+            application.setStatus(JobApplicationStatus.FAILED);
 
-            application.setErrorMessage(
-                    e.getMessage()
-            );
+            application.setErrorMessage(e.getMessage());
 
-            applicationRepository.save(
-                    application
-            );
+            applicationRepository.save(application);
 
             /*
              * Do not rethrow here.

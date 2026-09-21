@@ -25,11 +25,7 @@ public class ResumeLink {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "resume_parsed_data_id",
-            nullable = false,
-            unique = true
-    )
+    @JoinColumn(name = "resume_parsed_data_id", nullable = false, unique = true)
     private ResumeParsedData parsedData;
 
     @Column(name = "linkedin")

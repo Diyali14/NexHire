@@ -22,12 +22,8 @@ public class ResumeMessageConsumer {
     private final AiParserService aiParserService;
     private final ResumeParsedDataService resumeParsedDataService;
 
-    public ResumeMessageConsumer(
-            ResumeRepository resumeRepository,
-            CloudinaryStorageService cloudinaryStorageService,
-            AiParserService aiParserService,
-            ResumeParsedDataService resumeParsedDataService
-    ) {
+    public ResumeMessageConsumer(ResumeRepository resumeRepository, CloudinaryStorageService cloudinaryStorageService,
+            AiParserService aiParserService, ResumeParsedDataService resumeParsedDataService) {
         this.resumeRepository = resumeRepository;
         this.cloudinaryStorageService = cloudinaryStorageService;
         this.aiParserService = aiParserService;
@@ -37,20 +33,14 @@ public class ResumeMessageConsumer {
     @RabbitListener(queues = RabbitMQConfig.RESUME_QUEUE)
     public void processResume(ResumeProcessingMessage message) {
 
-        log.info("RESUME PROCESSING STARTED - Resume ID: {}, Candidate ID: {}",
-                message.getResumeId(), message.getCandidateId());
+        log.info("RESUME PROCESSING STARTED - Resume ID: {}, Candidate ID: {}", message.getResumeId(), message.getCandidateId());
 
-        Resume resume = resumeRepository
-                .findByIdAndCandidateId(
-                        message.getResumeId(),
-                        message.getCandidateId()
-                )
-                .orElseThrow(() ->
-                        new RuntimeException("Resume not found for ID: " + message.getResumeId())
-                );
+        Resume resume = resumeRepository.findByIdAndCandidateId(message.getResumeId(), message.getCandidateId())
+                .orElseThrow(() -> new RuntimeException("Resume not found for ID: " + message.getResumeId()));
 
         // Idempotency check: if already completed, do not re-process
         if (resume.getProcessingStatus() == ProcessingStatus.COMPLETED) {
+
             log.info("Resume ID {} already completed processing. Skipping.", message.getResumeId());
             return;
         }
@@ -64,28 +54,18 @@ public class ResumeMessageConsumer {
             log.info("Resume ID {} status updated to PROCESSING", message.getResumeId());
 
             // 2. Download file from Cloudinary
-            byte[] fileBytes =
-                    cloudinaryStorageService.downloadFile(
-                            message.getStorageObjectName()
-                    );
+            byte[] fileBytes = cloudinaryStorageService.downloadFile(message.getStorageObjectName());
 
             log.info("Downloaded {} bytes from Cloudinary for resume ID {}", fileBytes.length, message.getResumeId());
 
             // 3. Send file to AI parser
             String fileName = "resume." + (message.getFileType() != null ? message.getFileType().toLowerCase() : "pdf");
-            ParsedResumeDto parsedDto =
-                    aiParserService.parseResume(
-                            fileBytes,
-                            fileName
-                    );
+            ParsedResumeDto parsedDto = aiParserService.parseResume(fileBytes, fileName);
 
             log.info("AI parser response received for resume ID {}", message.getResumeId());
 
             // 4. Save parsed data
-            resumeParsedDataService.saveParsedData(
-                    message.getResumeId(),
-                    parsedDto
-            );
+            resumeParsedDataService.saveParsedData(message.getResumeId(), parsedDto);
 
             log.info("Parsed resume data saved to database for resume ID {}", message.getResumeId());
 

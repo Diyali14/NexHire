@@ -34,11 +34,7 @@ public class ResumeParsedData {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "resume_id",
-            nullable = false,
-            unique = true
-    )
+    @JoinColumn(name = "resume_id", nullable = false, unique = true)
     private Resume resume;
 
     // =========================================================
@@ -46,11 +42,7 @@ public class ResumeParsedData {
     // =========================================================
 
     @JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
-    @Column(
-            name = "parsed_json",
-            nullable = false,
-            columnDefinition = "jsonb"
-    )
+    @Column(name = "parsed_json", nullable = false, columnDefinition = "jsonb")
     private String parsedJson;
 
     // =========================================================
@@ -79,27 +71,18 @@ public class ResumeParsedData {
     // PARSER INFORMATION
     // =========================================================
 
-    @Column(
-            name = "parser_version",
-            length = 50
-    )
+    @Column(name = "parser_version", length = 50)
     private String parserVersion;
 
     // =========================================================
     // TIMESTAMPS
     // =========================================================
 
-    @Column(
-            name = "created_at",
-            nullable = false
-    )
+    @Column(name = "created_at", nullable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(
-            name = "updated_at",
-            nullable = false
-    )
+    @Column(name = "updated_at", nullable = false)
     @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 
