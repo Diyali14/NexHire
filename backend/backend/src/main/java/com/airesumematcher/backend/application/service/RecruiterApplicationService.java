@@ -165,12 +165,39 @@ public class RecruiterApplicationService {
                 && !application.getMatcherResult().isBlank()) {
             try {
                 matcherResult = objectMapper.readTree(application.getMatcherResult());
+                while (matcherResult != null && matcherResult.isTextual()) {
+                    matcherResult = objectMapper.readTree(matcherResult.asText());
+                }
             } catch (Exception ignored) {
             }
         }
 
-        JsonNode matchedSkills = matcherResult != null ? matcherResult.path("matchedSkills") : null;
-        JsonNode missingSkills = matcherResult != null ? matcherResult.path("missingSkills") : null;
+        JsonNode matchedSkillsNode = matcherResult != null ? matcherResult.path("matchedSkills") : null;
+        JsonNode missingSkillsNode = matcherResult != null ? matcherResult.path("missingSkills") : null;
+
+        Object matchedSkills = null;
+        if (matchedSkillsNode != null && !matchedSkillsNode.isMissingNode()) {
+            try {
+                matchedSkills = objectMapper.treeToValue(matchedSkillsNode, Object.class);
+            } catch (Exception ignored) {
+            }
+        }
+
+        Object missingSkills = null;
+        if (missingSkillsNode != null && !missingSkillsNode.isMissingNode()) {
+            try {
+                missingSkills = objectMapper.treeToValue(missingSkillsNode, Object.class);
+            } catch (Exception ignored) {
+            }
+        }
+
+        Object matcherResultObj = null;
+        if (matcherResult != null && !matcherResult.isMissingNode()) {
+            try {
+                matcherResultObj = objectMapper.treeToValue(matcherResult, Object.class);
+            } catch (Exception ignored) {
+            }
+        }
 
         Boolean experienceMet = null;
         if (matcherResult != null && matcherResult.has("experienceMet")) {
@@ -213,6 +240,7 @@ public class RecruiterApplicationService {
                 .matchedSkills(matchedSkills)
                 .missingSkills(missingSkills)
                 .summary(summary)
+                .matcherResult(matcherResultObj)
                 .build();
     }
 

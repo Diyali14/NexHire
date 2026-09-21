@@ -481,9 +481,23 @@ public class ResumeParsedDataService {
         // FINAL RESPONSE
         // =====================================================
 
+        Object parsedDataObject = null;
+        if (root != null) {
+            try {
+                parsedDataObject = objectMapper.treeToValue(root, Object.class);
+            } catch (Exception ignored) {
+            }
+        }
+
         return ResumeParsedDataResponse.builder()
                 .resumeId(
                         resume.getId()
+                )
+                .candidateId(
+                        candidateId
+                )
+                .status(
+                        resume.getProcessingStatus().name()
                 )
                 .parserVersion(
                         parsedData.getParserVersion()
@@ -497,7 +511,7 @@ public class ResumeParsedDataService {
                         parsedData.getCertifications()
                 )
                 .links(links)
-                .parsedData(root)
+                .parsedData(parsedDataObject)
                 .build();
     }
 

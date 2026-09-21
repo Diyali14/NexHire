@@ -18,6 +18,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
 
 @Service
@@ -28,6 +31,7 @@ public class JobService {
     private final UserRepository userRepository;
     private final JobMessageProducer jobMessageProducer;
     private final JobParsedDataRepository jobParsedDataRepository;
+    private final ObjectMapper objectMapper;
 
 
     // =========================================================
@@ -205,6 +209,18 @@ public class JobService {
 
 
         // 3. Return parsed data
+        Object parsedNode = null;
+        if (parsedData.getParsedJson() != null && !parsedData.getParsedJson().isBlank()) {
+            try {
+                JsonNode node = objectMapper.readTree(parsedData.getParsedJson());
+                while (node != null && node.isTextual()) {
+                    node = objectMapper.readTree(node.asText());
+                }
+                parsedNode = objectMapper.treeToValue(node, Object.class);
+            } catch (Exception e) {
+                throw new RuntimeException("Stored parsed job JSON is invalid", e);
+            }
+        }
 
         return JobParsedDataResponse.builder()
                 .jobId(job.getId())
@@ -212,7 +228,7 @@ public class JobService {
                         parsedData.getParserVersion()
                 )
                 .parsedJson(
-                        parsedData.getParsedJson()
+                        parsedNode
                 )
                 .build();
     }

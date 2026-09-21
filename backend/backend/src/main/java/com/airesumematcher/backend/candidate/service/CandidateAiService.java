@@ -51,7 +51,7 @@ public class CandidateAiService {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public JsonNode generateInterviewQuestions(Long jobId, Authentication authentication) {
+    public Object generateInterviewQuestions(Long jobId, Authentication authentication) {
         User candidate = getAuthenticatedCandidate(authentication);
 
         Job job = jobRepository.findById(jobId)
@@ -70,6 +70,9 @@ public class CandidateAiService {
         JsonNode responseNode;
         try {
             responseNode = objectMapper.readTree(rawResponse);
+            while (responseNode != null && responseNode.isTextual()) {
+                responseNode = objectMapper.readTree(responseNode.asText());
+            }
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse interview questions response", e);
         }
@@ -89,11 +92,11 @@ public class CandidateAiService {
 
         interviewQuestionRepository.save(record);
 
-        return responseNode;
+        return toResponseBody(responseNode);
     }
 
     @Transactional(readOnly = true)
-    public JsonNode getInterviewQuestions(Long jobId, Authentication authentication) {
+    public Object getInterviewQuestions(Long jobId, Authentication authentication) {
         User candidate = getAuthenticatedCandidate(authentication);
 
         InterviewQuestion record = interviewQuestionRepository
@@ -101,14 +104,18 @@ public class CandidateAiService {
                 .orElseThrow(() -> new IllegalArgumentException("Interview questions not found for this job"));
 
         try {
-            return objectMapper.readTree(record.getRawResponse());
+            JsonNode node = objectMapper.readTree(record.getRawResponse());
+            while (node != null && node.isTextual()) {
+                node = objectMapper.readTree(node.asText());
+            }
+            return toResponseBody(node);
         } catch (Exception e) {
             throw new RuntimeException("Stored interview questions JSON is invalid", e);
         }
     }
 
     @Transactional
-    public JsonNode analyzeSkillGap(Long jobId, Long resumeId, Authentication authentication) {
+    public Object analyzeSkillGap(Long jobId, Long resumeId, Authentication authentication) {
         User candidate = getAuthenticatedCandidate(authentication);
 
         Job job = jobRepository.findById(jobId)
@@ -150,6 +157,9 @@ public class CandidateAiService {
         JsonNode responseNode;
         try {
             responseNode = objectMapper.readTree(rawResponse);
+            while (responseNode != null && responseNode.isTextual()) {
+                responseNode = objectMapper.readTree(responseNode.asText());
+            }
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse skill gap analysis response", e);
         }
@@ -172,11 +182,11 @@ public class CandidateAiService {
 
         skillGapResultRepository.save(resultRecord);
 
-        return responseNode;
+        return toResponseBody(responseNode);
     }
 
     @Transactional(readOnly = true)
-    public JsonNode getSkillGap(Long jobId, Authentication authentication) {
+    public Object getSkillGap(Long jobId, Authentication authentication) {
         User candidate = getAuthenticatedCandidate(authentication);
 
         SkillGapResult record = skillGapResultRepository
@@ -184,9 +194,24 @@ public class CandidateAiService {
                 .orElseThrow(() -> new IllegalArgumentException("Skill gap analysis not found for this job"));
 
         try {
-            return objectMapper.readTree(record.getRawResponse());
+            JsonNode node = objectMapper.readTree(record.getRawResponse());
+            while (node != null && node.isTextual()) {
+                node = objectMapper.readTree(node.asText());
+            }
+            return toResponseBody(node);
         } catch (Exception e) {
             throw new RuntimeException("Stored skill gap JSON is invalid", e);
+        }
+    }
+
+    private Object toResponseBody(JsonNode node) {
+        if (node == null || node.isNull() || node.isMissingNode()) {
+            return java.util.Map.of();
+        }
+        try {
+            return objectMapper.treeToValue(node, Object.class);
+        } catch (Exception e) {
+            return java.util.Map.of();
         }
     }
 

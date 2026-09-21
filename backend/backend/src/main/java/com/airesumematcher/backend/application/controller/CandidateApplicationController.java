@@ -117,6 +117,17 @@ public class CandidateApplicationController {
             try {
                 matcherResultNode =
                         objectMapper.readTree(application.getMatcherResult());
+                while (matcherResultNode != null && matcherResultNode.isTextual()) {
+                    matcherResultNode = objectMapper.readTree(matcherResultNode.asText());
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        Object matcherResultObj = Map.of();
+        if (matcherResultNode != null && !matcherResultNode.isMissingNode()) {
+            try {
+                matcherResultObj = objectMapper.treeToValue(matcherResultNode, Object.class);
             } catch (Exception ignored) {
             }
         }
@@ -136,9 +147,7 @@ public class CandidateApplicationController {
                                 ? application.getMatcherVersion()
                                 : "",
                         "matcherResult",
-                        matcherResultNode != null
-                                ? matcherResultNode
-                                : Map.of()
+                        matcherResultObj
                 )
         );
     }

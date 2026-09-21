@@ -14,6 +14,10 @@ public class ResumeParsedDataResponse {
 
     private Long resumeId;
 
+    private Long candidateId;
+
+    private String status;
+
     private String parserVersion;
 
     private Profile profile;
@@ -31,7 +35,7 @@ public class ResumeParsedDataResponse {
     private Links links;
 
     // Complete original parser response
-    private JsonNode parsedData;
+    private Object parsedData;
 
     @Getter
     @Builder

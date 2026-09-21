@@ -15,7 +15,7 @@ public class CandidateAiController {
     private final CandidateAiService candidateAiService;
 
     @PostMapping("/{jobId}/interview-questions")
-    public ResponseEntity<JsonNode> generateInterviewQuestions(
+    public ResponseEntity<Object> generateInterviewQuestions(
             @PathVariable Long jobId,
             Authentication authentication
     ) {
@@ -25,7 +25,7 @@ public class CandidateAiController {
     }
 
     @GetMapping("/{jobId}/interview-questions")
-    public ResponseEntity<JsonNode> getInterviewQuestions(
+    public ResponseEntity<Object> getInterviewQuestions(
             @PathVariable Long jobId,
             Authentication authentication
     ) {
@@ -35,7 +35,7 @@ public class CandidateAiController {
     }
 
     @PostMapping("/{jobId}/skill-gap")
-    public ResponseEntity<JsonNode> analyzeSkillGap(
+    public ResponseEntity<Object> analyzeSkillGap(
             @PathVariable Long jobId,
             @RequestParam(required = false) Long resumeId,
             Authentication authentication
@@ -46,7 +46,7 @@ public class CandidateAiController {
     }
 
     @PostMapping("/{jobId}/analyze")
-    public ResponseEntity<JsonNode> analyzeSkillGapAlias(
+    public ResponseEntity<Object> analyzeSkillGapAlias(
             @PathVariable Long jobId,
             @RequestParam(required = false) Long resumeId,
             Authentication authentication
@@ -57,7 +57,7 @@ public class CandidateAiController {
     }
 
     @GetMapping("/{jobId}/skill-gap")
-    public ResponseEntity<JsonNode> getSkillGap(
+    public ResponseEntity<Object> getSkillGap(
             @PathVariable Long jobId,
             Authentication authentication
     ) {
@@ -67,7 +67,7 @@ public class CandidateAiController {
     }
 
     @GetMapping("/{jobId}/analyze")
-    public ResponseEntity<JsonNode> getSkillGapAlias(
+    public ResponseEntity<Object> getSkillGapAlias(
             @PathVariable Long jobId,
             Authentication authentication
     ) {

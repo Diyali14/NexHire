@@ -21,8 +21,8 @@ public class JwtService {
     private final long expiration;
 
     public JwtService(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") long expiration
+            @Value("${jwt.secret:${JWT_SECRET:nexhiredefaultjwtsecretkeywhichmustbeatleast256bitslong123456}}") String secret,
+            @Value("${jwt.expiration:${JWT_SECRET_EXPIRATION:86400000}}") long expiration
     ) {
         this.secretKey = Keys.hmacShaKeyFor(
                 secret.getBytes(StandardCharsets.UTF_8)
