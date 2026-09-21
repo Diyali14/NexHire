@@ -14,43 +14,31 @@ public class AiParserService {
 
     private final RestClient restClient;
 
-    public AiParserService(
-            @Value("${ai.parser.base-url}") String baseUrl
-    ) {
-        this.restClient = RestClient.builder()
-                .baseUrl(baseUrl)
-                .build();
+    public AiParserService(@Value("${ai.parser.base-url}") String baseUrl) {
+
+        this.restClient = RestClient.builder().baseUrl(baseUrl).build();
     }
 
     // ===============================
     // RESUME PARSER
     // ===============================
 
-    public ParsedResumeDto parseResume(
-            byte[] pdfBytes,
-            String fileName
-    ) {
+    public ParsedResumeDto parseResume(byte[] pdfBytes, String fileName) {
 
-        ByteArrayResource fileResource =
-                new ByteArrayResource(pdfBytes) {
+        ByteArrayResource fileResource = new ByteArrayResource(pdfBytes) {
 
                     @Override
                     public String getFilename() {
                         return fileName;
                     }
-                };
+        };
 
-        MultiValueMap<String, Object> body =
-                new LinkedMultiValueMap<>();
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
         body.add("file", fileResource);
 
-         ParsedResumeDto obj=restClient.post()
-                .uri("/ai/v1/parse-resume-file")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(body)
-                .retrieve()
-                .body(ParsedResumeDto.class);
+        ParsedResumeDto obj=restClient.post().uri("/ai/v1/parse-resume-file")
+                .contentType(MediaType.MULTIPART_FORM_DATA).body(body).retrieve().body(ParsedResumeDto.class);
         System.out.println(obj);
         return obj;
     }
@@ -60,15 +48,9 @@ public class AiParserService {
     // JOB DESCRIPTION PARSER
     // ===============================
 
-    public String analyzeJobDescription(
-            String jobDescription
-    ) {
+    public String analyzeJobDescription(String jobDescription) {
 
-        return restClient.post()
-                .uri("/ai/v1/analyze-jd")
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(jobDescription)
-                .retrieve()
-                .body(String.class);
+        return restClient.post().uri("/ai/v1/analyze-jd")
+                .contentType(MediaType.TEXT_PLAIN).body(jobDescription).retrieve().body(String.class);
     }
 }

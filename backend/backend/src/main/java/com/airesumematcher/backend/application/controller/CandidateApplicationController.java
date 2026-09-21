@@ -29,49 +29,23 @@ public class CandidateApplicationController {
     private final ObjectMapper objectMapper;
 
     @GetMapping("/jobs/{jobId}/application")
-    public ResponseEntity<?> getApplication(
-            @PathVariable Long jobId,
-            Authentication authentication
-    ) {
+    public ResponseEntity<?> getApplication(@PathVariable Long jobId, Authentication authentication) {
 
         User candidate = userRepository.findByEmailIgnoreCase(authentication.getName())
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Authenticated candidate not found"
-                        )
-                );
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Authenticated candidate not found"));
 
-        JobApplication application =
-                applicationRepository
-                        .findByJobIdAndCandidateId(
-                                jobId,
-                                candidate.getId()
-                        )
-                        .orElseThrow(() ->
-                                new ResponseStatusException(
-                                        HttpStatus.NOT_FOUND,
-                                        "You have not applied for this job"
-                                )
-                        );
+        JobApplication application = applicationRepository.findByJobIdAndCandidateId(jobId, candidate.getId())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "You have not applied for this job"));
 
         return ResponseEntity.ok(buildApplicationMap(application));
     }
 
     @GetMapping("/applications")
-    public ResponseEntity<List<Map<String, Object>>> getMyApplications(
-            Authentication authentication
-    ) {
+    public ResponseEntity<List<Map<String, Object>>> getMyApplications(Authentication authentication) {
         User candidate = userRepository.findByEmailIgnoreCase(authentication.getName())
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Authenticated candidate not found"
-                        )
-                );
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Authenticated candidate not found"));
 
-        List<JobApplication> applications =
-                applicationRepository.findAllByCandidateIdOrderByCreatedAtDesc(candidate.getId());
+        List<JobApplication> applications = applicationRepository.findAllByCandidateIdOrderByCreatedAtDesc(candidate.getId());
 
         List<Map<String, Object>> response = new ArrayList<>();
         for (JobApplication app : applications) {
@@ -82,42 +56,25 @@ public class CandidateApplicationController {
     }
 
     @GetMapping("/applications/{applicationId}/match-result")
-    public ResponseEntity<?> getMatchResult(
-            @PathVariable Long applicationId,
-            Authentication authentication
-    ) {
+    public ResponseEntity<?> getMatchResult(@PathVariable Long applicationId, Authentication authentication) {
         User candidate = userRepository.findByEmailIgnoreCase(authentication.getName())
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Authenticated candidate not found"
-                        )
-                );
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Authenticated candidate not found"));
 
         JobApplication application = applicationRepository.findById(applicationId)
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Application not found"
-                        )
-                );
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Application not found"));
 
         if (!application.getCandidate().getId().equals(candidate.getId())) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    "You are not authorized to view this application"
-            );
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to view this application");
         }
 
         JsonNode matcherResultNode = null;
 
-        if (application.getMatcherResult() != null
-                && !application.getMatcherResult().isBlank()) {
+        if (application.getMatcherResult() != null && !application.getMatcherResult().isBlank()) {
 
             try {
-                matcherResultNode =
-                        objectMapper.readTree(application.getMatcherResult());
+                matcherResultNode = objectMapper.readTree(application.getMatcherResult());
                 while (matcherResultNode != null && matcherResultNode.isTextual()) {
+
                     matcherResultNode = objectMapper.readTree(matcherResultNode.asText());
                 }
             } catch (Exception ignored) {
@@ -147,9 +104,7 @@ public class CandidateApplicationController {
                                 ? application.getMatcherVersion()
                                 : "",
                         "matcherResult",
-                        matcherResultObj
-                )
-        );
+                        matcherResultObj));
     }
 
     private Map<String, Object> buildApplicationMap(JobApplication app) {
@@ -163,7 +118,6 @@ public class CandidateApplicationController {
                 app.getOverallScore() != null
                         ? app.getOverallScore()
                         : 0,
-                "createdAt", app.getCreatedAt()
-        );
+                "createdAt", app.getCreatedAt());
     }
 }
