@@ -29,63 +29,36 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final com.airesumematcher.backend.security.CustomUserDetailsService
-            userDetailsService;
+    private final com.airesumematcher.backend.security.CustomUserDetailsService userDetailsService;
     private final JwtService jwtService;
 
     @Transactional
-    public AuthResponse register(
-            RegisterRequest request,
-            RoleName roleName
-    ) {
+    public AuthResponse register(RegisterRequest request, RoleName roleName) {
 
-        if (userRepository.existsByEmailIgnoreCase(
-                request.getEmail()
-        )) {
-            throw new IllegalArgumentException(
-                    "Email is already registered"
-            );
+        if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
+
+            throw new IllegalArgumentException("Email is already registered");
         }
 
-        Role role = roleRepository
-                .findByName(roleName)
-                .orElseThrow(() ->
-                        new IllegalStateException(
-                                "Role not configured: " + roleName
-                        )
-                );
+        Role role = roleRepository.findByName(roleName).orElseThrow(() -> new IllegalStateException("Role not configured: " + roleName));
 
-        User user = User.builder()
-                .email(request.getEmail().trim().toLowerCase())
-                .passwordHash(
-                        passwordEncoder.encode(
-                                request.getPassword()
-                        )
-                )
-                .firstName(request.getFirstName().trim())
-                .lastName(request.getLastName())
-                .phone(request.getPhone())
-                .status("ACTIVE")
-                .roles(Set.of(role))
-                .build();
+        User user = User.builder().email(request.getEmail().trim().toLowerCase()).passwordHash(passwordEncoder.encode(request.getPassword()))
+
+                .firstName(request.getFirstName().trim()).lastName(request.getLastName())
+                .phone(request.getPhone()).status("ACTIVE")
+                .roles(Set.of(role)).build();
 
         user = userRepository.save(user);
 
         if (roleName == RoleName.CANDIDATE) {
 
-            CandidateProfile profile =
-                    CandidateProfile.builder()
-                            .user(user)
-                            .build();
+            CandidateProfile profile = CandidateProfile.builder().user(user).build();
 
             candidateProfileRepository.save(profile);
 
         } else if (roleName == RoleName.RECRUITER) {
 
-            RecruiterProfile profile =
-                    RecruiterProfile.builder()
-                            .user(user)
-                            .build();
+            RecruiterProfile profile = RecruiterProfile.builder().user(user).build();
 
             recruiterProfileRepository.save(profile);
         }
@@ -93,36 +66,19 @@ public class AuthService {
         return generateAuthResponse(user);
     }
 
-    public AuthResponse login(
-            LoginRequest request,
-            RoleName expectedRole
+    public AuthResponse login(LoginRequest request, RoleName expectedRole
     ) {
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        User user = userRepository
-                .findByEmailIgnoreCase(request.getEmail())
-                .orElseThrow(() ->
-                        new BadCredentialsException(
-                                "Invalid credentials"
-                        )
-                );
+        User user = userRepository.findByEmailIgnoreCase(request.getEmail())
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
-        boolean hasExpectedRole = user.getRoles()
-                .stream()
-                .anyMatch(role ->
-                        role.getName() == expectedRole
-                );
+        boolean hasExpectedRole = user.getRoles().stream().anyMatch(role -> role.getName() == expectedRole);
 
         if (!hasExpectedRole) {
-            throw new BadCredentialsException(
-                    "User does not have the required role"
-            );
+
+            throw new BadCredentialsException("User does not have the required role");
         }
 
         return generateAuthResponse(user);
@@ -130,25 +86,13 @@ public class AuthService {
 
     private AuthResponse generateAuthResponse(User user) {
 
-        UserDetails userDetails =
-                userDetailsService.loadUserByUsername(
-                        user.getEmail()
-                );
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
 
-        String token =
-                jwtService.generateToken(userDetails);
+        String token = jwtService.generateToken(userDetails);
 
-        Set<String> roles = user.getRoles()
-                .stream()
-                .map(role -> role.getName().name())
-                .collect(Collectors.toSet());
+        Set<String> roles = user.getRoles().stream().map(role -> role.getName().name()).collect(Collectors.toSet());
 
-        return AuthResponse.builder()
-                .token(token)
-                .userId(user.getId())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .roles(roles)
-                .build();
+        return AuthResponse.builder().token(token).userId(user.getId()).email(user.getEmail()).firstName(user.getFirstName()).roles(roles).build();
+
     }
 }

@@ -15,18 +15,9 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private ErrorResponse buildError(
-            HttpStatus status,
-            String message,
-            HttpServletRequest request
-    ) {
-        return ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(status.value())
-                .error(status.getReasonPhrase())
-                .message(message)
-                .path(request.getRequestURI())
-                .build();
+    private ErrorResponse buildError(HttpStatus status, String message, HttpServletRequest request) {
+        return ErrorResponse.builder().timestamp(LocalDateTime.now()).status(status.value()).error(status.getReasonPhrase())
+                .message(message).path(request.getRequestURI()).build();
     }
 
 
@@ -35,32 +26,13 @@ public class GlobalExceptionHandler {
     // =========================================================
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(
-            MethodArgumentNotValidException ex,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
 
-        String message =
-                ex.getBindingResult()
-                        .getFieldErrors()
-                        .stream()
-                        .findFirst()
-                        .map(error ->
-                                error.getField()
-                                        + ": "
-                                        + error.getDefaultMessage()
-                        )
+        String message = ex.getBindingResult().getFieldErrors().stream().findFirst()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
                         .orElse("Invalid request");
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(
-                        buildError(
-                                HttpStatus.BAD_REQUEST,
-                                message,
-                                request
-                        )
-                );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildError(HttpStatus.BAD_REQUEST, message, request));
     }
 
 
@@ -69,20 +41,10 @@ public class GlobalExceptionHandler {
     // =========================================================
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
-            IllegalArgumentException ex,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex, HttpServletRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(
-                        buildError(
-                                HttpStatus.BAD_REQUEST,
-                                ex.getMessage(),
-                                request
-                        )
-                );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request));
     }
 
 
@@ -91,20 +53,10 @@ public class GlobalExceptionHandler {
     // =========================================================
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleBadCredentials(
-            BadCredentialsException ex,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(
-                        buildError(
-                                HttpStatus.UNAUTHORIZED,
-                                "Invalid credentials",
-                                request
-                        )
-                );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(buildError(HttpStatus.UNAUTHORIZED, "Invalid credentials", request));
     }
 
 
@@ -113,20 +65,10 @@ public class GlobalExceptionHandler {
     // =========================================================
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDenied(
-            AccessDeniedException ex,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(
-                        buildError(
-                                HttpStatus.FORBIDDEN,
-                                "Access denied",
-                                request
-                        )
-                );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(buildError(HttpStatus.FORBIDDEN, "Access denied", request));
     }
 
 
@@ -135,30 +77,14 @@ public class GlobalExceptionHandler {
     // =========================================================
 
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<ErrorResponse> handleResponseStatusException(
-            ResponseStatusException ex,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException ex, HttpServletRequest request) {
 
-        HttpStatus status =
-                HttpStatus.valueOf(
-                        ex.getStatusCode().value()
-                );
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
 
-        String message =
-                ex.getReason() != null
-                        ? ex.getReason()
-                        : status.getReasonPhrase();
+        String message = ex.getReason() != null ? ex.getReason() : status.getReasonPhrase();
 
-        return ResponseEntity
-                .status(status)
-                .body(
-                        buildError(
-                                status,
-                                message,
-                                request
-                        )
-                );
+        return ResponseEntity.status(status)
+                .body(buildError(status, message, request));
     }
 
 
@@ -166,23 +92,11 @@ public class GlobalExceptionHandler {
     // 404 - Resource not found
     // =========================================================
 
-    @ExceptionHandler(
-            org.springframework.web.servlet.resource.NoResourceFoundException.class
-    )
-    public ResponseEntity<ErrorResponse> handleNotFound(
-            Exception ex,
-            HttpServletRequest request
-    ) {
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(Exception ex, HttpServletRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(
-                        buildError(
-                                HttpStatus.NOT_FOUND,
-                                "Resource not found",
-                                request
-                        )
-                );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(buildError(HttpStatus.NOT_FOUND, "Resource not found", request));
     }
 
 
@@ -191,20 +105,10 @@ public class GlobalExceptionHandler {
     // =========================================================
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ErrorResponse> handleConflict(
-            IllegalStateException ex,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ErrorResponse> handleConflict(IllegalStateException ex, HttpServletRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(
-                        buildError(
-                                HttpStatus.CONFLICT,
-                                ex.getMessage(),
-                                request
-                        )
-                );
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(buildError(HttpStatus.CONFLICT, ex.getMessage(), request));
     }
 
 
@@ -217,26 +121,13 @@ public class GlobalExceptionHandler {
     // =========================================================
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneralException(
-            Exception ex,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex, HttpServletRequest request) {
 
         ex.printStackTrace();
 
-        String message =
-                ex.getMessage() != null
-                        ? ex.getMessage()
-                        : ex.getClass().getSimpleName();
+        String message = ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName();
 
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(
-                        buildError(
-                                HttpStatus.INTERNAL_SERVER_ERROR,
-                                message,
-                                request
-                        )
-                );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(buildError(HttpStatus.INTERNAL_SERVER_ERROR, message, request));
     }
 }

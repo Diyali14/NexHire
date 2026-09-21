@@ -18,14 +18,11 @@ public class RabbitMQConfig {
     // Spring Boot -> Python AI Service
     // =========================================================
 
-    public static final String RESUME_EXCHANGE =
-            "resume.exchange";
+    public static final String RESUME_EXCHANGE = "resume.exchange";
 
-    public static final String RESUME_QUEUE =
-            "resume.queue";
+    public static final String RESUME_QUEUE = "resume.queue";
 
-    public static final String RESUME_ROUTING_KEY =
-            "resume.process";
+    public static final String RESUME_ROUTING_KEY = "resume.process";
 
 
     // =========================================================
@@ -33,28 +30,22 @@ public class RabbitMQConfig {
     // Python AI Service -> Spring Boot
     // =========================================================
 
-    public static final String RESUME_RESULT_EXCHANGE =
-            "resume.result.exchange";
+    public static final String RESUME_RESULT_EXCHANGE = "resume.result.exchange";
 
-    public static final String RESUME_RESULT_QUEUE =
-            "resume.result.queue";
+    public static final String RESUME_RESULT_QUEUE = "resume.result.queue";
 
-    public static final String RESUME_RESULT_ROUTING_KEY =
-            "resume.result";
+    public static final String RESUME_RESULT_ROUTING_KEY = "resume.result";
 
 
     // =========================================================
     // JOB / JD
     // =========================================================
 
-    public static final String JOB_EXCHANGE =
-            "job.exchange";
+    public static final String JOB_EXCHANGE = "job.exchange";
 
-    public static final String JOB_QUEUE =
-            "job.queue";
+    public static final String JOB_QUEUE = "job.queue";
 
-    public static final String JOB_ROUTING_KEY =
-            "job.process";
+    public static final String JOB_ROUTING_KEY = "job.process";
 
 
     // =========================================================
@@ -62,14 +53,11 @@ public class RabbitMQConfig {
     // Spring Boot Application -> Matcher Consumer
     // =========================================================
 
-    public static final String MATCHER_EXCHANGE =
-            "resume.matcher.exchange";
+    public static final String MATCHER_EXCHANGE = "resume.matcher.exchange";
 
-    public static final String MATCHER_QUEUE =
-            "resume.matcher.queue";
+    public static final String MATCHER_QUEUE = "resume.matcher.queue";
 
-    public static final String MATCHER_ROUTING_KEY =
-            "resume.matcher";
+    public static final String MATCHER_ROUTING_KEY = "resume.matcher";
 
 
     // =========================================================
@@ -79,30 +67,20 @@ public class RabbitMQConfig {
     @Bean
     public DirectExchange resumeExchange() {
 
-        return new DirectExchange(
-                RESUME_EXCHANGE
-        );
+        return new DirectExchange(RESUME_EXCHANGE);
     }
 
     @Bean
     public Queue resumeQueue() {
 
-        return new Queue(
-                RESUME_QUEUE,
-                true
-        );
+        return new Queue(RESUME_QUEUE, true);
     }
 
     @Bean
-    public Binding resumeBinding(
-            Queue resumeQueue,
-            DirectExchange resumeExchange
-    ) {
+    public Binding resumeBinding(Queue resumeQueue, DirectExchange resumeExchange) {
 
-        return BindingBuilder
-                .bind(resumeQueue)
-                .to(resumeExchange)
-                .with(RESUME_ROUTING_KEY);
+        return BindingBuilder.bind(resumeQueue)
+                .to(resumeExchange).with(RESUME_ROUTING_KEY);
     }
 
 
@@ -113,30 +91,19 @@ public class RabbitMQConfig {
     @Bean
     public DirectExchange resumeResultExchange() {
 
-        return new DirectExchange(
-                RESUME_RESULT_EXCHANGE
-        );
+        return new DirectExchange(RESUME_RESULT_EXCHANGE);
     }
 
     @Bean
     public Queue resumeResultQueue() {
 
-        return new Queue(
-                RESUME_RESULT_QUEUE,
-                true
-        );
+        return new Queue(RESUME_RESULT_QUEUE, true);
     }
 
     @Bean
-    public Binding resumeResultBinding(
-            Queue resumeResultQueue,
-            DirectExchange resumeResultExchange
-    ) {
+    public Binding resumeResultBinding(Queue resumeResultQueue, DirectExchange resumeResultExchange) {
 
-        return BindingBuilder
-                .bind(resumeResultQueue)
-                .to(resumeResultExchange)
-                .with(RESUME_RESULT_ROUTING_KEY);
+        return BindingBuilder.bind(resumeResultQueue).to(resumeResultExchange).with(RESUME_RESULT_ROUTING_KEY);
     }
 
 
@@ -147,30 +114,19 @@ public class RabbitMQConfig {
     @Bean
     public DirectExchange jobExchange() {
 
-        return new DirectExchange(
-                JOB_EXCHANGE
-        );
+        return new DirectExchange(JOB_EXCHANGE);
     }
 
     @Bean
     public Queue jobQueue() {
 
-        return new Queue(
-                JOB_QUEUE,
-                true
-        );
+        return new Queue(JOB_QUEUE, true);
     }
 
     @Bean
-    public Binding jobBinding(
-            Queue jobQueue,
-            DirectExchange jobExchange
-    ) {
+    public Binding jobBinding(Queue jobQueue, DirectExchange jobExchange) {
 
-        return BindingBuilder
-                .bind(jobQueue)
-                .to(jobExchange)
-                .with(JOB_ROUTING_KEY);
+        return BindingBuilder.bind(jobQueue).to(jobExchange).with(JOB_ROUTING_KEY);
     }
 
 
@@ -181,30 +137,20 @@ public class RabbitMQConfig {
     @Bean
     public DirectExchange matcherExchange() {
 
-        return new DirectExchange(
-                MATCHER_EXCHANGE
-        );
+        return new DirectExchange(MATCHER_EXCHANGE);
     }
 
     @Bean
     public Queue matcherQueue() {
 
-        return new Queue(
-                MATCHER_QUEUE,
-                true
-        );
+        return new Queue(MATCHER_QUEUE, true);
     }
 
     @Bean
-    public Binding matcherBinding(
-            Queue matcherQueue,
-            DirectExchange matcherExchange
-    ) {
+    public Binding matcherBinding(Queue matcherQueue, DirectExchange matcherExchange) {
 
-        return BindingBuilder
-                .bind(matcherQueue)
-                .to(matcherExchange)
-                .with(MATCHER_ROUTING_KEY);
+        return BindingBuilder.bind(matcherQueue)
+                .to(matcherExchange).with(MATCHER_ROUTING_KEY);
     }
 
 
@@ -224,19 +170,11 @@ public class RabbitMQConfig {
     // =========================================================
 
     @Bean
-    public RabbitTemplate rabbitTemplate(
-            ConnectionFactory connectionFactory,
-            Jackson2JsonMessageConverter messageConverter
-    ) {
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, Jackson2JsonMessageConverter messageConverter) {
 
-        RabbitTemplate rabbitTemplate =
-                new RabbitTemplate(
-                        connectionFactory
-                );
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 
-        rabbitTemplate.setMessageConverter(
-                messageConverter
-        );
+        rabbitTemplate.setMessageConverter(messageConverter);
 
         return rabbitTemplate;
     }

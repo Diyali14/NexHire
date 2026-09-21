@@ -24,55 +24,27 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest request
     ) {
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(
-                        authService.register(
-                                request,
-                                RoleName.CANDIDATE
-                        )
-                );
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request, RoleName.CANDIDATE));
     }
 
     @PostMapping("/recruiter/register")
-    public ResponseEntity<AuthResponse> registerRecruiter(
-            @Valid @RequestBody RegisterRequest request
-    ) {
+    public ResponseEntity<AuthResponse> registerRecruiter(@Valid @RequestBody RegisterRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(
-                        authService.register(
-                                request,
-                                RoleName.RECRUITER
-                        )
-                );
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request, RoleName.RECRUITER));
+
     }
 
     @PostMapping("/candidate/login")
-    public ResponseEntity<AuthResponse> loginCandidate(
-            @Valid @RequestBody LoginRequest request
-    ) {
+    public ResponseEntity<AuthResponse> loginCandidate(@Valid @RequestBody LoginRequest request) {
 
-        return ResponseEntity.ok(
-                authService.login(
-                        request,
-                        RoleName.CANDIDATE
-                )
-        );
+        return ResponseEntity.ok(authService.login(request, RoleName.CANDIDATE));
     }
 
     @PostMapping("/recruiter/login")
-    public ResponseEntity<AuthResponse> loginRecruiter(
-            @Valid @RequestBody LoginRequest request
-    ) {
+    public ResponseEntity<AuthResponse> loginRecruiter(@Valid @RequestBody LoginRequest request) {
 
-        return ResponseEntity.ok(
-                authService.login(
-                        request,
-                        RoleName.RECRUITER
-                )
-        );
+        return ResponseEntity.ok(authService.login(request, RoleName.RECRUITER));
+
     }
 
 }
