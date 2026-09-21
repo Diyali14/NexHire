@@ -1,4 +1,4 @@
-```dockerfile
+
 # ================================
 # Stage 1: Build
 # ================================
@@ -39,4 +39,4 @@ EXPOSE 8080
 
 # Start Spring Boot
 ENTRYPOINT ["java", "-jar", "app.jar"]
-```
+
