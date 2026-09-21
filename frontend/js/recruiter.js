@@ -786,25 +786,196 @@ document.addEventListener("DOMContentLoaded", () => {
      RESUME MODAL
   ========================================================= */
 
+  const resumeModal = document.querySelector("[data-resume-modal]");
+  const resumePreview = document.getElementById("resumePreview");
+  const resumeFileName = document.getElementById("resumeFileName");
+  const downloadResumeButton = document.getElementById("downloadResumeButton");
+
+  let currentResumeBlobUrl = null;
+  let currentResumeFileName = "resume.pdf";
+
+  async function loadCandidateResume(applicationId) {
+    if (!applicationId) {
+      alert("Application ID is missing.");
+      return;
+    }
+
+    resumePreview.innerHTML = `
+        <div class="resume-loading">
+            Loading resume...
+        </div>
+    `;
+
+    resumeFileName.textContent = "Loading resume...";
+    downloadResumeButton.disabled = true;
+
+    resumeModal.classList.add("open");
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/recruiters/applications/${applicationId}/resume/download`,
+        {
+          method: "GET",
+          headers: getAuthHeaders(),
+        },
+      );
+
+      if (!response.ok) {
+        let errorMessage = "Unable to load resume.";
+
+        try {
+          const errorData = await response.json();
+
+          if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+        } catch (error) {
+          // Response was not JSON
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      const blob = await response.blob();
+
+      /*
+       * Try to get the filename from Content-Disposition
+       */
+      const contentDisposition = response.headers.get("Content-Disposition");
+
+      let fileName = "candidate_resume.pdf";
+
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?([^"]+)"?/i);
+
+        if (match && match[1]) {
+          fileName = match[1];
+        }
+      }
+
+      currentResumeFileName = fileName;
+
+      /*
+       * Create temporary browser URL for the downloaded file
+       */
+      if (currentResumeBlobUrl) {
+        URL.revokeObjectURL(currentResumeBlobUrl);
+      }
+
+      currentResumeBlobUrl = URL.createObjectURL(blob);
+
+      resumeFileName.textContent = fileName;
+
+      /*
+       * Show PDF inside the modal
+       */
+      if (
+        blob.type === "application/pdf" ||
+        fileName.toLowerCase().endsWith(".pdf")
+      ) {
+        resumePreview.innerHTML = `
+                <iframe
+                    src="${currentResumeBlobUrl}"
+                    class="resume-pdf-viewer"
+                    title="Candidate Resume"
+                ></iframe>
+            `;
+      } else {
+        resumePreview.innerHTML = `
+                <div class="resume-file-message">
+                    <p>Resume downloaded successfully.</p>
+                    <p>
+                        File:
+                        <strong>${fileName}</strong>
+                    </p>
+                    <p>
+                        Use the Download Resume button below
+                        to save the file.
+                    </p>
+                </div>
+            `;
+      }
+
+      downloadResumeButton.disabled = false;
+    } catch (error) {
+      console.error("Resume download error:", error);
+
+      resumePreview.innerHTML = `
+            <div class="resume-file-message error">
+                <p>Unable to load the candidate's resume.</p>
+                <p>${error.message}</p>
+            </div>
+        `;
+
+      resumeFileName.textContent = "Resume unavailable";
+    }
+  }
+
   document.querySelectorAll("[data-open-resume]").forEach((button) => {
     button.addEventListener("click", () => {
-      document.querySelector(".modal-backdrop")?.classList.add("open");
+      const applicationId =
+        button.dataset.applicationId ||
+        new URLSearchParams(window.location.search).get("applicationId");
+
+      loadCandidateResume(applicationId);
     });
   });
 
-  document.querySelectorAll("[data-close-modal]").forEach((button) => {
-    button.addEventListener("click", () => {
-      document.querySelector(".modal-backdrop")?.classList.remove("open");
-    });
+  //close resume
+
+  function closeResumeModal() {
+    resumeModal.classList.remove("open");
+
+    if (currentResumeBlobUrl) {
+      URL.revokeObjectURL(currentResumeBlobUrl);
+      currentResumeBlobUrl = null;
+    }
+
+    resumePreview.innerHTML = "";
+    resumeFileName.textContent = "";
+    downloadResumeButton.disabled = true;
+  }
+
+  document.querySelectorAll("[data-close-resume]").forEach((button) => {
+    button.addEventListener("click", closeResumeModal);
   });
 
-  document
-    .querySelector(".modal-backdrop")
-    ?.addEventListener("click", (event) => {
-      if (event.target.classList.contains("modal-backdrop")) {
-        event.currentTarget.classList.remove("open");
-      }
-    });
+  resumeModal.addEventListener("click", (event) => {
+    if (event.target === resumeModal) {
+      closeResumeModal();
+    }
+  });
+
+  //download resume
+
+  downloadResumeButton.addEventListener("click", () => {
+    if (!currentResumeBlobUrl) {
+      return;
+    }
+
+    const link = document.createElement("a");
+
+    link.href = currentResumeBlobUrl;
+    link.download = currentResumeFileName;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+
+  // document.querySelectorAll("[data-close-modal]").forEach((button) => {
+  //   button.addEventListener("click", () => {
+  //     document.querySelector(".modal-backdrop")?.classList.remove("open");
+  //   });
+  // });
+
+  // document
+  //   .querySelector(".modal-backdrop")
+  //   ?.addEventListener("click", (event) => {
+  //     if (event.target.classList.contains("modal-backdrop")) {
+  //       event.currentTarget.classList.remove("open");
+  //     }
+  //   });
 
   /* =========================================================
      RECRUITER PROFILE API
