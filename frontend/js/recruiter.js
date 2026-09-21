@@ -795,23 +795,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   /* =========================================================
-     RECRUITER PROFILE API
-  ========================================================= */
+   RECRUITER PROFILE API
+========================================================= */
 
   const API_BASE_URL = "https://nexhire-backend-5zv7.onrender.com/api/v1";
 
   /*
-   * Get JWT token from localStorage.
+   * Get JWT token.
    *
-   * Recommended:
-   *
-   * localStorage.setItem(
-   *   'nexhire-recruiter-token',
-   *   token
-   * );
-   *
-   * The fallback keys below allow this code to
-   * work with your existing login implementation.
+   * The code checks the same token locations already used
+   * by the existing NexHire recruiter authentication flow.
    */
   function getAuthHeaders() {
     const tokenKeys = [
@@ -825,6 +818,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let token = null;
 
+    /*
+     * First check sessionStorage.
+     */
     for (const key of tokenKeys) {
       const value = sessionStorage.getItem(key);
 
@@ -835,7 +831,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /*
-     * Also check recruiter session object.
+     * If no token was found, check the recruiter session object.
      */
     if (!token) {
       try {
@@ -853,6 +849,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    /*
+     * No token means the recruiter is not authenticated.
+     */
     if (!token) {
       throw new Error("Recruiter authentication token not found");
     }
@@ -864,8 +863,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================================================
-     PROFILE ELEMENT HELPERS
-  ========================================================= */
+   PROFILE ELEMENT HELPERS
+========================================================= */
 
   function setProfileField(id, value) {
     const element = document.getElementById(id);
@@ -884,10 +883,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================================================
-     PROFILE STATE
-  ========================================================= */
+   PROFILE STATE
+========================================================= */
 
   let currentProfile = null;
+
+  /* =========================================================
+   UPDATE RECRUITER GREETING
+========================================================= */
 
   function updateRecruiterGreeting(profile) {
     const greeting = document.querySelector("[data-recruiter-greeting]");
@@ -928,12 +931,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================================================
-     UPDATE PROFILE UI
-  ========================================================= */
+   UPDATE PROFILE UI
+========================================================= */
 
   function renderRecruiterProfile(profile) {
     currentProfile = profile;
 
+    /*
+     * Build full name for places where the UI
+     * displays the recruiter's complete name.
+     */
     const fullName =
       [profile.firstName, profile.lastName].filter(Boolean).join(" ") ||
       "Recruiter";
@@ -947,9 +954,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const phone = profile.phone || "";
 
     /*
-     * Form fields
+     * -------------------------------------------------------
+     * FORM FIELDS
+     * -------------------------------------------------------
+     *
+     * These IDs must match recruiter_profile.html.
      */
-    setProfileField("name", fullName);
+
+    setProfileField("first-name", profile.firstName || "");
+
+    setProfileField("last-name", profile.lastName || "");
 
     setProfileField("role", profile.designation || "");
 
@@ -960,8 +974,11 @@ document.addEventListener("DOMContentLoaded", () => {
     setProfileField("company", profile.companyName || "");
 
     /*
-     * Profile summary
+     * -------------------------------------------------------
+     * PROFILE SUMMARY
+     * -------------------------------------------------------
      */
+
     setProfileText("profile-display-name", fullName);
 
     setProfileText("profile-display-designation", designation);
@@ -973,8 +990,11 @@ document.addEventListener("DOMContentLoaded", () => {
     setProfileText("profile-display-phone", phone);
 
     /*
-     * Avatar initials
+     * -------------------------------------------------------
+     * AVATAR INITIALS
+     * -------------------------------------------------------
      */
+
     const initials =
       [profile.firstName, profile.lastName]
         .filter(Boolean)
@@ -989,8 +1009,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
     /*
-     * Top-right name
+     * -------------------------------------------------------
+     * TOP-RIGHT PROFILE NAME
+     * -------------------------------------------------------
      */
+
     const chipName = document.querySelector(".profile-chip-name");
 
     if (chipName) {
@@ -1000,13 +1023,31 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================================================
-     EDIT MODE
-  ========================================================= */
+   EDIT MODE
+========================================================= */
 
   function setEditMode(isEditing) {
-    const companyInput = document.getElementById("company");
+    /*
+     * These are the fields supported by:
+     *
+     * PUT /api/v1/recruiters/me
+     *
+     * firstName
+     * lastName
+     * email
+     * phone
+     * companyName
+     * designation
+     */
 
-    const roleInput = document.getElementById("role");
+    const editableInputs = [
+      document.getElementById("first-name"),
+      document.getElementById("last-name"),
+      document.getElementById("role"),
+      document.getElementById("email"),
+      document.getElementById("phone"),
+      document.getElementById("company"),
+    ].filter(Boolean);
 
     const editButton = document.querySelector("[data-edit-profile]");
 
@@ -1014,14 +1055,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const cancelButton = document.querySelector("[data-cancel-profile]");
 
-    if (companyInput) {
-      companyInput.readOnly = !isEditing;
-    }
+    /*
+     * Enable / disable editing for all
+     * backend-supported fields.
+     */
+    editableInputs.forEach((input) => {
+      input.readOnly = !isEditing;
+    });
 
-    if (roleInput) {
-      roleInput.readOnly = !isEditing;
-    }
-
+    /*
+     * Toggle buttons.
+     */
     if (editButton) {
       editButton.hidden = isEditing;
     }
@@ -1034,40 +1078,34 @@ document.addEventListener("DOMContentLoaded", () => {
       cancelButton.hidden = !isEditing;
     }
 
+    /*
+     * Focus first field when edit mode starts.
+     */
     if (isEditing) {
-      companyInput?.focus();
+      document.getElementById("first-name")?.focus();
     }
   }
 
   /* =========================================================
-     LOAD RECRUITER PROFILE
-  ========================================================= */
+   LOAD RECRUITER PROFILE
+========================================================= */
 
   async function loadRecruiterProfile() {
-    /*
-     * Run this on the recruiter dashboard
-     * and recruiter profile page.
-     */
-    // const isDashboard = document.querySelector("[data-recruiter-greeting]");
-
-    // const isProfilePage = document.querySelector("[data-save-profile]");
-
-    // if (!isDashboard && !isProfilePage) {
-    //   return;
-    // }
-
     const profilePage = document.querySelector(".profile-page");
 
     try {
       profilePage?.classList.add("profile-loading");
 
+      /*
+       * GET /api/v1/recruiters/me
+       */
       const response = await fetch(`${API_BASE_URL}/recruiters/me`, {
         method: "GET",
         headers: getAuthHeaders(),
       });
 
       /*
-       * Authentication failed.
+       * Authentication failure.
        */
       if (response.status === 401) {
         showToast("Session expired. Please login again.");
@@ -1079,25 +1117,39 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      /*
+       * Other backend errors.
+       */
       if (!response.ok) {
         throw new Error(`Profile request failed: ${response.status}`);
       }
 
+      /*
+       * Read recruiter profile.
+       */
       const profile = await response.json();
 
       console.log("Recruiter profile loaded:", profile);
 
       /*
-       * Store/render profile.
-       * This also updates:
-       * - profile chip
+       * Render profile data.
+       *
+       * This updates:
+       * - first name
+       * - last name
+       * - email
+       * - phone
+       * - company
+       * - designation
        * - avatar
-       * - profile page fields
+       * - top-right recruiter name
+       * - profile summary
        */
       renderRecruiterProfile(profile);
 
       /*
-       * Update dashboard greeting.
+       * Update dashboard greeting
+       * if the element exists on the page.
        */
       updateRecruiterGreeting(profile);
     } catch (error) {
@@ -1114,8 +1166,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================================================
-     EDIT PROFILE BUTTON
-  ========================================================= */
+   EDIT PROFILE BUTTON
+========================================================= */
 
   document
     .querySelector("[data-edit-profile]")
@@ -1124,14 +1176,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   /* =========================================================
-     CANCEL PROFILE EDIT
-  ========================================================= */
+   CANCEL PROFILE EDIT
+========================================================= */
 
   document
     .querySelector("[data-cancel-profile]")
     ?.addEventListener("click", () => {
       /*
-       * Restore values received from backend.
+       * Restore the values received
+       * from the backend.
        */
       if (currentProfile) {
         renderRecruiterProfile(currentProfile);
@@ -1141,25 +1194,72 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   /* =========================================================
-     SAVE PROFILE
-  ========================================================= */
+   SAVE PROFILE
+========================================================= */
 
   document
     .querySelector("[data-save-profile]")
     ?.addEventListener("click", async () => {
+      /*
+       * Get all backend-supported fields.
+       */
+      const firstNameInput = document.getElementById("first-name");
+
+      const lastNameInput = document.getElementById("last-name");
+
+      const emailInput = document.getElementById("email");
+
+      const phoneInput = document.getElementById("phone");
+
       const companyInput = document.getElementById("company");
 
       const roleInput = document.getElementById("role");
 
       const saveButton = document.querySelector("[data-save-profile]");
 
+      /*
+       * Read values.
+       */
+      const firstName = firstNameInput?.value.trim() || "";
+
+      const lastName = lastNameInput?.value.trim() || "";
+
+      const email = emailInput?.value.trim() || "";
+
+      const phone = phoneInput?.value.trim() || "";
+
       const companyName = companyInput?.value.trim() || "";
 
       const designation = roleInput?.value.trim() || "";
 
-      /*
-       * Validation
-       */
+      /* ===================================================
+         VALIDATION
+      =================================================== */
+
+      if (!firstName) {
+        showToast("First name is required");
+
+        firstNameInput?.focus();
+
+        return;
+      }
+
+      if (!lastName) {
+        showToast("Last name is required");
+
+        lastNameInput?.focus();
+
+        return;
+      }
+
+      if (!email) {
+        showToast("Email is required");
+
+        emailInput?.focus();
+
+        return;
+      }
+
       if (!companyName) {
         showToast("Company name is required");
 
@@ -1179,10 +1279,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const originalText = saveButton?.innerHTML;
 
       try {
-        /*
-         * Disable button while request
-         * is being processed.
-         */
+        /* =================================================
+           DISABLE SAVE BUTTON
+        ================================================= */
+
         if (saveButton) {
           saveButton.disabled = true;
 
@@ -1192,30 +1292,42 @@ document.addEventListener("DOMContentLoaded", () => {
           window.lucide?.createIcons();
         }
 
-        /*
-         * PUT /recruiters/me
-         */
+        /* =================================================
+           PUT /api/v1/recruiters/me
+        ================================================= */
+
         const response = await fetch(`${API_BASE_URL}/recruiters/me`, {
           method: "PUT",
 
           headers: getAuthHeaders(),
 
+          /*
+           * IMPORTANT:
+           * This exactly matches the
+           * backend request body.
+           */
           body: JSON.stringify({
+            firstName,
+            lastName,
+            email,
+            phone,
             companyName,
             designation,
           }),
         });
 
-        /*
-         * Authentication error.
-         */
+        /* =================================================
+           AUTHENTICATION ERROR
+        ================================================= */
+
         if (response.status === 401) {
           throw new Error("Your session has expired. Please login again.");
         }
 
-        /*
-         * Other backend errors.
-         */
+        /* =================================================
+           OTHER BACKEND ERRORS
+        ================================================= */
+
         if (!response.ok) {
           let message = `Profile update failed: ${response.status}`;
 
@@ -1224,29 +1336,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
             message = errorData.message || errorData.error || message;
           } catch (error) {
-            // Backend didn't return JSON.
+            /*
+             * Backend did not return JSON.
+             */
           }
 
           throw new Error(message);
         }
 
-        /*
-         * Backend returns the updated
-         * recruiter profile.
-         */
+        /* =================================================
+           READ UPDATED PROFILE
+        ================================================= */
+
         const updatedProfile = await response.json();
 
         console.log("Recruiter profile updated:", updatedProfile);
 
-        /*
-         * Render returned backend data.
-         */
+        /* =================================================
+           UPDATE UI WITH BACKEND RESPONSE
+        ================================================= */
+
         renderRecruiterProfile(updatedProfile);
 
         /*
-         * Leave edit mode.
+         * Update greeting too, if present.
          */
+        updateRecruiterGreeting(updatedProfile);
+
+        /* =================================================
+           EXIT EDIT MODE
+        ================================================= */
+
         setEditMode(false);
+
+        /* =================================================
+           SUCCESS MESSAGE
+        ================================================= */
 
         showToast("Profile changes saved successfully");
       } catch (error) {
@@ -1255,7 +1380,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast(error.message || "Could not save profile changes");
 
         /*
-         * If token expired, redirect to login.
+         * Redirect if JWT expired.
          */
         if (error.message.includes("session has expired")) {
           setTimeout(() => {
@@ -1263,6 +1388,9 @@ document.addEventListener("DOMContentLoaded", () => {
           }, 1000);
         }
       } finally {
+        /*
+         * Restore Save button.
+         */
         if (saveButton) {
           saveButton.disabled = false;
 
@@ -1274,22 +1402,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   /* =========================================================
-     PROFILE INITIALIZATION
-  ========================================================= */
+   PROFILE INITIALIZATION
+========================================================= */
 
   /*
-   * Start with read-only fields.
+   * Start in read-only mode.
    */
   setEditMode(false);
 
   /*
-   * Fetch recruiter profile.
+   * Fetch recruiter profile when page loads.
    */
   loadRecruiterProfile();
 
   /* =========================================================
-     UTILITIES
-  ========================================================= */
+   UTILITIES
+========================================================= */
 
   function escapeHTML(value) {
     return String(value).replace(
