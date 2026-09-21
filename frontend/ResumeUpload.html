@@ -1,23 +1,37 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>NexHire | Upload Resume</title>
 
-    <link rel="stylesheet" href="css/ResumeUpload.css" />
-  </head>
+    <link
+        rel="stylesheet"
+        href="css/ResumeUpload.css">
 
-  <body>
-    <header class="site-header">
-      <div class="container navbar">
-        <a href="candidate-dashboard.html" class="brand">
-          <span class="brand-mark">
-            <span></span>
-            <span></span>
-            <span></span>
-          </span>
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     HEADER
+     ========================================================= -->
+
+<header class="site-header">
+
+    <div class="container navbar">
+
+        <a
+            href="candidate-dashboard.html"
+            class="brand">
 
           <span class="brand-name"> Nex<span>Hire</span> </span>
         </a>
@@ -32,9 +46,60 @@
             ☼
           </button>
 
-          <div class="profile-menu">
-            <button class="profile-button" id="profileButton" type="button">
-              <span class="profile-avatar">K</span>
+
+            <!-- THEME BUTTON -->
+
+            <button
+                class="icon-button theme-toggle"
+                id="themeToggle"
+                type="button"
+                aria-label="Switch to dark mode"
+                title="Switch to dark mode">
+
+                ☼
+
+            </button>
+
+
+            <!-- PROFILE MENU -->
+
+            <div class="profile-menu">
+
+                <button
+                    class="profile-button"
+                    id="profileButton"
+                    type="button"
+                    aria-expanded="false"
+                    aria-haspopup="true">
+
+                    <span class="profile-avatar">
+                        K
+                    </span>
+
+                    <span class="profile-details">
+
+                        <strong>
+                            Kaushik
+                        </strong>
+
+                        <small>
+                            Candidate
+                        </small>
+
+                    </span>
+
+                    <span class="profile-arrow">
+                        ▾
+                    </span>
+
+                </button>
+
+
+                <!-- PROFILE DROPDOWN -->
+
+                <div
+                    class="profile-dropdown"
+                    id="profileDropdown">
 
               <span class="profile-details">
                 <strong>Kaushik</strong>
@@ -54,8 +119,24 @@
       </div>
     </header>
 
-    <main class="candidate-layout">
-      <!-- SIDEBAR -->
+    </div>
+
+</header>
+
+
+
+<!-- =========================================================
+     MAIN LAYOUT
+     ========================================================= -->
+
+<main class="candidate-layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
 
       <aside class="sidebar">
         <div class="sidebar-inner">
@@ -96,34 +177,135 @@
           <div class="sidebar-help">
             <div class="help-icon">?</div>
 
-            <div>
-              <strong>Need help?</strong>
-              <span>Ask NexHire AI</span>
+
+            <div class="sidebar-label">
+                CANDIDATE
+            </div>
+
+
+            <nav class="sidebar-nav">
+
+
+                <!-- DASHBOARD -->
+
+                <a
+                    href="candidate-dashboard.html"
+                    class="sidebar-link">
+
+                    <span class="sidebar-icon">
+                        ⌂
+                    </span>
+
+                    <span>
+                        Dashboard
+                    </span>
+
+                </a>
+
+
+                <!-- UPLOAD RESUME -->
+
+                <a
+                    href="ResumeUpload.html"
+                    class="sidebar-link active">
+
+                    <span class="sidebar-icon">
+                        ↑
+                    </span>
+
+                    <span>
+                        Upload Resume
+                    </span>
+
+                </a>
+
+
+                <!-- JOB SEARCH -->
+
+                <a
+                    href="candidate-job-search.html"
+                    class="sidebar-link">
+
+                    <span class="sidebar-icon">
+                        ⌕
+                    </span>
+
+                    <span>
+                        Job Search
+                    </span>
+
+                </a>
+
+
+            </nav>
+
+
+            <!-- SIDEBAR HELP -->
+
+            <div class="sidebar-help">
+
+                <div class="help-icon">
+                    ?
+                </div>
+
+                <div>
+
+                    <strong>
+                        Need help?
+                    </strong>
+
+                    <span>
+                        Check the resume guidelines
+                    </span>
+
+                </div>
+
             </div>
           </div>
         </div>
       </aside>
 
-      <!-- MAIN CONTENT -->
+    </aside>
 
-      <section class="dashboard-content">
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <section class="dashboard-content">
+
+
+        <!-- PAGE HEADING -->
+
         <div class="dashboard-heading">
-          <div>
-            <span class="eyebrow"> RESUME </span>
 
-            <h1>
-              Build your
-              <span>profile.</span>
-            </h1>
+            <div>
 
-            <p>
-              Upload your latest resume to help NexHire understand your skills,
-              experience and projects for better job recommendations.
-            </p>
-          </div>
+                <span class="eyebrow">
+                    RESUME
+                </span>
+
+                <h1>
+                    Build your
+                    <span>profile.</span>
+                </h1>
+
+                <p>
+                    Upload your latest resume to help
+                    NexHire understand your skills,
+                    experience and projects.
+                </p>
+
+            </div>
+
         </div>
 
-        <!-- RESUME CARD -->
+
+
+        <!-- =================================================
+             RESUME CARD
+             ================================================= -->
 
         <section class="resume-card">
           <div class="resume-card-header">
@@ -143,7 +325,13 @@
           <div class="upload-zone" id="uploadZone">
             <div class="upload-icon">↑</div>
 
-            <h3>Drop your resume here</h3>
+            <!-- =================================================
+                 SELECTED FILE
+                 ================================================= -->
+
+            <div
+                class="selected-file"
+                id="selectedFile">
 
             <p>or click to browse from your computer</p>
 
@@ -197,7 +385,11 @@
           </div>
         </section>
 
-        <!-- BENEFITS -->
+
+
+        <!-- =================================================
+             BENEFITS
+             ================================================= -->
 
         <section class="dashboard-section">
           <div class="section-heading-row">
@@ -254,7 +446,36 @@
 
         <span class="section-kicker"> RESUME GUIDELINES </span>
 
-        <h2>Make your resume effective</h2>
+
+<!-- =========================================================
+     FORMAT MODAL
+     ========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="formatModal">
+
+    <div class="format-modal">
+
+
+        <button
+            type="button"
+            class="modal-close"
+            id="modalClose">
+
+            ×
+
+        </button>
+
+
+        <span class="section-kicker">
+            RESUME GUIDELINES
+        </span>
+
+        <h2>
+            Make your resume effective
+        </h2>
+
 
         <ul>
           <li>Keep your resume clear and concise.</li>
@@ -263,7 +484,9 @@
 
           <li>Include relevant education and experience.</li>
 
-          <li>Use a readable and professional format.</li>
+            <li>
+                Upload PDF, JPG/JPEG or TXT files.
+            </li>
 
           <li>Upload PDF, DOCX or TXT files.</li>
         </ul>
@@ -278,7 +501,19 @@
       </div>
     </div>
 
-    <!-- PROCESSING -->
+</div>
+
+
+
+<!-- =========================================================
+     PROCESSING OVERLAY
+     ========================================================= -->
+
+<div
+    class="processing-overlay"
+    id="processingOverlay">
+
+    <div class="processing-card">
 
     <div class="processing-overlay" id="processingOverlay">
       <div class="processing-card">
@@ -290,6 +525,19 @@
       </div>
     </div>
 
-    <script src="js/ResumeUpload.js"></script>
-  </body>
+</div>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ResumeUpload.js"></script>
+
+
+</body>
+
 </html>
