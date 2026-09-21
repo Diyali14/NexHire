@@ -2,25 +2,21 @@
 # ================================
 # Stage 1: Build
 # ================================
-FROM eclipse-temurin:25-jdk AS builder
+FROM maven:3.9.11-eclipse-temurin-25 AS builder
 
 WORKDIR /app
 
-# Copy Maven wrapper and project files first
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml ./
+# Copy Maven project files
+COPY pom.xml ./
 
-# Make Maven wrapper executable
-RUN chmod +x mvnw
-
-# Download dependencies first for better Docker layer caching
-RUN ./mvnw dependency:go-offline -B
+# Download dependencies
+RUN mvn dependency:go-offline -B
 
 # Copy source code
 COPY src ./src
 
-# Build the application
-RUN ./mvnw clean package -DskipTests
+# Build Spring Boot application
+RUN mvn clean package -DskipTests
 
 
 # ================================
@@ -30,13 +26,11 @@ FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 
-# Copy the generated JAR from builder
+# Copy generated JAR
 COPY --from=builder /app/target/*.jar app.jar
 
-# Render provides the PORT environment variable.
-# Spring Boot reads it from server.port=${PORT:8080}
+# Render provides PORT dynamically
 EXPOSE 8080
 
-# Start Spring Boot
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
