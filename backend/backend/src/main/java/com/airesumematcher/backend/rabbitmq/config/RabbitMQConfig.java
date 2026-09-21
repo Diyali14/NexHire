@@ -6,7 +6,7 @@ import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -45,7 +45,6 @@ public class RabbitMQConfig {
 
     // =========================================================
     // JOB / JD
-    // Keep these for later
     // =========================================================
 
     public static final String JOB_EXCHANGE =
@@ -59,7 +58,22 @@ public class RabbitMQConfig {
 
 
     // =========================================================
-    // RESUME INPUT RABBITMQ
+    // MATCHER
+    // Spring Boot Application -> Matcher Consumer
+    // =========================================================
+
+    public static final String MATCHER_EXCHANGE =
+            "resume.matcher.exchange";
+
+    public static final String MATCHER_QUEUE =
+            "resume.matcher.queue";
+
+    public static final String MATCHER_ROUTING_KEY =
+            "resume.matcher";
+
+
+    // =========================================================
+    // RESUME INPUT
     // =========================================================
 
     @Bean
@@ -93,7 +107,7 @@ public class RabbitMQConfig {
 
 
     // =========================================================
-    // RESUME RESULT RABBITMQ
+    // RESUME RESULT
     // =========================================================
 
     @Bean
@@ -127,8 +141,7 @@ public class RabbitMQConfig {
 
 
     // =========================================================
-    // JOB RABBITMQ
-    // Leave this untouched for now
+    // JOB / JD
     // =========================================================
 
     @Bean
@@ -162,13 +175,47 @@ public class RabbitMQConfig {
 
 
     // =========================================================
+    // MATCHER
+    // =========================================================
+
+    @Bean
+    public DirectExchange matcherExchange() {
+
+        return new DirectExchange(
+                MATCHER_EXCHANGE
+        );
+    }
+
+    @Bean
+    public Queue matcherQueue() {
+
+        return new Queue(
+                MATCHER_QUEUE,
+                true
+        );
+    }
+
+    @Bean
+    public Binding matcherBinding(
+            Queue matcherQueue,
+            DirectExchange matcherExchange
+    ) {
+
+        return BindingBuilder
+                .bind(matcherQueue)
+                .to(matcherExchange)
+                .with(MATCHER_ROUTING_KEY);
+    }
+
+
+    // =========================================================
     // JSON MESSAGE CONVERTER
     // =========================================================
 
     @Bean
-    public JacksonJsonMessageConverter jacksonJsonMessageConverter() {
+    public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
 
-        return new JacksonJsonMessageConverter();
+        return new Jackson2JsonMessageConverter();
     }
 
 
@@ -179,7 +226,7 @@ public class RabbitMQConfig {
     @Bean
     public RabbitTemplate rabbitTemplate(
             ConnectionFactory connectionFactory,
-            JacksonJsonMessageConverter messageConverter
+            Jackson2JsonMessageConverter messageConverter
     ) {
 
         RabbitTemplate rabbitTemplate =
@@ -194,4 +241,3 @@ public class RabbitMQConfig {
         return rabbitTemplate;
     }
 }
-

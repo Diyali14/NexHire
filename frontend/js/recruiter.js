@@ -227,6 +227,120 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   /* =========================================================
+   JOB PARSER
+========================================================= */
+
+  /*
+   * Wait until the backend confirms that parsed job data
+   * is available.
+   *
+   * IMPORTANT:
+   * Backend processing statuses such as QUEUED,
+   * PROCESSING and COMPLETED are NOT shown in the UI.
+   */
+
+  async function waitForParsedJob(jobId) {
+    const checkInterval = 5000; // 5 seconds
+    const maxAttempts = 24; // 2 minutes maximum
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      console.log(
+        `Checking parsed data for job ${jobId} (${attempt}/${maxAttempts})`,
+      );
+
+      const response = await fetch(`${API_BASE_URL}/jobs/${jobId}/status`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      /*
+       * Authentication failure
+       */
+
+      if (response.status === 401) {
+        throw new Error("Your session has expired. Please login again.");
+      }
+
+      /*
+       * Other backend errors
+       */
+
+      if (!response.ok) {
+        throw new Error(`Job status request failed: ${response.status}`);
+      }
+
+      const statusData = await response.json();
+
+      console.log("Job processing check:", statusData);
+
+      /*
+       * THIS is the only thing the frontend
+       * actually cares about.
+       *
+       * We do NOT display statusData.status.
+       */
+
+      if (statusData.parsedDataAvailable === true) {
+        console.log(`Parsed data is ready for job ${jobId}`);
+
+        return true;
+      }
+
+      /*
+       * Parser is not finished yet.
+       *
+       * Wait before checking again.
+       */
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, checkInterval);
+      });
+    }
+
+    /*
+     * Parser took longer than our maximum
+     * waiting period.
+     */
+
+    throw new Error(
+      "Job processing is taking longer than expected. Please check your jobs later.",
+    );
+  }
+
+  /* =========================================================
+   FETCH PARSED JOB DATA
+========================================================= */
+
+  async function getParsedJobData(jobId) {
+    const response = await fetch(`${API_BASE_URL}/jobs/${jobId}/parsed-data`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+
+    /*
+     * Authentication failure
+     */
+
+    if (response.status === 401) {
+      throw new Error("Your session has expired. Please login again.");
+    }
+
+    /*
+     * Backend error
+     */
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch parsed job data: ${response.status}`);
+    }
+
+    const parsedData = await response.json();
+
+    console.log("Parsed job data received:", parsedData);
+
+    return parsedData;
+  }
+
+  /* =========================================================
    CREATE JOB
 ========================================================= */
 
@@ -288,6 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (postButton) {
         postButton.disabled = true;
+        postButton.classList.add("loading");
 
         postButton.innerHTML = '<i data-lucide="loader-circle"></i> Posting...';
 
@@ -342,8 +457,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const createdJob = await response.json();
 
-        console.log("Job created successfully:", createdJob);
+        console.log("Job accepted by backend:", createdJob);
 
+        const jobId = createdJob.jobId;
+
+        if (!jobId) {
+          throw new Error("Backend did not return a job ID.");
+        }
+
+        /*
+         * DO NOT add the job to the dashboard yet.
+         *
+         * The AI parser still needs to process it.
+         */
+
+        showToast("Job submitted. Preparing job details...");
+        if (postButton) {
+          postButton.innerHTML =
+            '<i data-lucide="loader-circle"></i> Preparing Job...';
+
+          window.lucide?.createIcons();
+        }
+        /*
+         * Wait for AI parser to finish.
+         *
+         * Backend processing states remain completely
+         * hidden from the frontend UI.
+         */
+        await waitForParsedJob(jobId);
+        const parsedJob = await getParsedJobData(jobId);
+
+        console.log("Final parsed job:", parsedJob);
+
+        let parsedJson = null;
+
+        try {
+          if (parsedJob.parsedJson) {
+            parsedJson =
+              typeof parsedJob.parsedJson === "string"
+                ? JSON.parse(parsedJob.parsedJson)
+                : parsedJob.parsedJson;
+          }
+        } catch (error) {
+          console.error("Unable to parse parsedJson:", error);
+
+          throw new Error(
+            "Job was processed, but the parsed data could not be read.",
+          );
+        }
         /* -----------------------------------------
          OPTIONAL LOCAL STORAGE
          Keeps your existing dashboard UI working
@@ -398,12 +559,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         localStorage.setItem(
           "nexhire-last-created-job",
-          JSON.stringify(createdJob),
+          JSON.stringify({
+            job: createdJob,
+            parsedData: parsedJob,
+          }),
         );
 
         /* -----------------------------------------
          SUCCESS
       ----------------------------------------- */
+        if (postButton) {
+          postButton.classList.remove("loading");
+          postButton.innerHTML = '<i data-lucide="check"></i> Job Posted';
+
+          window.lucide?.createIcons();
+        }
 
         showToast("Job posted successfully");
 
@@ -435,7 +605,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (postButton) {
           postButton.disabled = false;
-
+          postButton.classList.remove("loading");
           postButton.innerHTML = originalButtonText;
 
           window.lucide?.createIcons();
@@ -616,25 +786,196 @@ document.addEventListener("DOMContentLoaded", () => {
      RESUME MODAL
   ========================================================= */
 
+  const resumeModal = document.querySelector("[data-resume-modal]");
+  const resumePreview = document.getElementById("resumePreview");
+  const resumeFileName = document.getElementById("resumeFileName");
+  const downloadResumeButton = document.getElementById("downloadResumeButton");
+
+  let currentResumeBlobUrl = null;
+  let currentResumeFileName = "resume.pdf";
+
+  async function loadCandidateResume(applicationId) {
+    if (!applicationId) {
+      alert("Application ID is missing.");
+      return;
+    }
+
+    resumePreview.innerHTML = `
+        <div class="resume-loading">
+            Loading resume...
+        </div>
+    `;
+
+    resumeFileName.textContent = "Loading resume...";
+    downloadResumeButton.disabled = true;
+
+    resumeModal.classList.add("open");
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/recruiters/applications/${applicationId}/resume/download`,
+        {
+          method: "GET",
+          headers: getAuthHeaders(),
+        },
+      );
+
+      if (!response.ok) {
+        let errorMessage = "Unable to load resume.";
+
+        try {
+          const errorData = await response.json();
+
+          if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+        } catch (error) {
+          // Response was not JSON
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      const blob = await response.blob();
+
+      /*
+       * Try to get the filename from Content-Disposition
+       */
+      const contentDisposition = response.headers.get("Content-Disposition");
+
+      let fileName = "candidate_resume.pdf";
+
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?([^"]+)"?/i);
+
+        if (match && match[1]) {
+          fileName = match[1];
+        }
+      }
+
+      currentResumeFileName = fileName;
+
+      /*
+       * Create temporary browser URL for the downloaded file
+       */
+      if (currentResumeBlobUrl) {
+        URL.revokeObjectURL(currentResumeBlobUrl);
+      }
+
+      currentResumeBlobUrl = URL.createObjectURL(blob);
+
+      resumeFileName.textContent = fileName;
+
+      /*
+       * Show PDF inside the modal
+       */
+      if (
+        blob.type === "application/pdf" ||
+        fileName.toLowerCase().endsWith(".pdf")
+      ) {
+        resumePreview.innerHTML = `
+                <iframe
+                    src="${currentResumeBlobUrl}"
+                    class="resume-pdf-viewer"
+                    title="Candidate Resume"
+                ></iframe>
+            `;
+      } else {
+        resumePreview.innerHTML = `
+                <div class="resume-file-message">
+                    <p>Resume downloaded successfully.</p>
+                    <p>
+                        File:
+                        <strong>${fileName}</strong>
+                    </p>
+                    <p>
+                        Use the Download Resume button below
+                        to save the file.
+                    </p>
+                </div>
+            `;
+      }
+
+      downloadResumeButton.disabled = false;
+    } catch (error) {
+      console.error("Resume download error:", error);
+
+      resumePreview.innerHTML = `
+            <div class="resume-file-message error">
+                <p>Unable to load the candidate's resume.</p>
+                <p>${error.message}</p>
+            </div>
+        `;
+
+      resumeFileName.textContent = "Resume unavailable";
+    }
+  }
+
   document.querySelectorAll("[data-open-resume]").forEach((button) => {
     button.addEventListener("click", () => {
-      document.querySelector(".modal-backdrop")?.classList.add("open");
+      const applicationId =
+        button.dataset.applicationId ||
+        new URLSearchParams(window.location.search).get("applicationId");
+
+      loadCandidateResume(applicationId);
     });
   });
 
-  document.querySelectorAll("[data-close-modal]").forEach((button) => {
-    button.addEventListener("click", () => {
-      document.querySelector(".modal-backdrop")?.classList.remove("open");
-    });
+  //close resume
+
+  function closeResumeModal() {
+    resumeModal.classList.remove("open");
+
+    if (currentResumeBlobUrl) {
+      URL.revokeObjectURL(currentResumeBlobUrl);
+      currentResumeBlobUrl = null;
+    }
+
+    resumePreview.innerHTML = "";
+    resumeFileName.textContent = "";
+    downloadResumeButton.disabled = true;
+  }
+
+  document.querySelectorAll("[data-close-resume]").forEach((button) => {
+    button.addEventListener("click", closeResumeModal);
   });
 
-  document
-    .querySelector(".modal-backdrop")
-    ?.addEventListener("click", (event) => {
-      if (event.target.classList.contains("modal-backdrop")) {
-        event.currentTarget.classList.remove("open");
-      }
-    });
+  resumeModal.addEventListener("click", (event) => {
+    if (event.target === resumeModal) {
+      closeResumeModal();
+    }
+  });
+
+  //download resume
+
+  downloadResumeButton.addEventListener("click", () => {
+    if (!currentResumeBlobUrl) {
+      return;
+    }
+
+    const link = document.createElement("a");
+
+    link.href = currentResumeBlobUrl;
+    link.download = currentResumeFileName;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+
+  // document.querySelectorAll("[data-close-modal]").forEach((button) => {
+  //   button.addEventListener("click", () => {
+  //     document.querySelector(".modal-backdrop")?.classList.remove("open");
+  //   });
+  // });
+
+  // document
+  //   .querySelector(".modal-backdrop")
+  //   ?.addEventListener("click", (event) => {
+  //     if (event.target.classList.contains("modal-backdrop")) {
+  //       event.currentTarget.classList.remove("open");
+  //     }
+  //   });
 
   /* =========================================================
      RECRUITER PROFILE API

@@ -1,4 +1,4 @@
-CREATE TABLE jobs (
+CREATE TABLE IF NOT EXISTS jobs (
                       id BIGSERIAL PRIMARY KEY,
 
                       recruiter_id BIGINT NOT NULL,
@@ -23,8 +23,8 @@ CREATE TABLE jobs (
                               ON DELETE CASCADE
 );
 
-CREATE INDEX idx_jobs_recruiter_id
+CREATE INDEX IF NOT EXISTS idx_jobs_recruiter_id
     ON jobs(recruiter_id);
 
-CREATE INDEX idx_jobs_processing_status
+CREATE INDEX IF NOT EXISTS idx_jobs_processing_status
     ON jobs(processing_status);

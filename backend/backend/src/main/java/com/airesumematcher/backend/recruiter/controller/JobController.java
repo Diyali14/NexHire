@@ -1,6 +1,7 @@
 package com.airesumematcher.backend.recruiter.controller;
 
 import com.airesumematcher.backend.recruiter.dto.JobCreateRequest;
+import com.airesumematcher.backend.recruiter.dto.JobParsedDataResponse;
 import com.airesumematcher.backend.recruiter.dto.JobResponse;
 import com.airesumematcher.backend.recruiter.dto.JobStatusResponse;
 import com.airesumematcher.backend.recruiter.service.JobService;
@@ -19,12 +20,15 @@ public class JobController {
 
     private final JobService jobService;
 
+    // =========================================================
+    // CREATE JOB
+    // =========================================================
+
     @PostMapping
     public ResponseEntity<JobResponse> createJob(
             @Valid @RequestBody JobCreateRequest request,
             Authentication authentication
     ) {
-
         return ResponseEntity.ok(
                 jobService.createJob(
                         request,
@@ -33,38 +37,57 @@ public class JobController {
         );
     }
 
+    // =========================================================
+    // GET RECRUITER'S OWN JOBS
+    // =========================================================
+
     @GetMapping
     public ResponseEntity<List<JobResponse>> getMyJobs(
             Authentication authentication
     ) {
-
         return ResponseEntity.ok(
-                jobService.getMyJobs(
-                        authentication
-                )
+                jobService.getMyJobs(authentication)
         );
     }
 
+    // =========================================================
+    // GET SINGLE JOB DETAILS FOR RECRUITER
+    // =========================================================
+
     @GetMapping("/{jobId}")
-    public ResponseEntity<JobResponse> getMyJob(
+    public ResponseEntity<JobResponse> getJob(
             @PathVariable Long jobId,
             Authentication authentication
     ) {
-
         return ResponseEntity.ok(
-                jobService.getMyJob(
-                        jobId,
-                        authentication
-                )
+                jobService.getJob(jobId, authentication)
         );
     }
+
+    // =========================================================
+    // UPDATE JOB
+    // =========================================================
+
+    @PutMapping("/{jobId}")
+    public ResponseEntity<JobResponse> updateJob(
+            @PathVariable Long jobId,
+            @Valid @RequestBody JobCreateRequest request,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(
+                jobService.updateJob(jobId, request, authentication)
+        );
+    }
+
+    // =========================================================
+    // GET JOB STATUS
+    // =========================================================
 
     @GetMapping("/{jobId}/status")
     public ResponseEntity<JobStatusResponse> getJobStatus(
             @PathVariable Long jobId,
             Authentication authentication
     ) {
-
         return ResponseEntity.ok(
                 jobService.getJobStatus(
                         jobId,
@@ -73,12 +96,32 @@ public class JobController {
         );
     }
 
+    // =========================================================
+    // GET PARSED JOB DATA
+    // =========================================================
+
+    @GetMapping("/{jobId}/parsed-data")
+    public ResponseEntity<JobParsedDataResponse> getParsedJobData(
+            @PathVariable Long jobId,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(
+                jobService.getParsedJobData(
+                        jobId,
+                        authentication
+                )
+        );
+    }
+
+    // =========================================================
+    // DELETE JOB
+    // =========================================================
+
     @DeleteMapping("/{jobId}")
     public ResponseEntity<Void> deleteJob(
             @PathVariable Long jobId,
             Authentication authentication
     ) {
-
         jobService.deleteJob(
                 jobId,
                 authentication

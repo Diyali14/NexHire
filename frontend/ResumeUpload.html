@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -33,20 +33,18 @@
             href="candidate-dashboard.html"
             class="brand">
 
-            <span class="brand-mark">
-                <span></span>
-                <span></span>
-                <span></span>
-            </span>
-
-            <span class="brand-name">
-                Nex<span>Hire</span>
-            </span>
-
+          <span class="brand-name"> Nex<span>Hire</span> </span>
         </a>
 
-
         <div class="nav-actions">
+          <button
+            class="icon-button theme-toggle"
+            id="themeToggle"
+            type="button"
+            aria-label="Toggle theme"
+          >
+            ☼
+          </button>
 
 
             <!-- THEME BUTTON -->
@@ -103,32 +101,23 @@
                     class="profile-dropdown"
                     id="profileDropdown">
 
-                    <a href="candidate-profile.html">
-                        View Profile
-                    </a>
+              <span class="profile-details">
+                <strong>Kaushik</strong>
+                <small>Candidate</small>
+              </span>
 
-                    <a href="candidate-profile.html">
-                        Edit Profile
-                    </a>
+              <span class="profile-arrow">▾</span>
+            </button>
 
-                    <div class="dropdown-divider"></div>
+            <div class="profile-dropdown" id="profileDropdown">
+              <a href="candidate-profile.html"> View Profile </a>
 
-                    <button
-                        type="button"
-                        class="logout-button"
-                        id="logoutButton">
-
-                        <span>↪</span>
-
-                        Logout
-
-                    </button>
-
-                </div>
-
+              <a href="candidate-profile.html"> Edit Profile </a>
             </div>
-
+          </div>
         </div>
+      </div>
+    </header>
 
     </div>
 
@@ -149,7 +138,44 @@
 
     <aside class="sidebar">
 
+      <aside class="sidebar">
         <div class="sidebar-inner">
+          <div class="sidebar-label">CANDIDATE</div>
+
+          <nav class="sidebar-nav">
+            <a href="candidate-dashboard.html" class="sidebar-link">
+              <span class="sidebar-icon">⌂</span>
+              <span>Dashboard</span>
+            </a>
+
+            <a href="candidate-profile.html" class="sidebar-link">
+              <span class="sidebar-icon">◯</span>
+              <span>Profile</span>
+            </a>
+
+            <a href="ResumeUpload.html" class="sidebar-link active">
+              <span class="sidebar-icon">↑</span>
+              <span>Upload Resume</span>
+            </a>
+
+            <a href="candidate-job-search.html" class="sidebar-link">
+              <span class="sidebar-icon">⌕</span>
+              <span>Job Search</span>
+            </a>
+
+            <a href="candidate-recommended-jobs.html" class="sidebar-link">
+              <span class="sidebar-icon">✦</span>
+              <span>Recommended Jobs</span>
+            </a>
+
+            <a href="ai-assistant.html" class="sidebar-link">
+              <span class="sidebar-icon">✧</span>
+              <span>AI Assistant</span>
+            </a>
+          </nav>
+
+          <div class="sidebar-help">
+            <div class="help-icon">?</div>
 
 
             <div class="sidebar-label">
@@ -235,8 +261,9 @@
                 </div>
 
             </div>
-
+          </div>
         </div>
+      </aside>
 
     </aside>
 
@@ -281,66 +308,22 @@
              ================================================= -->
 
         <section class="resume-card">
+          <div class="resume-card-header">
+            <div>
+              <span class="section-kicker"> RESUME UPLOAD </span>
 
+              <h2>Upload your resume</h2>
 
-            <div class="resume-card-header">
-
-                <div>
-
-                    <span class="section-kicker">
-                        RESUME UPLOAD
-                    </span>
-
-                    <h2>
-                        Upload your resume
-                    </h2>
-
-                    <p>
-                        Supported formats:
-                        PDF, JPG/JPEG and TXT.
-                        Maximum file size: 5 MB.
-                    </p>
-
-                </div>
-
+              <p>
+                Supported formats: PDF, DOCX and TXT. Maximum file size: 5 MB.
+              </p>
             </div>
+          </div>
 
+          <!-- DROP ZONE -->
 
-
-            <!-- =================================================
-                 DROP ZONE
-                 ================================================= -->
-
-            <div
-                class="upload-zone"
-                id="uploadZone">
-
-                <div class="upload-icon">
-                    ↑
-                </div>
-
-                <h3>
-                    Drop your resume here
-                </h3>
-
-                <p>
-                    or click to browse from your computer
-                </p>
-
-                <span class="upload-format">
-                    PDF · JPG · TXT
-                </span>
-
-
-                <input
-                    type="file"
-                    id="resumeInput"
-                    accept=".pdf,.jpeg,.jpg,.txt"
-                    hidden>
-
-            </div>
-
-
+          <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">↑</div>
 
             <!-- =================================================
                  SELECTED FILE
@@ -350,74 +333,56 @@
                 class="selected-file"
                 id="selectedFile">
 
-                <div class="file-icon">
-                    📄
-                </div>
+            <p>or click to browse from your computer</p>
 
-                <div class="file-info">
+            <span class="upload-format"> PDF · DOCX · TXT </span>
 
-                    <strong id="fileName">
-                        Resume.pdf
-                    </strong>
+            <input
+              type="file"
+              id="resumeInput"
+              accept=".pdf,.docx,.txt"
+              hidden
+            />
+          </div>
 
-                    <span id="fileSize">
-                        0 KB
-                    </span>
+          <!-- SELECTED FILE -->
 
-                </div>
+          <div class="selected-file" id="selectedFile">
+            <div class="file-icon">📄</div>
 
-                <button
-                    type="button"
-                    class="remove-file"
-                    id="removeFile">
+            <div class="file-info">
+              <strong id="fileName"> Resume.pdf </strong>
 
-                    ×
-
-                </button>
-
+              <span id="fileSize"> 0 KB </span>
             </div>
 
+            <button type="button" class="remove-file" id="removeFile">×</button>
+          </div>
 
+          <!-- ERROR -->
 
-            <!-- =================================================
-                 ERROR
-                 ================================================= -->
+          <div class="upload-error" id="uploadError"></div>
 
-            <div
-                class="upload-error"
-                id="uploadError">
-            </div>
+          <!-- ACTIONS -->
 
+          <div class="upload-actions">
+            <button
+              type="button"
+              class="button button-secondary"
+              id="formatButton"
+            >
+              View Guidelines
+            </button>
 
-
-            <!-- =================================================
-                 ACTIONS
-                 ================================================= -->
-
-            <div class="upload-actions">
-
-                <button
-                    type="button"
-                    class="button button-secondary"
-                    id="formatButton">
-
-                    View Guidelines
-
-                </button>
-
-
-                <button
-                    type="button"
-                    class="button button-primary"
-                    id="analyzeButton"
-                    disabled>
-
-                    Upload Resume
-
-                </button>
-
-            </div>
-
+            <button
+              type="button"
+              class="button button-primary"
+              id="analyzeButton"
+              disabled
+            >
+              Upload Resume
+            </button>
+          </div>
         </section>
 
 
@@ -427,94 +392,59 @@
              ================================================= -->
 
         <section class="dashboard-section">
+          <div class="section-heading-row">
+            <div>
+              <span class="section-kicker"> WHY UPLOAD? </span>
 
+              <h2>Get better opportunities</h2>
+            </div>
+          </div>
 
-            <div class="section-heading-row">
+          <div class="benefits-grid">
+            <div class="benefit-card">
+              <div class="benefit-icon">✦</div>
 
-                <div>
+              <h3>Better Matches</h3>
 
-                    <span class="section-kicker">
-                        WHY UPLOAD?
-                    </span>
-
-                    <h2>
-                        Get better opportunities
-                    </h2>
-
-                </div>
-
+              <p>
+                Your skills and experience help us identify relevant job
+                opportunities.
+              </p>
             </div>
 
+            <div class="benefit-card">
+              <div class="benefit-icon">◇</div>
 
+              <h3>Skill Insights</h3>
 
-            <div class="benefits-grid">
-
-
-                <div class="benefit-card">
-
-                    <div class="benefit-icon">
-                        ✦
-                    </div>
-
-                    <h3>
-                        Better Matches
-                    </h3>
-
-                    <p>
-                        Your skills and experience help us
-                        identify relevant job opportunities.
-                    </p>
-
-                </div>
-
-
-
-                <div class="benefit-card">
-
-                    <div class="benefit-icon">
-                        ◇
-                    </div>
-
-                    <h3>
-                        Skill Insights
-                    </h3>
-
-                    <p>
-                        Extract important skills from your
-                        resume for your Candidate profile.
-                    </p>
-
-                </div>
-
-
-
-                <div class="benefit-card">
-
-                    <div class="benefit-icon">
-                        ✓
-                    </div>
-
-                    <h3>
-                        Profile Building
-                    </h3>
-
-                    <p>
-                        Your resume information can be used
-                        to build and improve your candidate
-                        profile.
-                    </p>
-
-                </div>
-
-
+              <p>
+                Extract important skills from your resume for your Candidate
+                profile.
+              </p>
             </div>
 
+            <div class="benefit-card">
+              <div class="benefit-icon">✧</div>
+
+              <h3>AI Assistance</h3>
+
+              <p>
+                Use NexHire AI to improve your resume and prepare for
+                interviews.
+              </p>
+            </div>
+          </div>
         </section>
+      </section>
+    </main>
 
-    </section>
+    <!-- FORMAT MODAL -->
 
-</main>
+    <div class="modal-overlay" id="formatModal">
+      <div class="format-modal">
+        <button type="button" class="modal-close" id="modalClose">×</button>
 
+        <span class="section-kicker"> RESUME GUIDELINES </span>
 
 
 <!-- =========================================================
@@ -548,39 +478,27 @@
 
 
         <ul>
+          <li>Keep your resume clear and concise.</li>
 
-            <li>
-                Keep your resume clear and concise.
-            </li>
+          <li>Mention your technical skills and projects.</li>
 
-            <li>
-                Mention your technical skills and projects.
-            </li>
-
-            <li>
-                Include relevant education and experience.
-            </li>
-
-            <li>
-                Use a readable and professional format.
-            </li>
+          <li>Include relevant education and experience.</li>
 
             <li>
                 Upload PDF, JPG/JPEG or TXT files.
             </li>
 
+          <li>Upload PDF, DOCX or TXT files.</li>
         </ul>
 
-
         <button
-            type="button"
-            class="button button-primary modal-button"
-            id="modalDone">
-
-            Got it
-
+          type="button"
+          class="button button-primary modal-button"
+          id="modalDone"
+        >
+          Got it
         </button>
-
+      </div>
     </div>
 
 </div>
@@ -597,16 +515,14 @@
 
     <div class="processing-card">
 
+    <div class="processing-overlay" id="processingOverlay">
+      <div class="processing-card">
         <div class="loader"></div>
 
-        <h3>
-            Processing your resume
-        </h3>
+        <h3>Processing your resume</h3>
 
-        <p>
-            NexHire is preparing your profile...
-        </p>
-
+        <p>NexHire is preparing your profile...</p>
+      </div>
     </div>
 
 </div>

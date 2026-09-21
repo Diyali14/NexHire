@@ -1,5 +1,6 @@
 package com.airesumematcher.backend.resume.service;
 
+import com.airesumematcher.backend.resume.dto.ParsedResumeDto;
 import com.airesumematcher.backend.resume.dto.ResumeParsedDataResponse;
 import com.airesumematcher.backend.resume.entity.Resume;
 import com.airesumematcher.backend.resume.entity.ResumeEducation;
@@ -17,8 +18,11 @@ import com.airesumematcher.backend.resume.repository.ResumeRepository;
 import com.airesumematcher.backend.resume.repository.ResumeSkillRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+
+//point of breakage
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+//point of breakage
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,12 +82,6 @@ public class ResumeParsedDataService {
             );
         }
 
-        /*
-         * Parse the complete JSON response once.
-         *
-         * This JsonNode is also what we store in the PostgreSQL
-         * JSONB column. Do NOT store the JSON as String.
-         */
         JsonNode root =
                 validateAndParseJson(parsedJson);
 
@@ -107,10 +105,6 @@ public class ResumeParsedDataService {
                                 )
                         );
 
-        // =====================================================
-        // CREATE / GET MAIN PARSED DATA RECORD
-        // =====================================================
-
         ResumeParsedData parsedData =
                 resumeParsedDataRepository
                         .findByResumeId(resumeId)
@@ -120,20 +114,17 @@ public class ResumeParsedDataService {
                                         .build()
                         );
 
-        /*
-         * IMPORTANT:
-         *
-         * parsed_json is PostgreSQL JSONB.
-         * Therefore the entity field must receive JsonNode,
-         * not the original String.
-         */
-        parsedData.setParsedJson(root);
+        try {
+            parsedData.setParsedJson(
+                    objectMapper.writeValueAsString(root)
+            );
+        } catch (Exception e) {
+            parsedData.setParsedJson(root.toString());
+        }
 
-        parsedData.setParserVersion(parserVersion);
-
-        // =====================================================
-        // EXTRACT PROFILE
-        // =====================================================
+        parsedData.setParserVersion(
+                parserVersion != null ? parserVersion : (root.hasNonNull("parserVersion") ? root.get("parserVersion").asText() : null)
+        );
 
         parsedData.setCandidateName(
                 getText(
@@ -181,83 +172,21 @@ public class ResumeParsedDataService {
                         parsedData
                 );
 
-        // =====================================================
-        // REMOVE OLD CHILD DATA
-        // =====================================================
-
-        resumeSkillRepository
-                .deleteAllByParsedDataId(
-                        parsedData.getId()
-                );
-
-        resumeEducationRepository
-                .deleteAllByParsedDataId(
-                        parsedData.getId()
-                );
-
-        resumeExperienceRepository
-                .deleteAllByParsedDataId(
-                        parsedData.getId()
-                );
-
-        resumeProjectRepository
-                .deleteAllByParsedDataId(
-                        parsedData.getId()
-                );
-
-        resumeLinkRepository
-                .deleteByParsedDataId(
-                        parsedData.getId()
-                );
-
-        // =====================================================
-        // SAVE SKILLS
-        // =====================================================
-
-        saveSkills(
-                parsedData,
-                resumeNode.path("skills")
-        );
-
-        // =====================================================
-        // SAVE EDUCATION
-        // =====================================================
-
-        saveEducation(
-                parsedData,
-                resumeNode.path("education")
-        );
-
-        // =====================================================
-        // SAVE EXPERIENCE
-        // =====================================================
-
-        saveExperience(
-                parsedData,
-                resumeNode.path("experience")
-        );
-
-        // =====================================================
-        // SAVE PROJECTS
-        // =====================================================
-
-        saveProjects(
-                parsedData,
-                resumeNode.path("projects")
-        );
-
-        // =====================================================
-        // SAVE LINKS
-        // =====================================================
-
-        saveLinks(
-                parsedData,
-                resumeNode.path("links")
-        );
-
         return parsedData;
     }
 
+    @Transactional
+    public ResumeParsedData saveParsedData(
+            Long resumeId,
+            ParsedResumeDto parsedDto
+    ) {
+        try {
+            String json = objectMapper.writeValueAsString(parsedDto);
+            return saveParsedData(resumeId, json, parsedDto.getParserVersion());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize ParsedResumeDto", e);
+        }
+    }
     // =========================================================
     // GET PARSED DATA
     // =========================================================
@@ -295,14 +224,16 @@ public class ResumeParsedDataService {
          * parsed_json is already JsonNode.
          * No need to parse it again.
          */
-        JsonNode root =
-                parsedData.getParsedJson();
+        JsonNode root;
 
-        if (root == null
-                || !root.isObject()) {
-
+        try {
+            root = objectMapper.readTree(
+                    parsedData.getParsedJson()
+            );
+        } catch (Exception e) {
             throw new RuntimeException(
-                    "Stored parsed resume data is invalid"
+                    "Stored parsed resume JSON is invalid",
+                    e
             );
         }
 
@@ -721,18 +652,24 @@ public class ResumeParsedDataService {
                                     )
                             )
                             .responsibilities(
-                                    experienceNodeItem.path(
-                                            "responsibilities"
+                                    toJsonString(
+                                            experienceNodeItem.path(
+                                                    "responsibilities"
+                                            )
                                     )
                             )
                             .technologies(
-                                    experienceNodeItem.path(
-                                            "technologies"
+                                    toJsonString(
+                                            experienceNodeItem.path(
+                                                    "technologies"
+                                            )
                                     )
                             )
                             .additionalInformation(
-                                    experienceNodeItem.path(
-                                            "additional_information"
+                                    toJsonString(
+                                            experienceNodeItem.path(
+                                                    "additional_information"
+                                            )
                                     )
                             )
                             .build();
@@ -996,26 +933,22 @@ public class ResumeParsedDataService {
     // JSON SERIALIZATION HELPER
     // =========================================================
 
-    private String toJsonString(
-            JsonNode node
-    ) {
+    private String toJsonString(JsonNode node) {
 
         if (node == null
                 || node.isMissingNode()
                 || node.isNull()) {
 
-            return "[]";
+            return null;
         }
 
         try {
-
-            return objectMapper.writeValueAsString(
-                    node
-            );
-
+            return objectMapper.writeValueAsString(node);
         } catch (Exception e) {
-
-            return "[]";
+            throw new IllegalArgumentException(
+                    "Failed to serialize JSON data",
+                    e
+            );
         }
     }
 }

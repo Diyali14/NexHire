@@ -1,5 +1,6 @@
 package com.airesumematcher.backend.ai.service;
 
+import com.airesumematcher.backend.resume.dto.ParsedResumeDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -21,7 +22,11 @@ public class AiParserService {
                 .build();
     }
 
-    public String parseResume(
+    // ===============================
+    // RESUME PARSER
+    // ===============================
+
+    public ParsedResumeDto parseResume(
             byte[] pdfBytes,
             String fileName
     ) {
@@ -40,10 +45,29 @@ public class AiParserService {
 
         body.add("file", fileResource);
 
-        return restClient.post()
+         ParsedResumeDto obj=restClient.post()
                 .uri("/ai/v1/parse-resume-file")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(body)
+                .retrieve()
+                .body(ParsedResumeDto.class);
+        System.out.println(obj);
+        return obj;
+    }
+
+
+    // ===============================
+    // JOB DESCRIPTION PARSER
+    // ===============================
+
+    public String analyzeJobDescription(
+            String jobDescription
+    ) {
+
+        return restClient.post()
+                .uri("/ai/v1/analyze-jd")
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(jobDescription)
                 .retrieve()
                 .body(String.class);
     }
