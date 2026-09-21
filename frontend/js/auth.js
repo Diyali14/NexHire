@@ -363,7 +363,7 @@
 
     if (typeof accessToken === "string" && accessToken) {
       sessionStorage.setItem(
-        "nexhire-access-token",
+        "token",
         accessToken
       );
     }

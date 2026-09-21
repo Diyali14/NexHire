@@ -1,21 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>NexHire | Upload Resume</title>
 
-    <link rel="stylesheet" href="css/ResumeUpload.css">
+    <link
+        rel="stylesheet"
+        href="css/ResumeUpload.css">
+
 </head>
 
+
 <body>
+
+
+<!-- =========================================================
+     HEADER
+     ========================================================= -->
 
 <header class="site-header">
 
     <div class="container navbar">
 
-        <a href="candidate-dashboard.html" class="brand">
+        <a
+            href="candidate-dashboard.html"
+            class="brand">
 
             <span class="brand-mark">
                 <span></span>
@@ -32,33 +48,56 @@
 
         <div class="nav-actions">
 
+
+            <!-- THEME BUTTON -->
+
             <button
                 class="icon-button theme-toggle"
                 id="themeToggle"
                 type="button"
-                aria-label="Toggle theme">
+                aria-label="Switch to dark mode"
+                title="Switch to dark mode">
+
                 ☼
+
             </button>
 
+
+            <!-- PROFILE MENU -->
 
             <div class="profile-menu">
 
                 <button
                     class="profile-button"
                     id="profileButton"
-                    type="button">
+                    type="button"
+                    aria-expanded="false"
+                    aria-haspopup="true">
 
-                    <span class="profile-avatar">K</span>
-
-                    <span class="profile-details">
-                        <strong>Kaushik</strong>
-                        <small>Candidate</small>
+                    <span class="profile-avatar">
+                        K
                     </span>
 
-                    <span class="profile-arrow">▾</span>
+                    <span class="profile-details">
+
+                        <strong>
+                            Kaushik
+                        </strong>
+
+                        <small>
+                            Candidate
+                        </small>
+
+                    </span>
+
+                    <span class="profile-arrow">
+                        ▾
+                    </span>
 
                 </button>
 
+
+                <!-- PROFILE DROPDOWN -->
 
                 <div
                     class="profile-dropdown"
@@ -80,6 +119,7 @@
                         id="logoutButton">
 
                         <span>↪</span>
+
                         Logout
 
                     </button>
@@ -96,13 +136,21 @@
 
 
 
+<!-- =========================================================
+     MAIN LAYOUT
+     ========================================================= -->
+
 <main class="candidate-layout">
 
-    <!-- SIDEBAR -->
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
 
     <aside class="sidebar">
 
         <div class="sidebar-inner">
+
 
             <div class="sidebar-label">
                 CANDIDATE
@@ -111,67 +159,62 @@
 
             <nav class="sidebar-nav">
 
+
+                <!-- DASHBOARD -->
+
                 <a
                     href="candidate-dashboard.html"
                     class="sidebar-link">
 
-                    <span class="sidebar-icon">⌂</span>
-                    <span>Dashboard</span>
+                    <span class="sidebar-icon">
+                        ⌂
+                    </span>
+
+                    <span>
+                        Dashboard
+                    </span>
 
                 </a>
 
 
-                <a
-                    href="candidate-profile.html"
-                    class="sidebar-link">
-
-                    <span class="sidebar-icon">◯</span>
-                    <span>Profile</span>
-
-                </a>
-
+                <!-- UPLOAD RESUME -->
 
                 <a
                     href="ResumeUpload.html"
                     class="sidebar-link active">
 
-                    <span class="sidebar-icon">↑</span>
-                    <span>Upload Resume</span>
+                    <span class="sidebar-icon">
+                        ↑
+                    </span>
+
+                    <span>
+                        Upload Resume
+                    </span>
 
                 </a>
 
+
+                <!-- JOB SEARCH -->
 
                 <a
                     href="candidate-job-search.html"
                     class="sidebar-link">
 
-                    <span class="sidebar-icon">⌕</span>
-                    <span>Job Search</span>
+                    <span class="sidebar-icon">
+                        ⌕
+                    </span>
+
+                    <span>
+                        Job Search
+                    </span>
 
                 </a>
 
-
-                <a
-                    href="candidate-recommended-jobs.html"
-                    class="sidebar-link">
-
-                    <span class="sidebar-icon">✦</span>
-                    <span>Recommended Jobs</span>
-
-                </a>
-
-
-                <a
-                    href="ai-assistant.html"
-                    class="sidebar-link">
-
-                    <span class="sidebar-icon">✧</span>
-                    <span>AI Assistant</span>
-
-                </a>
 
             </nav>
 
+
+            <!-- SIDEBAR HELP -->
 
             <div class="sidebar-help">
 
@@ -180,8 +223,15 @@
                 </div>
 
                 <div>
-                    <strong>Need help?</strong>
-                    <span>Ask NexHire AI</span>
+
+                    <strong>
+                        Need help?
+                    </strong>
+
+                    <span>
+                        Check the resume guidelines
+                    </span>
+
                 </div>
 
             </div>
@@ -192,9 +242,14 @@
 
 
 
-    <!-- MAIN CONTENT -->
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
 
     <section class="dashboard-content">
+
+
+        <!-- PAGE HEADING -->
 
         <div class="dashboard-heading">
 
@@ -210,9 +265,9 @@
                 </h1>
 
                 <p>
-                    Upload your latest resume to help NexHire
-                    understand your skills, experience and
-                    projects for better job recommendations.
+                    Upload your latest resume to help
+                    NexHire understand your skills,
+                    experience and projects.
                 </p>
 
             </div>
@@ -221,9 +276,12 @@
 
 
 
-        <!-- RESUME CARD -->
+        <!-- =================================================
+             RESUME CARD
+             ================================================= -->
 
         <section class="resume-card">
+
 
             <div class="resume-card-header">
 
@@ -238,7 +296,8 @@
                     </h2>
 
                     <p>
-                        Supported formats: PDF, DOCX and TXT.
+                        Supported formats:
+                        PDF, JPG/JPEG and TXT.
                         Maximum file size: 5 MB.
                     </p>
 
@@ -248,7 +307,9 @@
 
 
 
-            <!-- DROP ZONE -->
+            <!-- =================================================
+                 DROP ZONE
+                 ================================================= -->
 
             <div
                 class="upload-zone"
@@ -267,21 +328,23 @@
                 </p>
 
                 <span class="upload-format">
-                    PDF · DOCX · TXT
+                    PDF · JPG · TXT
                 </span>
 
 
                 <input
                     type="file"
                     id="resumeInput"
-                    accept=".pdf,.docx,.txt"
+                    accept=".pdf,.jpeg,.jpg,.txt"
                     hidden>
 
             </div>
 
 
 
-            <!-- SELECTED FILE -->
+            <!-- =================================================
+                 SELECTED FILE
+                 ================================================= -->
 
             <div
                 class="selected-file"
@@ -316,7 +379,9 @@
 
 
 
-            <!-- ERROR -->
+            <!-- =================================================
+                 ERROR
+                 ================================================= -->
 
             <div
                 class="upload-error"
@@ -325,7 +390,9 @@
 
 
 
-            <!-- ACTIONS -->
+            <!-- =================================================
+                 ACTIONS
+                 ================================================= -->
 
             <div class="upload-actions">
 
@@ -355,9 +422,12 @@
 
 
 
-        <!-- BENEFITS -->
+        <!-- =================================================
+             BENEFITS
+             ================================================= -->
 
         <section class="dashboard-section">
+
 
             <div class="section-heading-row">
 
@@ -376,7 +446,9 @@
             </div>
 
 
+
             <div class="benefits-grid">
+
 
                 <div class="benefit-card">
 
@@ -394,6 +466,7 @@
                     </p>
 
                 </div>
+
 
 
                 <div class="benefit-card">
@@ -414,22 +487,25 @@
                 </div>
 
 
+
                 <div class="benefit-card">
 
                     <div class="benefit-icon">
-                        ✧
+                        ✓
                     </div>
 
                     <h3>
-                        AI Assistance
+                        Profile Building
                     </h3>
 
                     <p>
-                        Use NexHire AI to improve your resume
-                        and prepare for interviews.
+                        Your resume information can be used
+                        to build and improve your candidate
+                        profile.
                     </p>
 
                 </div>
+
 
             </div>
 
@@ -441,13 +517,16 @@
 
 
 
-<!-- FORMAT MODAL -->
+<!-- =========================================================
+     FORMAT MODAL
+     ========================================================= -->
 
 <div
     class="modal-overlay"
     id="formatModal">
 
     <div class="format-modal">
+
 
         <button
             type="button"
@@ -487,7 +566,7 @@
             </li>
 
             <li>
-                Upload PDF, DOCX or TXT files.
+                Upload PDF, JPG/JPEG or TXT files.
             </li>
 
         </ul>
@@ -508,7 +587,9 @@
 
 
 
-<!-- PROCESSING -->
+<!-- =========================================================
+     PROCESSING OVERLAY
+     ========================================================= -->
 
 <div
     class="processing-overlay"
@@ -532,7 +613,15 @@
 
 
 
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
 <script src="js/ResumeUpload.js"></script>
 
+
 </body>
+
 </html>

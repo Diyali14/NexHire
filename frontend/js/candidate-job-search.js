@@ -1,799 +1,1414 @@
 /* =========================================================
-   NEXHIRE - CANDIDATE JOB SEARCH
+   NEXHIRE — CANDIDATE JOB SEARCH
    ========================================================= */
 
-
-/* =========================================================
-   SAMPLE JOB DATA
-   ========================================================= */
-
-const jobs = [
-
-    {
-        id: 1,
-        title: "Software Engineer",
-        company: "ABC Technologies",
-        location: "Kolkata",
-        type: "Full Time",
-        salary: "₹5-8 LPA",
-        salaryValue: 8,
-        posted: "2 days ago",
-        skills: ["Java", "SQL", "Spring Boot"],
-        description:
-            "Work on scalable software applications and collaborate with development teams."
-    },
-
-    {
-        id: 2,
-        title: "Java Developer",
-        company: "XYZ Technologies",
-        location: "Bangalore",
-        type: "Full Time",
-        salary: "₹6-10 LPA",
-        salaryValue: 10,
-        posted: "1 day ago",
-        skills: ["Java", "Spring", "MySQL"],
-        description:
-            "Develop and maintain Java-based enterprise applications."
-    },
-
-    {
-        id: 3,
-        title: "Frontend Developer",
-        company: "TechNova",
-        location: "Remote",
-        type: "Full Time",
-        salary: "₹4-7 LPA",
-        salaryValue: 7,
-        posted: "3 days ago",
-        skills: ["HTML", "CSS", "JavaScript"],
-        description:
-            "Build responsive and user-friendly web interfaces."
-    },
-
-    {
-        id: 4,
-        title: "Software Engineering Intern",
-        company: "Innovate Labs",
-        location: "Hyderabad",
-        type: "Internship",
-        salary: "₹20,000/month",
-        salaryValue: 2,
-        posted: "5 days ago",
-        skills: ["Java", "Python", "Git"],
-        description:
-            "Learn and contribute to real-world software development projects."
-    },
-
-    {
-        id: 5,
-        title: "Backend Developer",
-        company: "CloudWorks",
-        location: "Pune",
-        type: "Full Time",
-        salary: "₹7-11 LPA",
-        salaryValue: 11,
-        posted: "Today",
-        skills: ["Java", "Spring Boot", "AWS"],
-        description:
-            "Develop backend services and cloud-based applications."
-    }
-
-];
+document.addEventListener("DOMContentLoaded", function () {
 
 
-/* =========================================================
-   DOM ELEMENTS
-   ========================================================= */
+    /* =====================================================
+       DOM ELEMENTS
+       ===================================================== */
 
-const jobList =
-    document.getElementById("jobList");
+    const jobList =
+        document.getElementById("jobList");
 
-const resultCount =
-    document.getElementById("resultCount");
+    const resultCount =
+        document.getElementById("resultCount");
 
-const noResults =
-    document.getElementById("noResults");
+    const noResults =
+        document.getElementById("noResults");
 
-const searchInput =
-    document.getElementById("searchInput");
+    const searchInput =
+        document.getElementById("searchInput");
 
-const locationInput =
-    document.getElementById("locationInput");
+    const locationInput =
+        document.getElementById("locationInput");
 
-const jobType =
-    document.getElementById("jobType");
+    const jobType =
+        document.getElementById("jobType");
 
-const searchBtn =
-    document.getElementById("searchBtn");
+    const searchBtn =
+        document.getElementById("searchBtn");
 
-const sortJobs =
-    document.getElementById("sortJobs");
+    const sortJobs =
+        document.getElementById("sortJobs");
 
-const jobModal =
-    document.getElementById("jobModal");
+    const jobModal =
+        document.getElementById("jobModal");
 
-const closeModal =
-    document.getElementById("closeModal");
+    const closeModal =
+        document.getElementById("closeModal");
 
-const modalContent =
-    document.getElementById("modalContent");
+    const modalContent =
+        document.getElementById("modalContent");
 
-const profileBtn =
-    document.getElementById("profileButton");
+    const profileButton =
+        document.getElementById("profileButton");
 
-const profileMenu =
-    document.getElementById("profileDropdown");
+    const profileDropdown =
+        document.getElementById("profileDropdown");
 
-const themeToggle =
-    document.getElementById("themeToggle");
+    const themeToggle =
+        document.getElementById("themeToggle");
 
-
-/* =========================================================
-   DISPLAY JOBS
-   ========================================================= */
-
-function displayJobs(jobArray) {
-
-    jobList.innerHTML = "";
+    const logoutButton =
+        document.getElementById("logoutButton");
 
 
-    resultCount.textContent =
-        `${jobArray.length} job${jobArray.length !== 1 ? "s" : ""} found`;
+    /* =====================================================
+       STATE
+       ===================================================== */
+
+    let jobs = [];
+
+    let filteredJobs = [];
 
 
-    if (jobArray.length === 0) {
+    /* =====================================================
+       ESCAPE HTML
+       ===================================================== */
 
-        noResults.classList.add("show");
+    function escapeHtml(value) {
 
-        return;
+        if (value === null || value === undefined) {
+            return "";
+        }
 
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
 
-    noResults.classList.remove("show");
+    /* =====================================================
+       FORMAT DATE
+       ===================================================== */
+
+    function formatDate(dateValue) {
+
+        if (!dateValue) {
+            return "Date unavailable";
+        }
+
+        const date =
+            new Date(dateValue);
+
+        if (Number.isNaN(date.getTime())) {
+            return "Date unavailable";
+        }
+
+        return date.toLocaleDateString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }
+        );
+    }
 
 
-    jobArray.forEach(job => {
+    /* =====================================================
+       NORMALIZE SKILLS
+       ===================================================== */
 
-        const card =
-            document.createElement("article");
+    function normalizeSkills(skills) {
 
-        card.className =
-            "job-card";
+        if (!Array.isArray(skills)) {
+            return [];
+        }
+
+        return skills
+            .filter(skill =>
+                typeof skill === "string"
+            )
+            .map(skill =>
+                skill.trim()
+            )
+            .filter(Boolean);
+    }
 
 
-        const skillsHTML =
-            job.skills
-                .map(skill => `<span class="skill">${skill}</span>`)
-                .join("");
+    /* =====================================================
+       GET COMPANY INITIAL
+       ===================================================== */
+
+    function getCompanyInitial(company) {
+
+        if (!company) {
+            return "C";
+        }
+
+        return company
+            .trim()
+            .charAt(0)
+            .toUpperCase();
+    }
 
 
-        card.innerHTML = `
+    /* =====================================================
+       LOAD JOBS
+       ===================================================== */
 
-            <div class="job-card-top">
+    async function loadJobs() {
 
-                <div class="company-logo">
-                    ${job.company.charAt(0)}
-                </div>
+        jobList.innerHTML = `
+            <div class="loading-state">
+                Loading available jobs...
+            </div>
+        `;
 
-                <div class="job-main">
+        noResults.hidden = true;
 
-                    <h3 class="job-title">
-                        ${job.title}
-                    </h3>
+        try {
 
-                    <p class="company-name">
-                        ${job.company}
-                    </p>
+            const response =
+                await apiGet("/candidates/jobs");
 
-                    <div class="job-meta">
+            if (!Array.isArray(response)) {
 
-                        <span class="job-type">
-                            ${job.type}
+                throw new Error(
+                    "Invalid jobs response from server."
+                );
+            }
+
+
+            jobs = response.map(job => {
+
+                return {
+
+                    jobId: job.jobId,
+
+                    jobTitle:
+                        job.jobTitle ||
+                        "Untitled Job",
+
+                    company:
+                        job.companyName ||
+                        "",
+
+                    jobDescription:
+                        job.jobDescription ||
+                        "No description provided.",
+
+                    experienceRequired:
+                        job.experienceRequired ||
+                        "",
+
+                    educationRequired:
+                        job.educationRequired ||
+                        "",
+
+                    processingStatus:
+                        job.processingStatus ||
+                        "UNKNOWN",
+
+                    createdAt:
+                        job.createdAt ||
+                        null,
+
+                    updatedAt:
+                        job.updatedAt ||
+                        null,
+
+                    skills:
+                        normalizeSkills(
+                            job.skills
+                        ),
+
+                    location:
+                        job.location ||
+                        "",
+
+                    type:
+                        job.type ||
+                        "",
+
+                    salary:
+                        job.salary ||
+                        ""
+                };
+
+            });
+
+
+            /* newest first */
+
+            jobs.sort(
+                (a, b) =>
+                    new Date(b.createdAt || 0) -
+                    new Date(a.createdAt || 0)
+            );
+
+
+            searchJobs();
+
+        } catch (error) {
+
+            console.error(
+                "Failed to load jobs:",
+                error
+            );
+
+            jobList.innerHTML = "";
+
+            resultCount.textContent =
+                "Unable to load jobs";
+
+            noResults.hidden = false;
+
+            noResults.querySelector("h3").textContent =
+                "Unable to load jobs";
+
+            noResults.querySelector("p").textContent =
+                error.message ||
+                "Please try again later.";
+        }
+    }
+
+
+    /* =====================================================
+       SEARCH JOBS
+       ===================================================== */
+
+    function searchJobs() {
+
+        const keyword =
+            searchInput.value
+                .trim()
+                .toLowerCase();
+
+        const location =
+            locationInput.value
+                .trim()
+                .toLowerCase();
+
+        const selectedType =
+            jobType.value
+                .trim()
+                .toLowerCase();
+
+
+        filteredJobs =
+            jobs.filter(job => {
+
+                /* -----------------------------------------
+                   KEYWORD
+                   ----------------------------------------- */
+
+                const searchableText = [
+
+                    job.jobTitle,
+
+                    job.company,
+
+                    job.jobDescription,
+
+                    job.experienceRequired,
+
+                    job.educationRequired,
+
+                    ...job.skills
+
+                ]
+                    .join(" ")
+                    .toLowerCase();
+
+
+                const matchesKeyword =
+                    !keyword ||
+                    searchableText.includes(keyword);
+
+
+                /* -----------------------------------------
+                   LOCATION
+                   ----------------------------------------- */
+
+                const jobLocation =
+                    String(
+                        job.location || ""
+                    ).toLowerCase();
+
+                const matchesLocation =
+                    !location ||
+                    !jobLocation ||
+                    jobLocation.includes(location);
+
+
+                /* -----------------------------------------
+                   JOB TYPE
+                   ----------------------------------------- */
+
+                const jobTypeValue =
+                    String(
+                        job.type || ""
+                    ).toLowerCase();
+
+                const matchesType =
+                    !selectedType ||
+                    !jobTypeValue ||
+                    jobTypeValue === selectedType;
+
+
+                return (
+                    matchesKeyword &&
+                    matchesLocation &&
+                    matchesType
+                );
+
+            });
+
+
+        sortFilteredJobs();
+
+        displayJobs(filteredJobs);
+    }
+
+
+    /* =====================================================
+       SORT JOBS
+       ===================================================== */
+
+    function sortFilteredJobs() {
+
+        const sortValue =
+            sortJobs.value;
+
+
+        if (
+            sortValue === "default" ||
+            sortValue === "recent"
+        ) {
+
+            filteredJobs.sort(
+                (a, b) =>
+                    new Date(
+                        b.createdAt || 0
+                    ) -
+                    new Date(
+                        a.createdAt || 0
+                    )
+            );
+
+            return;
+        }
+
+
+        /*
+         * Salary sorting cannot be performed reliably
+         * because the supplied API response does not
+         * currently provide a usable salary field.
+         */
+    }
+
+
+    /* =====================================================
+       DISPLAY JOBS
+       ===================================================== */
+
+    function displayJobs(jobArray) {
+
+        /* reset no-result text */
+
+        noResults.querySelector("h3").textContent =
+            "No jobs found";
+
+        noResults.querySelector("p").textContent =
+            "Try changing your search filters.";
+
+
+        resultCount.textContent =
+            `${jobArray.length} ${
+                jobArray.length === 1
+                    ? "job"
+                    : "jobs"
+            } found`;
+
+
+        if (jobArray.length === 0) {
+
+            jobList.innerHTML = "";
+
+            noResults.hidden = false;
+
+            return;
+        }
+
+
+        noResults.hidden = true;
+
+
+        jobList.innerHTML =
+            jobArray.map(job => {
+
+                const skillsHtml =
+                    job.skills.length > 0
+
+                        ? job.skills
+                            .map(skill => `
+                                <span class="skill-tag">
+                                    ${escapeHtml(skill)}
+                                </span>
+                            `)
+                            .join("")
+
+                        : `
+                            <span class="skill-tag">
+                                Skills not specified
+                            </span>
+                        `;
+
+
+                return `
+
+                    <article
+                        class="job-card"
+                        data-job-id="${escapeHtml(job.jobId)}">
+
+                        <div class="job-top">
+
+
+                            <div class="job-heading">
+
+                                <div class="company-avatar">
+                                    ${escapeHtml(
+                                        getCompanyInitial(
+                                            job.company
+                                        )
+                                    )}
+                                </div>
+
+
+                                <div>
+
+                                    <h3 class="job-title">
+                                        ${escapeHtml(
+                                            job.jobTitle
+                                        )}
+                                    </h3>
+
+                                    <div class="job-company">
+                                        ${escapeHtml(
+                                            job.company ||
+                                            "Company not specified"
+                                        )}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="job-actions">
+
+                                <button
+                                    type="button"
+                                    class="save-button"
+                                    data-save-id="${escapeHtml(job.jobId)}">
+
+                                    ♡ Save
+
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    class="view-button"
+                                    data-view-id="${escapeHtml(job.jobId)}">
+
+                                    View Job
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- META -->
+
+                        <div class="job-meta">
+
+                            ${
+                                job.type
+                                    ? `
+                                        <span class="job-meta-item">
+                                            ◈
+                                            ${escapeHtml(job.type)}
+                                        </span>
+                                      `
+                                    : ""
+                            }
+
+
+                            ${
+                                job.location
+                                    ? `
+                                        <span class="job-meta-item">
+                                            ◉
+                                            ${escapeHtml(job.location)}
+                                        </span>
+                                      `
+                                    : ""
+                            }
+
+
+                            ${
+                                job.experienceRequired
+                                    ? `
+                                        <span class="job-meta-item">
+                                            ▣
+                                            ${escapeHtml(
+                                                job.experienceRequired
+                                            )}
+                                        </span>
+                                      `
+                                    : ""
+                            }
+
+
+                            ${
+                                job.salary
+                                    ? `
+                                        <span class="job-meta-item">
+                                            ₹
+                                            ${escapeHtml(job.salary)}
+                                        </span>
+                                      `
+                                    : ""
+                            }
+
+                        </div>
+
+
+                        <!-- DESCRIPTION -->
+
+                        <p class="job-description">
+
+                            ${escapeHtml(
+                                job.jobDescription
+                            )}
+
+                        </p>
+
+
+                        <!-- SKILLS -->
+
+                        <div class="job-skills">
+
+                            ${skillsHtml}
+
+                        </div>
+
+
+                        <!-- FOOTER -->
+
+                        <div class="job-footer">
+
+                            <span>
+                                Posted:
+                                ${formatDate(
+                                    job.createdAt
+                                )}
+                            </span>
+
+                            <span>
+                                ${escapeHtml(
+                                    job.processingStatus
+                                )}
+                            </span>
+
+                        </div>
+
+                    </article>
+
+                `;
+
+            }).join("");
+
+
+        attachJobButtons();
+    }
+
+
+    /* =====================================================
+       JOB BUTTON EVENTS
+       ===================================================== */
+
+    function attachJobButtons() {
+
+
+        /* -----------------------------------------
+           SAVE
+           ----------------------------------------- */
+
+        document
+            .querySelectorAll(
+                "[data-save-id]"
+            )
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        if (
+                            this.classList.contains(
+                                "saved"
+                            )
+                        ) {
+
+                            this.classList.remove(
+                                "saved"
+                            );
+
+                            this.textContent =
+                                "♡ Save";
+
+                        } else {
+
+                            this.classList.add(
+                                "saved"
+                            );
+
+                            this.textContent =
+                                "♥ Saved";
+                        }
+
+                    }
+                );
+
+            });
+
+
+        /* -----------------------------------------
+           VIEW JOB
+           ----------------------------------------- */
+
+        document
+            .querySelectorAll(
+                "[data-view-id]"
+            )
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const jobId =
+                            this.dataset.viewId;
+
+                        openJobDetails(jobId);
+
+                    }
+                );
+
+            });
+
+    }
+
+
+    /* =====================================================
+       OPEN JOB DETAILS
+       ===================================================== */
+
+    async function openJobDetails(jobId) {
+
+        modalContent.innerHTML = `
+
+            <div class="loading-state">
+                Loading job details...
+            </div>
+
+        `;
+
+        jobModal.hidden = false;
+
+        document.body.style.overflow =
+            "hidden";
+
+
+        try {
+
+            const job =
+                await apiGet(
+                    `/candidates/jobs/${encodeURIComponent(
+                        jobId
+                    )}`
+                );
+
+
+            const skills =
+                normalizeSkills(
+                    job.skills
+                );
+
+
+            const skillsHtml =
+                skills.length > 0
+
+                    ? skills
+                        .map(skill => `
+                            <span class="skill-tag">
+                                ${escapeHtml(skill)}
+                            </span>
+                        `)
+                        .join("")
+
+                    : `
+                        <span class="skill-tag">
+                            Skills not specified
                         </span>
+                    `;
 
-                        <span class="job-location">
-                            📍 ${job.location}
-                        </span>
 
-                        <span class="job-salary">
-                            ${job.salary}
-                        </span>
+            modalContent.innerHTML = `
+
+                <div class="modal-job-header">
+
+                    <h2 class="modal-job-title">
+
+                        ${escapeHtml(
+                            job.jobTitle ||
+                            "Untitled Job"
+                        )}
+
+                    </h2>
+
+
+                    <div class="modal-company">
+
+                        ${escapeHtml(
+                            job.companyName ||
+                            "Company not specified"
+                        )}
 
                     </div>
 
                 </div>
 
-            </div>
+
+                <!-- INFORMATION -->
+
+                <div class="modal-info-grid">
 
 
-            <p class="job-description">
-                ${job.description}
-            </p>
+                    <div class="modal-info-item">
+
+                        <span class="modal-info-label">
+                            Job ID
+                        </span>
+
+                        <span class="modal-info-value">
+                            ${escapeHtml(
+                                job.jobId ||
+                                jobId
+                            )}
+                        </span>
+
+                    </div>
 
 
-            <div class="skills">
-                ${skillsHTML}
-            </div>
+                    <div class="modal-info-item">
+
+                        <span class="modal-info-label">
+                            Status
+                        </span>
+
+                        <span class="modal-info-value">
+                            ${escapeHtml(
+                                job.processingStatus ||
+                                "UNKNOWN"
+                            )}
+                        </span>
+
+                    </div>
 
 
-            <div class="job-footer">
+                    <div class="modal-info-item">
 
-                <span class="job-posted">
-                    Posted ${job.posted}
-                </span>
+                        <span class="modal-info-label">
+                            Experience
+                        </span>
 
-                <div class="job-actions">
+                        <span class="modal-info-value">
+                            ${escapeHtml(
+                                job.experienceRequired ||
+                                "Not specified"
+                            )}
+                        </span>
 
-                    <button
-                        class="save-btn"
-                        data-id="${job.id}"
-                    >
-                        Save
-                    </button>
+                    </div>
 
-                    <button
-                        class="view-btn"
-                        data-id="${job.id}"
-                    >
-                        View Job
-                    </button>
+
+                    <div class="modal-info-item">
+
+                        <span class="modal-info-label">
+                            Education
+                        </span>
+
+                        <span class="modal-info-value">
+                            ${escapeHtml(
+                                job.educationRequired ||
+                                "Not specified"
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    ${
+                        job.location
+                            ? `
+                                <div class="modal-info-item">
+
+                                    <span class="modal-info-label">
+                                        Location
+                                    </span>
+
+                                    <span class="modal-info-value">
+                                        ${escapeHtml(
+                                            job.location
+                                        )}
+                                    </span>
+
+                                </div>
+                              `
+                            : ""
+                    }
+
+
+                    ${
+                        job.type
+                            ? `
+                                <div class="modal-info-item">
+
+                                    <span class="modal-info-label">
+                                        Job Type
+                                    </span>
+
+                                    <span class="modal-info-value">
+                                        ${escapeHtml(
+                                            job.type
+                                        )}
+                                    </span>
+
+                                </div>
+                              `
+                            : ""
+                    }
 
                 </div>
 
-            </div>
-
-        `;
 
 
-        jobList.appendChild(card);
+                <!-- DESCRIPTION -->
 
-    });
+                <div class="modal-section">
 
+                    <h4>
+                        Job Description
+                    </h4>
 
-    attachJobEvents();
-}
+                    <p>
 
+                        ${escapeHtml(
+                            job.jobDescription ||
+                            "No description provided."
+                        )}
 
-/* =========================================================
-   JOB EVENTS
-   ========================================================= */
+                    </p>
 
-function attachJobEvents() {
-
-    const viewButtons =
-        document.querySelectorAll(".view-btn");
-
-
-    const saveButtons =
-        document.querySelectorAll(".save-btn");
+                </div>
 
 
-    viewButtons.forEach(button => {
 
-        button.addEventListener("click", () => {
+                <!-- SKILLS -->
 
-            const id =
-                Number(button.dataset.id);
+                <div class="modal-section">
 
-            openJobModal(id);
+                    <h4>
+                        Required Skills
+                    </h4>
 
-        });
+                    <div class="modal-skills">
 
-    });
+                        ${skillsHtml}
 
+                    </div>
 
-    saveButtons.forEach(button => {
-
-        button.addEventListener("click", () => {
-
-            button.classList.toggle("saved");
+                </div>
 
 
-            if (button.classList.contains("saved")) {
 
-                button.textContent =
-                    "Saved";
+                <!-- DATES -->
 
-            } else {
+                <div class="modal-section">
 
-                button.textContent =
-                    "Save";
+                    <h4>
+                        Job Information
+                    </h4>
+
+                    <p>
+
+                        Posted:
+                        ${formatDate(
+                            job.createdAt
+                        )}
+
+                        <br>
+
+                        Updated:
+                        ${formatDate(
+                            job.updatedAt
+                        )}
+
+                    </p>
+
+                </div>
+
+
+
+                <!-- APPLY -->
+
+                <button
+                    type="button"
+                    class="modal-apply-button"
+                    id="applyNowButton">
+
+                    Apply Now
+
+                </button>
+
+            `;
+
+
+            const applyButton =
+                document.getElementById(
+                    "applyNowButton"
+                );
+
+
+            if (applyButton) {
+
+                applyButton.addEventListener(
+                    "click",
+                    function () {
+
+                        alert(
+                            "Application submission is not connected yet. Please provide the backend application API endpoint and request format."
+                        );
+
+                    }
+                );
 
             }
 
-        });
 
-    });
+        } catch (error) {
 
-}
-
-
-/* =========================================================
-   SEARCH JOBS
-   ========================================================= */
-
-function searchJobs() {
-
-    const keyword =
-        searchInput.value
-            .trim()
-            .toLowerCase();
-
-
-    const location =
-        locationInput.value
-            .trim()
-            .toLowerCase();
-
-
-    const selectedType =
-        jobType.value;
-
-
-    let filteredJobs =
-        jobs.filter(job => {
-
-            const searchableText = `
-
-                ${job.title}
-                ${job.company}
-                ${job.location}
-                ${job.skills.join(" ")}
-
-            `.toLowerCase();
-
-
-            const matchesKeyword =
-                keyword === "" ||
-                searchableText.includes(keyword);
-
-
-            const matchesLocation =
-                location === "" ||
-                job.location
-                    .toLowerCase()
-                    .includes(location);
-
-
-            const matchesType =
-                selectedType === "all" ||
-                job.type === selectedType;
-
-
-            return (
-                matchesKeyword &&
-                matchesLocation &&
-                matchesType
+            console.error(
+                "Failed to load job details:",
+                error
             );
 
-        });
 
+            modalContent.innerHTML = `
 
-    sortFilteredJobs(filteredJobs);
+                <div class="no-results">
 
-}
+                    <div class="no-results-icon">
+                        !
+                    </div>
 
+                    <h3>
+                        Unable to load job
+                    </h3>
 
-/* =========================================================
-   SORT JOBS
-   ========================================================= */
+                    <p>
+                        ${
+                            escapeHtml(
+                                error.message ||
+                                "Please try again."
+                            )
+                        }
+                    </p>
 
-function sortFilteredJobs(jobArray) {
+                </div>
 
-    const sortValue =
-        sortJobs.value;
-
-
-    if (sortValue === "salary") {
-
-        jobArray.sort(
-            (a, b) =>
-                b.salaryValue - a.salaryValue
-        );
-
-    }
-
-
-    if (sortValue === "recent") {
-
-        jobArray.sort(
-            (a, b) =>
-                a.id - b.id
-        );
-
-    }
-
-
-    displayJobs(jobArray);
-
-}
-
-
-/* =========================================================
-   SEARCH BUTTON
-   ========================================================= */
-
-searchBtn.addEventListener(
-    "click",
-    searchJobs
-);
-
-
-/* =========================================================
-   SEARCH WITH ENTER
-   ========================================================= */
-
-searchInput.addEventListener(
-    "keydown",
-    event => {
-
-        if (event.key === "Enter") {
-
-            searchJobs();
+            `;
 
         }
 
     }
-);
 
 
-locationInput.addEventListener(
-    "keydown",
-    event => {
+    /* =====================================================
+       CLOSE MODAL
+       ===================================================== */
 
-        if (event.key === "Enter") {
+    function closeJobModal() {
 
-            searchJobs();
+        jobModal.hidden = true;
+
+        document.body.style.overflow = "";
+    }
+
+
+    if (closeModal) {
+
+        closeModal.addEventListener(
+            "click",
+            closeJobModal
+        );
+
+    }
+
+
+    if (jobModal) {
+
+        jobModal.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target === jobModal
+                ) {
+
+                    closeJobModal();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Escape" &&
+                !jobModal.hidden
+            ) {
+
+                closeJobModal();
+
+            }
 
         }
-
-    }
-);
-
-
-/* =========================================================
-   SORT
-   ========================================================= */
-
-sortJobs.addEventListener(
-    "change",
-    searchJobs
-);
-
-
-/* =========================================================
-   JOB MODAL
-   ========================================================= */
-
-function openJobModal(id) {
-
-    const job =
-        jobs.find(
-            item => item.id === id
-        );
-
-
-    if (!job) {
-        return;
-    }
-
-
-    modalContent.innerHTML = `
-
-        <h2 class="modal-title">
-            ${job.title}
-        </h2>
-
-        <p class="modal-company">
-            ${job.company} • ${job.location}
-        </p>
-
-
-        <div class="modal-section">
-
-            <h4>
-                Job Type
-            </h4>
-
-            <p>
-                ${job.type}
-            </p>
-
-        </div>
-
-
-        <div class="modal-section">
-
-            <h4>
-                Salary
-            </h4>
-
-            <p>
-                ${job.salary}
-            </p>
-
-        </div>
-
-
-        <div class="modal-section">
-
-            <h4>
-                Required Skills
-            </h4>
-
-            <p>
-                ${job.skills.join(", ")}
-            </p>
-
-        </div>
-
-
-        <div class="modal-section">
-
-            <h4>
-                Job Description
-            </h4>
-
-            <p>
-                ${job.description}
-            </p>
-
-        </div>
-
-
-        <button
-            class="modal-apply"
-            type="button"
-            onclick="applyForJob(${job.id})"
-        >
-            Apply Now
-        </button>
-
-    `;
-
-
-    jobModal.classList.add("show");
-
-}
-
-
-/* =========================================================
-   APPLY
-   ========================================================= */
-
-function applyForJob(id) {
-
-    const job =
-        jobs.find(
-            item => item.id === id
-        );
-
-
-    if (!job) {
-        return;
-    }
-
-
-    alert(
-        `Application started for ${job.title} at ${job.company}.`
     );
 
-}
+
+    /* =====================================================
+       SEARCH EVENTS
+       ===================================================== */
+
+    if (searchBtn) {
+
+        searchBtn.addEventListener(
+            "click",
+            searchJobs
+        );
+
+    }
 
 
-/* =========================================================
-   CLOSE MODAL
-   ========================================================= */
+    if (searchInput) {
 
-function closeJobModal() {
+        searchInput.addEventListener(
+            "keydown",
+            function (event) {
 
-    jobModal.classList.remove("show");
+                if (
+                    event.key === "Enter"
+                ) {
 
-}
+                    searchJobs();
+
+                }
+
+            }
+        );
+
+    }
 
 
-closeModal.addEventListener(
-    "click",
-    closeJobModal
-);
+    if (locationInput) {
+
+        locationInput.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    searchJobs();
+
+                }
+
+            }
+        );
+
+    }
 
 
-jobModal.addEventListener(
-    "click",
-    event => {
+    if (jobType) {
 
-        if (event.target === jobModal) {
+        jobType.addEventListener(
+            "change",
+            searchJobs
+        );
 
-            closeJobModal();
+    }
+
+
+    if (sortJobs) {
+
+        sortJobs.addEventListener(
+            "change",
+            function () {
+
+                sortFilteredJobs();
+
+                displayJobs(
+                    filteredJobs
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       PROFILE DROPDOWN
+       ===================================================== */
+
+    if (profileButton) {
+
+        profileButton.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+                const isOpen =
+                    profileDropdown.classList.toggle(
+                        "open"
+                    );
+
+                profileButton.setAttribute(
+                    "aria-expanded",
+                    String(isOpen)
+                );
+
+            }
+        );
+
+    }
+
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                profileDropdown &&
+                profileButton &&
+                !profileDropdown.contains(event.target) &&
+                !profileButton.contains(event.target)
+            ) {
+
+                profileDropdown.classList.remove(
+                    "open"
+                );
+
+                profileButton.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+
+            }
 
         }
-
-    }
-);
+    );
 
 
-/* =========================================================
-   PROFILE DROPDOWN
-   ========================================================= */
+    /* =====================================================
+       THEME
+       ===================================================== */
 
-profileBtn.addEventListener(
-    "click",
-    event => {
+    function applyTheme(theme) {
 
-        event.stopPropagation();
+        if (theme === "dark") {
 
-        profileMenu.classList.toggle("open");
-
-    }
-);
-
-
-document.addEventListener(
-    "click",
-    () => {
-
-        profileMenu.classList.remove("open");
-
-    }
-);
-
-
-/* =========================================================
-   ESCAPE KEY
-   ========================================================= */
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (event.key === "Escape") {
-
-            closeJobModal();
-
-            profileMenu.classList.remove("open");
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   DARK MODE
-   ========================================================= */
-
-function loadTheme() {
-
-    const savedTheme =
-        localStorage.getItem("nexhire-theme");
-
-
-    if (savedTheme === "dark") {
-
-        document.documentElement.setAttribute(
-            "data-theme",
-            "dark"
-        );
-
-        themeToggle.textContent = "☀";
-
-        themeToggle.setAttribute(
-            "aria-label",
-            "Switch to light mode"
-        );
-
-    } else {
-
-        document.documentElement.removeAttribute(
-            "data-theme"
-        );
-
-        themeToggle.textContent = "☼";
-
-        themeToggle.setAttribute(
-            "aria-label",
-            "Switch to dark mode"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   THEME TOGGLE
-   ========================================================= */
-
-themeToggle.addEventListener(
-    "click",
-    () => {
-
-        const html =
-            document.documentElement;
-
-
-        const isDark =
-            html.getAttribute("data-theme")
-            === "dark";
-
-
-        if (isDark) {
-
-            html.removeAttribute(
-                "data-theme"
-            );
-
-            localStorage.setItem(
-                "nexhire-theme",
-                "light"
-            );
-
-            themeToggle.textContent = "☼";
-
-            themeToggle.setAttribute(
-                "aria-label",
-                "Switch to dark mode"
-            );
-
-        } else {
-
-            html.setAttribute(
+            document.documentElement.setAttribute(
                 "data-theme",
                 "dark"
             );
 
-            localStorage.setItem(
-                "nexhire-theme",
-                "dark"
+
+            if (themeToggle) {
+
+                /*
+                 * Your requested icon convention:
+                 * Dark mode -> ☀
+                 */
+
+                themeToggle.textContent =
+                    "☀";
+
+                themeToggle.setAttribute(
+                    "aria-label",
+                    "Switch to light mode"
+                );
+
+                themeToggle.setAttribute(
+                    "title",
+                    "Switch to light mode"
+                );
+
+            }
+
+        } else {
+
+            document.documentElement.removeAttribute(
+                "data-theme"
             );
 
-            themeToggle.textContent = "☀";
 
-            themeToggle.setAttribute(
-                "aria-label",
-                "Switch to light mode"
-            );
+            if (themeToggle) {
+
+                /*
+                 * Your requested icon convention:
+                 * Light mode -> ☼
+                 */
+
+                themeToggle.textContent =
+                    "☼";
+
+                themeToggle.setAttribute(
+                    "aria-label",
+                    "Switch to dark mode"
+                );
+
+                themeToggle.setAttribute(
+                    "title",
+                    "Switch to dark mode"
+                );
+
+            }
 
         }
 
     }
-);
 
 
-/* =========================================================
-   INITIAL LOAD
-   ========================================================= */
-
-loadTheme();
-
-displayJobs(jobs);
-
-
-// ================= LOGOUT =================
-
-const logoutButton = document.getElementById("logoutButton");
-
-if (logoutButton) {
-
-    logoutButton.addEventListener("click", function () {
-
-        const confirmLogout = confirm(
-            "Are you sure you want to logout?"
+    const savedTheme =
+        localStorage.getItem(
+            "nexhire-theme"
         );
 
-        if (!confirmLogout) {
-            return;
-        }
 
-        // Remove temporary login/session data
-        localStorage.removeItem("candidateId");
-        localStorage.removeItem("candidateName");
+    applyTheme(
+        savedTheme === "dark"
+            ? "dark"
+            : "light"
+    );
 
-        sessionStorage.clear();
 
-        // Redirect to login page
-        window.location.href = "candidate-login.html";
-    });
-}
+    if (themeToggle) {
+
+        themeToggle.addEventListener(
+            "click",
+            function () {
+
+                const currentTheme =
+                    document.documentElement
+                        .getAttribute(
+                            "data-theme"
+                        );
+
+
+                const newTheme =
+                    currentTheme === "dark"
+                        ? "light"
+                        : "dark";
+
+
+                localStorage.setItem(
+                    "nexhire-theme",
+                    newTheme
+                );
+
+
+                applyTheme(
+                    newTheme
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       LOGOUT
+       ===================================================== */
+
+    if (logoutButton) {
+
+        logoutButton.addEventListener(
+            "click",
+            function () {
+
+                const confirmed =
+                    confirm(
+                        "Are you sure you want to logout?"
+                    );
+
+
+                if (!confirmed) {
+                    return;
+                }
+
+
+                localStorage.removeItem(
+                    "candidateId"
+                );
+
+                localStorage.removeItem(
+                    "candidateName"
+                );
+
+                localStorage.removeItem(
+                    "resumeId"
+                );
+
+
+                sessionStorage.clear();
+
+
+                window.location.href =
+                    "candidate-login.html";
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       INITIAL LOAD
+       ===================================================== */
+
+    loadJobs();
+
+});

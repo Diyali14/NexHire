@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,11 +12,13 @@
 
 <body>
 
-    <!-- Header -->
+    <!-- ================= HEADER ================= -->
+
     <header class="site-header">
 
         <div class="container navbar">
 
+            <!-- Brand -->
             <a href="candidate-dashboard.html" class="brand">
 
                 <span class="brand-mark">
@@ -31,33 +34,40 @@
             </a>
 
 
+            <!-- Navigation Actions -->
             <div class="nav-actions">
 
+                <!-- Theme Toggle -->
                 <button
-                    class="icon-button"
+                    class="icon-button theme-toggle"
                     id="themeToggle"
                     type="button"
-                >
-                    ☼
+                    aria-label="Switch to dark mode"
+                    title="Switch to dark mode">
+                    ☾
                 </button>
 
 
+                <!-- Profile Dropdown -->
                 <div class="profile-menu">
 
                     <button
                         class="profile-button"
                         id="profileButton"
                         type="button"
-                    >
+                        aria-expanded="false"
+                        aria-haspopup="true">
 
-                        <span class="profile-avatar">
+                        <span
+                            class="profile-avatar"
+                            id="headerAvatar">
                             K
                         </span>
 
                         <span class="profile-details">
 
-                            <strong>
-                                Kaushik
+                            <strong id="headerName">
+                                Candidate
                             </strong>
 
                             <small>
@@ -73,16 +83,17 @@
                     </button>
 
 
+                    <!-- Dropdown -->
                     <div
                         class="profile-dropdown"
                         id="profileDropdown">
 
-                        <a href="candidate-profile.html">
-                            View Profile
+                        <a href="candidate-dashboard.html">
+                            Dashboard
                         </a>
 
                         <a href="candidate-profile.html">
-                            Edit Profile
+                            View Profile
                         </a>
 
                         <div class="dropdown-divider"></div>
@@ -108,11 +119,13 @@
     </header>
 
 
-    <!-- Main Layout -->
+    <!-- ================= MAIN LAYOUT ================= -->
+
     <main class="candidate-layout">
 
 
-        <!-- Sidebar -->
+        <!-- ================= SIDEBAR ================= -->
+
         <aside class="sidebar">
 
             <div class="sidebar-inner">
@@ -124,10 +137,11 @@
 
                 <nav class="sidebar-nav">
 
+                    <!-- Dashboard -->
                     <a
                         href="candidate-dashboard.html"
-                        class="sidebar-link"
-                    >
+                        class="sidebar-link">
+
                         <span class="sidebar-icon">
                             ⌂
                         </span>
@@ -135,28 +149,15 @@
                         <span>
                             Dashboard
                         </span>
+
                     </a>
 
 
-                    <a
-                        href="candidate-profile.html"
-                        class="sidebar-link active"
-                    >
-                        <span class="sidebar-icon">
-                            ◯
-                        </span>
-
-                        <span>
-                            Profile
-                        </span>
-                    </a>
-
-
+                    <!-- Resume Upload -->
                     <a
                         href="ResumeUpload.html"
-                        class="sidebar-link"
-                        
-                    >
+                        class="sidebar-link">
+
                         <span class="sidebar-icon">
                             ↑
                         </span>
@@ -164,13 +165,15 @@
                         <span>
                             Upload Resume
                         </span>
+
                     </a>
 
 
+                    <!-- Job Search -->
                     <a
                         href="candidate-job-search.html"
-                        class="sidebar-link"
-                    >
+                        class="sidebar-link">
+
                         <span class="sidebar-icon">
                             ⌕
                         </span>
@@ -178,221 +181,498 @@
                         <span>
                             Job Search
                         </span>
-                    </a>
 
-
-                    <a
-                        href="candidate-recommended-jobs.html"
-                        class="sidebar-link"
-                    >
-                        <span class="sidebar-icon">
-                            ✦
-                        </span>
-
-                        <span>
-                            Recommended Jobs
-                        </span>
-                    </a>
-
-
-                    <a
-                        href="#"
-                        class="sidebar-link"
-                    >
-                        <span class="sidebar-icon">
-                            ✧
-                        </span>
-
-                        <span>
-                            AI Assistant
-                        </span>
                     </a>
 
                 </nav>
-
-
-                <!-- Help -->
-                <div class="sidebar-help">
-
-                    <div class="help-icon">
-                        ?
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            Need help?
-                        </strong>
-
-                        <span>
-                            Ask NexHire AI
-                        </span>
-
-                    </div>
-
-                </div>
 
             </div>
 
         </aside>
 
 
-        <!-- Profile Content -->
+        <!-- ================= PROFILE CONTENT ================= -->
+
         <section class="profile-content">
 
-            <div class="profile-heading">
 
-                <span class="eyebrow">
-                    MY PROFILE
-                </span>
+            <!-- ================= PAGE HEADING ================= -->
 
-                <h1>
-                    Your professional
-                    <span>profile.</span>
-                </h1>
+            <div class="page-heading">
 
-                <p>
-                    Manage your personal information,
-                    skills and projects.
-                </p>
+                <div>
 
-            </div>
+                    <span class="eyebrow">
+                        CANDIDATE PROFILE
+                    </span>
 
-
-            <!-- Profile Card -->
-            <div class="profile-card">
-
-                <div class="profile-card-header">
-
-                    <div class="large-avatar">
-                        K
-                    </div>
-
-                    <div class="profile-main-info">
-
-                        <h2>
-                            Kaushik Debnath
-                        </h2>
-
-                        <p>
-                            Software Engineer
-                        </p>
-
-                        <span>
-                            Kolkata, India
-                        </span>
-
-                    </div>
-
-                    <button
-                        class="edit-button"
-                        type="button"
-                    >
-                        Edit Profile
-                    </button>
-
-                </div>
-
-
-                <!-- About -->
-                <div class="profile-section">
-
-                    <h3>
-                        About
-                    </h3>
+                    <h1>
+                        Your <span>Profile</span>
+                    </h1>
 
                     <p>
-                        Computer Science Engineering student
-                        interested in software development,
-                        Java and web technologies.
+                        Manage your personal information and
+                        professional details.
                     </p>
 
                 </div>
 
 
-                <!-- Skills -->
-                <div class="profile-section">
+                <a
+                    href="candidate-dashboard.html"
+                    class="button button-secondary">
 
-                    <h3>
-                        Skills
-                    </h3>
+                    ← Back to Dashboard
 
-                    <div class="skills">
-
-                        <span>
-                            Java
-                        </span>
-
-                        <span>
-                            SQL
-                        </span>
-
-                        <span>
-                            HTML
-                        </span>
-
-                        <span>
-                            CSS
-                        </span>
-
-                        <span>
-                            JavaScript
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Projects -->
-                <div class="profile-section">
-
-                    <h3>
-                        Projects
-                    </h3>
-
-                    <div class="project-list">
-
-                        <div class="project-item">
-
-                            <strong>
-                                Quiz Application
-                            </strong>
-
-                            <p>
-                                Java Swing based quiz
-                                application with
-                                interactive MCQs.
-                            </p>
-
-                        </div>
-
-
-                        <div class="project-item">
-
-                            <strong>
-                                Weather Application
-                            </strong>
-
-                            <p>
-                                Web application using
-                                HTML, CSS and JavaScript.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
+                </a>
 
             </div>
+
+
+            <!-- ================= PROFILE SUMMARY ================= -->
+
+            <section class="profile-summary-card">
+
+                <div class="profile-summary-main">
+
+                    <div
+                        class="large-avatar"
+                        id="profileAvatar">
+
+                        K
+
+                    </div>
+
+
+                    <div class="profile-summary-info">
+
+                        <h2 id="profileFullName">
+                            Candidate Name
+                        </h2>
+
+                        <p id="profileEmail">
+                            Email address
+                        </p>
+
+                        <span class="profile-role">
+                            Candidate
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="button button-primary"
+                    id="editProfileButton">
+
+                    ✎ Edit Profile
+
+                </button>
+
+            </section>
+
+
+            <!-- ================= STATUS MESSAGE ================= -->
+
+            <div
+                class="status-message"
+                id="statusMessage"
+                role="status"
+                aria-live="polite"
+                hidden>
+            </div>
+
+
+            <!-- ================= BASIC DETAILS ================= -->
+
+            <section class="profile-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            PERSONAL INFORMATION
+                        </span>
+
+                        <h2>
+                            Basic Details
+                        </h2>
+
+                        <p>
+                            Keep your contact information up to date.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <form id="profileForm">
+
+                    <div class="form-grid">
+
+
+                        <!-- First Name -->
+                        <div class="form-group">
+
+                            <label for="firstName">
+                                First Name <span>*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="firstName"
+                                name="firstName"
+                                placeholder="Enter your first name"
+                                autocomplete="given-name"
+                                required
+                                disabled>
+
+                        </div>
+
+
+                        <!-- Last Name -->
+                        <div class="form-group">
+
+                            <label for="lastName">
+                                Last Name <span>*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="lastName"
+                                name="lastName"
+                                placeholder="Enter your last name"
+                                autocomplete="family-name"
+                                required
+                                disabled>
+
+                        </div>
+
+
+                        <!-- Email -->
+                        <div class="form-group">
+
+                            <label for="email">
+                                Email Address
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="Enter your email address"
+                                autocomplete="email"
+                                disabled>
+
+                            <small>
+                                Your registered email address.
+                            </small>
+
+                        </div>
+
+
+                        <!-- Phone -->
+                        <div class="form-group">
+
+                            <label for="phone">
+                                Phone Number
+                            </label>
+
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                placeholder="Enter your phone number"
+                                autocomplete="tel"
+                                disabled>
+
+                        </div>
+
+
+                        <!-- LinkedIn -->
+                        <div class="form-group">
+
+                            <label for="linkedinUrl">
+                                LinkedIn Profile
+                            </label>
+
+                            <input
+                                type="url"
+                                id="linkedinUrl"
+                                name="linkedinUrl"
+                                placeholder="https://www.linkedin.com/in/your-profile"
+                                disabled>
+
+                        </div>
+
+
+                        <!-- GitHub -->
+                        <div class="form-group">
+
+                            <label for="githubUrl">
+                                GitHub Profile
+                            </label>
+
+                            <input
+                                type="url"
+                                id="githubUrl"
+                                name="githubUrl"
+                                placeholder="https://github.com/your-username"
+                                disabled>
+
+                        </div>
+
+
+                        <!-- Bio -->
+                        <div class="form-group form-group-full">
+
+                            <label for="bio">
+                                About Me
+                            </label>
+
+                            <textarea
+                                id="bio"
+                                name="bio"
+                                rows="5"
+                                maxlength="1000"
+                                placeholder="Write a short introduction about yourself..."
+                                disabled></textarea>
+
+                            <small>
+                                Briefly describe your background,
+                                interests, and career goals.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Form Actions -->
+                    <div
+                        class="form-actions"
+                        id="formActions"
+                        hidden>
+
+                        <button
+                            type="button"
+                            class="button button-secondary"
+                            id="cancelEditButton">
+
+                            Cancel
+
+                        </button>
+
+
+                        <button
+                            type="submit"
+                            class="button button-primary"
+                            id="saveProfileButton">
+
+                            Save Changes
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- ================= PROFILE COMPLETION ================= -->
+
+            <section
+                class="profile-section completion-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            PROFILE PROGRESS
+                        </span>
+
+                        <h2>
+                            Profile Completion
+                        </h2>
+
+                        <p>
+                            Complete your information to keep your
+                            profile up to date.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="completion-card">
+
+                    <div class="completion-header">
+
+                        <div>
+
+                            <strong id="completionPercentage">
+                                0%
+                            </strong>
+
+                            <span>
+                                completed
+                            </span>
+
+                        </div>
+
+
+                        <span id="completionMessage">
+                            Complete your profile details.
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        class="completion-track"
+                        id="completionProgress"
+                        role="progressbar"
+                        aria-label="Profile completion"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-valuenow="0">
+
+                        <span
+                            id="completionBar"
+                            style="width: 0%;">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= CHANGE PASSWORD ================= -->
+
+            <section
+                class="profile-section password-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            ACCOUNT SECURITY
+                        </span>
+
+                        <h2>
+                            Change Password
+                        </h2>
+
+                        <p>
+                            Update your account password.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <form id="changePasswordForm">
+
+                    <div class="form-grid">
+
+
+                        <!-- Current Password -->
+                        <div class="form-group">
+
+                            <label for="currentPassword">
+                                Current Password
+                            </label>
+
+                            <input
+                                type="password"
+                                id="currentPassword"
+                                name="currentPassword"
+                                autocomplete="current-password"
+                                placeholder="Enter current password"
+                                required>
+
+                        </div>
+
+
+                        <!-- New Password -->
+                        <div class="form-group">
+
+                            <label for="newPassword">
+                                New Password
+                            </label>
+
+                            <input
+                                type="password"
+                                id="newPassword"
+                                name="newPassword"
+                                autocomplete="new-password"
+                                placeholder="Enter new password"
+                                minlength="8"
+                                required>
+
+                        </div>
+
+
+                        <!-- Confirm Password -->
+                        <div class="form-group">
+
+                            <label for="confirmPassword">
+                                Confirm New Password
+                            </label>
+
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                autocomplete="new-password"
+                                placeholder="Confirm new password"
+                                minlength="8"
+                                required>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Password Action -->
+                    <div class="form-actions">
+
+                        <button
+                            type="submit"
+                            class="button button-primary"
+                            id="changePasswordButton">
+
+                            Update Password
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
 
         </section>
 
     </main>
 
 
+    <!-- ================= JAVASCRIPT ================= -->
+
     <script src="js/candidate-profile.js"></script>
 
 </body>
+
 </html>
