@@ -6,29 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface JobApplicationRepository
-        extends JpaRepository<JobApplication, Long> {
+public interface JobApplicationRepository extends JpaRepository<JobApplication, Long> {
 
-    boolean existsByJobIdAndCandidateId(
-            Long jobId,
-            Long candidateId
-    );
+    boolean existsByJobIdAndCandidateId(Long jobId, Long candidateId);
 
-    Optional<JobApplication> findByJobIdAndCandidateId(
-            Long jobId,
-            Long candidateId
-    );
+    Optional<JobApplication> findByJobIdAndCandidateId(Long jobId, Long candidateId);
 
-    List<JobApplication> findAllByJobIdOrderByOverallScoreDescCreatedAtAsc(
-            Long jobId
-    );
+    List<JobApplication> findAllByJobIdOrderByOverallScoreDescCreatedAtAsc(Long jobId);
 
-    List<JobApplication> findAllByCandidateIdOrderByCreatedAtDesc(
-            Long candidateId
-    );
+    List<JobApplication> findAllByCandidateIdOrderByCreatedAtDesc(Long candidateId);
 
-    Optional<JobApplication> findByIdAndCandidateId(
-            Long applicationId,
-            Long candidateId
-    );
+    Optional<JobApplication> findByIdAndCandidateId(Long applicationId, Long candidateId);
 }

@@ -36,60 +36,35 @@ public class RecruiterApplicationService {
     private final CloudinaryStorageService cloudinaryStorageService;
     private final ObjectMapper objectMapper;
 
-    public List<RecruiterApplicationResponse> getApplicationsForJob(
-            Long jobId,
-            Authentication authentication
-    ) {
+    public List<RecruiterApplicationResponse> getApplicationsForJob(Long jobId, Authentication authentication) {
 
         User recruiter = getAuthenticatedRecruiter(authentication);
 
-        Job job = jobRepository
-                .findByIdAndRecruiterId(
-                        jobId,
-                        recruiter.getId()
-                )
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Job not found or you do not own this job"
-                        )
-                );
+        Job job = jobRepository.findByIdAndRecruiterId(jobId, recruiter.getId())
+                .orElseThrow(() -> new RuntimeException("Job not found or you do not own this job"));
 
-        List<JobApplication> applications =
-                applicationRepository
-                        .findAllByJobIdOrderByOverallScoreDescCreatedAtAsc(
-                                jobId
-                        );
+        List<JobApplication> applications = applicationRepository.findAllByJobIdOrderByOverallScoreDescCreatedAtAsc(jobId);
 
         List<RecruiterApplicationResponse> response = new ArrayList<>();
         for (JobApplication application : applications) {
+
             response.add(buildResponse(application));
         }
 
         return response;
     }
 
-    public Map<String, Object> getApplicationDetails(
-            Long jobId,
-            Long applicationId,
-            Authentication authentication
-    ) {
+    public Map<String, Object> getApplicationDetails(Long jobId, Long applicationId, Authentication authentication) {
+
         User recruiter = getAuthenticatedRecruiter(authentication);
 
-        Job job = jobRepository
-                .findByIdAndRecruiterId(
-                        jobId,
-                        recruiter.getId()
-                )
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Job not found or you do not own this job"
-                        )
-                );
+        Job job = jobRepository.findByIdAndRecruiterId(jobId, recruiter.getId())
+                .orElseThrow(() -> new RuntimeException("Job not found or you do not own this job"));
 
-        JobApplication application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new RuntimeException("Application not found"));
+        JobApplication application = applicationRepository.findById(applicationId).orElseThrow(() -> new RuntimeException("Application not found"));
 
         if (!application.getJob().getId().equals(job.getId())) {
+
             throw new RuntimeException("Application does not belong to this job");
         }
 
@@ -105,34 +80,29 @@ public class RecruiterApplicationService {
             }
         }
 
-        return Map.of(
-                "applicationSummary", buildResponse(application),
-                "candidateProfile", profileOpt.isPresent() ? Map.of(
+        return Map.of("applicationSummary", buildResponse(application), "candidateProfile", profileOpt.isPresent() ? Map.of(
                         "linkedinUrl", profileOpt.get().getLinkedinUrl() != null ? profileOpt.get().getLinkedinUrl() : "",
                         "githubUrl", profileOpt.get().getGithubUrl() != null ? profileOpt.get().getGithubUrl() : "",
-                        "bio", profileOpt.get().getBio() != null ? profileOpt.get().getBio() : ""
-                ) : Map.of(),
+                        "bio", profileOpt.get().getBio() != null ? profileOpt.get().getBio() : "") : Map.of(),
                 "parsedResume", parsedResumeJson != null ? parsedResumeJson : Map.of()
         );
     }
 
-    public Map<String, Object> downloadCandidateResume(
-            Long applicationId,
-            Authentication authentication
-    ) {
+    public Map<String, Object> downloadCandidateResume(Long applicationId, Authentication authentication) {
         User recruiter = getAuthenticatedRecruiter(authentication);
 
-        JobApplication application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new RuntimeException("Application not found"));
+        JobApplication application = applicationRepository.findById(applicationId).orElseThrow(() -> new RuntimeException("Application not found"));
 
         // Authorization check: recruiter MUST own the job for this application
         Job job = application.getJob();
         if (!job.getRecruiter().getId().equals(recruiter.getId())) {
+
             throw new RuntimeException("Forbidden: You do not own the job for this application");
         }
 
         Resume resume = application.getResume();
         if (resume == null || resume.getStorageUrl() == null) {
+
             throw new RuntimeException("Resume file not found for this application");
         }
 
@@ -148,24 +118,20 @@ public class RecruiterApplicationService {
 
     private User getAuthenticatedRecruiter(Authentication authentication) {
         String email = authentication.getName();
-        return userRepository
-                .findByEmailIgnoreCase(email)
-                .orElseThrow(() ->
-                        new RuntimeException("Authenticated recruiter not found")
-                );
+        return userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new RuntimeException("Authenticated recruiter not found"));
     }
 
-    private RecruiterApplicationResponse buildResponse(
-            JobApplication application
-    ) {
+    private RecruiterApplicationResponse buildResponse(JobApplication application) {
 
         JsonNode matcherResult = null;
 
-        if (application.getMatcherResult() != null
-                && !application.getMatcherResult().isBlank()) {
+        if (application.getMatcherResult() != null && !application.getMatcherResult().isBlank()) {
             try {
                 matcherResult = objectMapper.readTree(application.getMatcherResult());
+
                 while (matcherResult != null && matcherResult.isTextual()) {
+
                     matcherResult = objectMapper.readTree(matcherResult.asText());
                 }
             } catch (Exception ignored) {
@@ -178,6 +144,7 @@ public class RecruiterApplicationService {
         Object matchedSkills = null;
         if (matchedSkillsNode != null && !matchedSkillsNode.isMissingNode()) {
             try {
+
                 matchedSkills = objectMapper.treeToValue(matchedSkillsNode, Object.class);
             } catch (Exception ignored) {
             }
@@ -201,11 +168,13 @@ public class RecruiterApplicationService {
 
         Boolean experienceMet = null;
         if (matcherResult != null && matcherResult.has("experienceMet")) {
+
             experienceMet = matcherResult.path("experienceMet").asBoolean();
         }
 
         Boolean educationMet = null;
         if (matcherResult != null && matcherResult.has("educationMet")) {
+
             educationMet = matcherResult.path("educationMet").asBoolean();
         }
 
@@ -222,32 +191,22 @@ public class RecruiterApplicationService {
             resumeUrl = application.getResume().getStorageUrl();
         }
 
-        return RecruiterApplicationResponse
-                .builder()
-                .applicationId(application.getId())
-                .candidateId(candidate.getId())
-                .resumeId(application.getResume() != null ? application.getResume().getId() : null)
-                .candidateName(candidateName)
-                .candidateEmail(candidate.getEmail())
-                .candidatePhone(candidate.getPhone())
-                .resumeFileName(resumeFileName)
-                .resumeUrl(resumeUrl)
-                .status(application.getStatus().name())
-                .overallScore(application.getOverallScore())
-                .matcherVersion(application.getMatcherVersion())
-                .experienceMet(experienceMet)
-                .educationMet(educationMet)
-                .matchedSkills(matchedSkills)
-                .missingSkills(missingSkills)
-                .summary(summary)
-                .matcherResult(matcherResultObj)
+        return RecruiterApplicationResponse.builder().applicationId(application.getId())
+                .candidateId(candidate.getId()).resumeId(application.getResume() != null ? application.getResume().getId() : null)
+                .candidateName(candidateName).candidateEmail(candidate.getEmail())
+                .candidatePhone(candidate.getPhone()).resumeFileName(resumeFileName).resumeUrl(resumeUrl)
+                .status(application.getStatus().name()).overallScore(application.getOverallScore())
+                .matcherVersion(application.getMatcherVersion()).experienceMet(experienceMet).educationMet(educationMet)
+                .matchedSkills(matchedSkills).missingSkills(missingSkills).summary(summary).matcherResult(matcherResultObj)
                 .build();
     }
 
     private String buildCandidateName(User candidate) {
+
         String firstName = candidate.getFirstName() != null ? candidate.getFirstName() : "";
         String lastName = candidate.getLastName() != null ? candidate.getLastName() : "";
         String fullName = (firstName + " " + lastName).trim();
+
         return fullName.isBlank() ? candidate.getEmail() : fullName;
     }
 }
