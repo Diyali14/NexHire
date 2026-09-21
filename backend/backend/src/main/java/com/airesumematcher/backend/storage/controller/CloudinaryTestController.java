@@ -13,28 +13,16 @@ public class CloudinaryTestController {
 
     private final FileProcessingService fileProcessingService;
 
-    public CloudinaryTestController(
-            FileProcessingService fileProcessingService
-    ) {
-        this.fileProcessingService =
-                fileProcessingService;
+    public CloudinaryTestController(FileProcessingService fileProcessingService) {
+        this.fileProcessingService = fileProcessingService;
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadFile(
-            @RequestParam("file") MultipartFile file
-    ) {
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
 
-        String publicId =
-                "nexhire/test/"
-                        + System.currentTimeMillis()
-                        + "/resume";
+        String publicId = "nexhire/test/" + System.currentTimeMillis() + "/resume";
 
-        Map<String, Object> result =
-                fileProcessingService.processAndUpload(
-                        file,
-                        publicId
-                );
+        Map<String, Object> result = fileProcessingService.processAndUpload(file, publicId);
 
         return ResponseEntity.ok(result);
     }

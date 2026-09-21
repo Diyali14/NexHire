@@ -24,22 +24,12 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http
-    ) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-                .csrf(csrf -> csrf.disable())
+        http.csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                .cors(cors -> cors.configurationSource(
-                        corsConfigurationSource()
-                ))
-
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
 
@@ -61,31 +51,20 @@ public class SecurityConfig {
                         // CANDIDATE
                         // =================================================
 
-                        .requestMatchers(
-                                "/api/v1/candidates/**"
-                        ).hasRole("CANDIDATE")
+                        .requestMatchers("/api/v1/candidates/**").hasRole("CANDIDATE")
 
-                        .requestMatchers(
-                                "/api/v1/resumes/**"
-                        ).hasRole("CANDIDATE")
+                        .requestMatchers("/api/v1/resumes/**").hasRole("CANDIDATE")
 
                         // Candidate applies to recruiter job
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/v1/jobs/*/apply"
-                        ).hasRole("CANDIDATE")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/jobs/*/apply").hasRole("CANDIDATE")
 
                         // =================================================
                         // RECRUITER
                         // =================================================
 
-                        .requestMatchers(
-                                "/api/v1/recruiters/**"
-                        ).hasRole("RECRUITER")
+                        .requestMatchers("/api/v1/recruiters/**").hasRole("RECRUITER")
 
-                        .requestMatchers(
-                                "/api/v1/jobs/**"
-                        ).hasRole("RECRUITER")
+                        .requestMatchers("/api/v1/jobs/**").hasRole("RECRUITER")
 
                         // =================================================
                         // EVERYTHING ELSE
@@ -95,10 +74,7 @@ public class SecurityConfig {
                         .authenticated()
                 )
 
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -109,9 +85,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration
-    ) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
 
         return configuration.getAuthenticationManager();
     }
@@ -119,19 +93,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuration =
-                new CorsConfiguration();
+        CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(
-                List.of(
+        configuration.setAllowedOrigins(List.of(
                         "http://localhost:5500",
                         "http://127.0.0.1:5501",
                         "http://localhost:3000",
                         "http://localhost:5000",
                         "http://localhost:5001",
-                        "https://nex-hire-11i2.vercel.app"
-                )
-        );
+                        "https://nex-hire-11i2.vercel.app"));
 
         configuration.setAllowedMethods(
                 List.of(
@@ -140,23 +110,15 @@ public class SecurityConfig {
                         "PUT",
                         "DELETE",
                         "PATCH",
-                        "OPTIONS"
-                )
-        );
+                        "OPTIONS"));
 
-        configuration.setAllowedHeaders(
-                List.of("*")
-        );
+        configuration.setAllowedHeaders(List.of("*"));
 
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        source.registerCorsConfiguration(
-                "/**",
-                configuration
-        );
+        source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }

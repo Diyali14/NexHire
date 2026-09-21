@@ -16,18 +16,10 @@ public class UserController {
     private final UserService userService;
 
     @PutMapping("/me/password")
-    public ResponseEntity<String> changePassword(
-            Authentication authentication,
-            @Valid @RequestBody PasswordChangeRequest request
-    ) {
+    public ResponseEntity<String> changePassword(Authentication authentication, @Valid @RequestBody PasswordChangeRequest request) {
 
-        userService.changePassword(
-                authentication.getName(),
-                request
-        );
+        userService.changePassword(authentication.getName(), request);
 
-        return ResponseEntity.ok(
-                "Password changed successfully"
-        );
+        return ResponseEntity.ok("Password changed successfully");
     }
 }
