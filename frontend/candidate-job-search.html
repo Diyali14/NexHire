@@ -1,73 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>NexHire | Job Search</title>
 
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="css/candidate-job-search.css">
 </head>
 
 <body>
 
-    <!-- ================= HEADER ================= -->
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
     <header class="site-header">
 
         <div class="container navbar">
 
-            <!-- Logo -->
+            <!-- BRAND -->
             <a href="candidate-dashboard.html" class="brand">
 
-                <span class="brand-mark">
+                <div class="brand-mark">
                     <span></span>
                     <span></span>
                     <span></span>
-                </span>
+                </div>
 
-                <span class="brand-name">
+                <div class="brand-name">
                     Nex<span>Hire</span>
-                </span>
+                </div>
 
             </a>
 
 
-            <!-- Header Actions -->
+            <!-- HEADER ACTIONS -->
             <div class="nav-actions">
 
-                <!-- Theme Button -->
+                <!-- THEME -->
                 <button
                     class="icon-button theme-toggle"
                     id="themeToggle"
                     type="button"
-                    aria-label="Toggle dark mode"
-                >
+                    aria-label="Switch to dark mode"
+                    title="Switch to dark mode">
                     ☼
                 </button>
 
 
-                <!-- Profile -->
+                <!-- PROFILE -->
                 <div class="profile-menu">
 
                     <button
                         class="profile-button"
                         id="profileButton"
                         type="button"
-                    >
+                        aria-expanded="false">
 
-                        <span class="profile-avatar">
+                        <div class="profile-avatar">
                             K
-                        </span>
+                        </div>
 
-                        <span class="profile-details">
+                        <div class="profile-details">
 
                             <strong>Kaushik</strong>
 
-                            <small>
-                                Candidate
-                            </small>
+                            <small>Candidate</small>
 
-                        </span>
+                        </div>
 
                         <span class="profile-arrow">
                             ▾
@@ -76,19 +86,36 @@
                     </button>
 
 
-                    <!-- Profile Dropdown -->
+                    <!-- PROFILE DROPDOWN -->
                     <div
                         class="profile-dropdown"
-                        id="profileDropdown"
-                    >
+                        id="profileDropdown">
 
-                        <a href="#">
+                        <a
+                            href="candidate-profile.html"
+                            class="dropdown-item">
+                            <span>◉</span>
                             View Profile
                         </a>
 
-                        <a href="#">
+                        <a
+                            href="candidate-profile.html"
+                            class="dropdown-item">
+                            <span>✎</span>
                             Edit Profile
                         </a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <button
+                            type="button"
+                            class="logout-button"
+                            id="logoutButton">
+
+                            <span>↪</span>
+                            Logout
+
+                        </button>
 
                     </div>
 
@@ -102,12 +129,16 @@
 
 
 
-    <!-- ================= MAIN LAYOUT ================= -->
+    <!-- =====================================================
+         MAIN LAYOUT
+         ===================================================== -->
 
-    <main class="candidate-layout">
+    <div class="candidate-layout">
 
 
-        <!-- ================= SIDEBAR ================= -->
+        <!-- =================================================
+             SIDEBAR
+             ================================================= -->
 
         <aside class="sidebar">
 
@@ -120,13 +151,10 @@
 
                 <nav class="sidebar-nav">
 
-
-                    <!-- Dashboard -->
-
+                    <!-- DASHBOARD -->
                     <a
                         href="candidate-dashboard.html"
-                        class="sidebar-link"
-                    >
+                        class="sidebar-link">
 
                         <span class="sidebar-icon">
                             ⌂
@@ -139,32 +167,10 @@
                     </a>
 
 
-
-                    <!-- Profile -->
-
-                    <a
-                        href="#"
-                        class="sidebar-link"
-                    >
-
-                        <span class="sidebar-icon">
-                            ◯
-                        </span>
-
-                        <span>
-                            Profile
-                        </span>
-
-                    </a>
-
-
-
-                    <!-- Resume -->
-
+                    <!-- RESUME -->
                     <a
                         href="ResumeUpload.html"
-                        class="sidebar-link"
-                    >
+                        class="sidebar-link">
 
                         <span class="sidebar-icon">
                             ↑
@@ -177,13 +183,10 @@
                     </a>
 
 
-
-                    <!-- Job Search -->
-
+                    <!-- JOB SEARCH -->
                     <a
                         href="candidate-job-search.html"
-                        class="sidebar-link active"
-                    >
+                        class="sidebar-link active">
 
                         <span class="sidebar-icon">
                             ⌕
@@ -195,50 +198,10 @@
 
                     </a>
 
-
-
-                    <!-- Recommended Jobs -->
-
-                    <a
-                        href="candidate-recommended-jobs.html"
-                        class="sidebar-link"
-                    >
-
-                        <span class="sidebar-icon">
-                            ✦
-                        </span>
-
-                        <span>
-                            Recommended Jobs
-                        </span>
-
-                    </a>
-
-
-
-                    <!-- AI Assistant -->
-
-                    <a
-                        href="#"
-                        class="sidebar-link"
-                    >
-
-                        <span class="sidebar-icon">
-                            ✧
-                        </span>
-
-                        <span>
-                            AI Assistant
-                        </span>
-
-                    </a>
-
                 </nav>
 
 
-
-                <!-- Help -->
-
+                <!-- SIDEBAR HELP -->
                 <div class="sidebar-help">
 
                     <div class="help-icon">
@@ -252,7 +215,7 @@
                         </strong>
 
                         <span>
-                            Ask NexHire AI
+                            Explore available jobs
                         </span>
 
                     </div>
@@ -265,218 +228,268 @@
 
 
 
-        <!-- ================= JOB CONTENT ================= -->
+        <!-- =================================================
+             MAIN CONTENT
+             ================================================= -->
 
-        <section class="job-content">
-
-
-            <!-- Page Heading -->
-
-            <div class="job-heading">
-
-                <span class="eyebrow">
-                    JOB SEARCH
-                </span>
-
-                <h1>
-                    Find your next
-                    <span>opportunity.</span>
-                </h1>
-
-                <p>
-                    Search for jobs that match your skills,
-                    experience and career goals.
-                </p>
-
-            </div>
+        <main class="dashboard-content">
 
 
+            <!-- PAGE HEADING -->
+            <section class="dashboard-heading">
 
-            <!-- ================= SEARCH CARD ================= -->
+                <div>
+
+                    <span class="eyebrow">
+                        JOB SEARCH
+                    </span>
+
+                    <h1>
+                        Find your next
+                        <span>opportunity.</span>
+                    </h1>
+
+                    <p>
+                        Search through available opportunities
+                        and find a role that matches your skills,
+                        experience, and career goals.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 SEARCH CARD
+                 ================================================= -->
 
             <section class="search-card">
 
 
-                <!-- Search -->
-
+                <!-- KEYWORD -->
                 <div class="search-field">
 
                     <label for="searchInput">
                         Search jobs
                     </label>
 
-                    <input
-                        type="text"
-                        id="searchInput"
-                        placeholder="Job title, skills, company..."
-                    >
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            ⌕
+                        </span>
+
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="Job title, skills, company...">
+
+                    </div>
 
                 </div>
 
 
 
-                <!-- Location -->
-
+                <!-- LOCATION -->
                 <div class="search-field">
 
                     <label for="locationInput">
                         Location
                     </label>
 
-                    <input
-                        type="text"
-                        id="locationInput"
-                        placeholder="Kolkata, Bangalore..."
-                    >
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            ◉
+                        </span>
+
+                        <input
+                            type="text"
+                            id="locationInput"
+                            placeholder="City or location">
+
+                    </div>
 
                 </div>
 
 
 
-                <!-- Job Type -->
-
+                <!-- JOB TYPE -->
                 <div class="search-field">
 
                     <label for="jobType">
-                        Job Type
+                        Job type
                     </label>
 
-                    <select id="jobType">
+                    <div class="select-wrapper">
 
-                        <option value="all">
-                            All Types
-                        </option>
+                        <select id="jobType">
 
-                        <option value="Full Time">
-                            Full Time
-                        </option>
+                            <option value="">
+                                All Types
+                            </option>
 
-                        <option value="Internship">
-                            Internship
-                        </option>
+                            <option value="FULL_TIME">
+                                Full Time
+                            </option>
 
-                        <option value="Part Time">
-                            Part Time
-                        </option>
+                            <option value="INTERNSHIP">
+                                Internship
+                            </option>
 
-                    </select>
+                            <option value="PART_TIME">
+                                Part Time
+                            </option>
+
+                        </select>
+
+                    </div>
 
                 </div>
 
 
 
-                <!-- Search Button -->
-
+                <!-- SEARCH BUTTON -->
                 <button
-                    class="search-btn"
-                    id="searchBtn"
                     type="button"
-                >
-                    Search Jobs
+                    class="search-button"
+                    id="searchBtn">
+
+                    <span>
+                        ⌕
+                    </span>
+
+                    Search
+
                 </button>
 
             </section>
 
 
 
-            <!-- ================= RESULTS HEADER ================= -->
+            <!-- =================================================
+                 RESULTS HEADER
+                 ================================================= -->
 
-            <div class="results-header">
+            <section class="results-section">
 
-                <div>
+                <div class="results-header">
 
-                    <span class="section-kicker">
-                        OPPORTUNITIES
-                    </span>
+                    <div
+                        class="result-count"
+                        id="resultCount">
 
-                    <h2>
-                        Available Jobs
-                    </h2>
-
-                    <p id="resultCount">
                         0 jobs found
+
+                    </div>
+
+
+                    <div class="sort-container">
+
+                        <label for="sortJobs">
+                            Sort
+                        </label>
+
+                        <select id="sortJobs">
+
+                            <option value="default">
+                                Default
+                            </option>
+
+                            <option value="recent">
+                                Most Recent
+                            </option>
+
+                            <option value="salary">
+                                Salary
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- JOB LIST -->
+                <div
+                    class="job-list"
+                    id="jobList">
+
+                    <div class="loading-state">
+                        Loading jobs...
+                    </div>
+
+                </div>
+
+
+
+                <!-- NO RESULTS -->
+                <div
+                    class="no-results"
+                    id="noResults"
+                    hidden>
+
+                    <div class="no-results-icon">
+                        ⌕
+                    </div>
+
+                    <h3>
+                        No jobs found
+                    </h3>
+
+                    <p>
+                        Try changing your search filters.
                     </p>
 
                 </div>
 
+            </section>
 
-                <!-- Sorting -->
+        </main>
 
-                <select id="sortJobs">
-
-                    <option value="default">
-                        Sort by
-                    </option>
-
-                    <option value="salary">
-                        Salary
-                    </option>
-
-                    <option value="recent">
-                        Most Recent
-                    </option>
-
-                </select>
-
-            </div>
+    </div>
 
 
 
-            <!-- ================= JOB LIST ================= -->
-
-            <div
-                class="job-list"
-                id="jobList"
-            ></div>
-
-
-
-            <!-- ================= NO RESULTS ================= -->
-
-            <div
-                class="no-results"
-                id="noResults"
-            >
-
-                <div class="no-results-icon">
-                    ⌕
-                </div>
-
-                <h3>
-                    No jobs found
-                </h3>
-
-                <p>
-                    Try changing your search keywords or location.
-                </p>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-
-    <!-- ================= JOB MODAL ================= -->
+    <!-- =====================================================
+         JOB DETAILS MODAL
+         ===================================================== -->
 
     <div
         class="modal-overlay"
         id="jobModal"
-    >
+        hidden>
 
         <div class="job-modal">
 
-            <button
-                class="close-modal"
-                id="closeModal"
-                type="button"
-                aria-label="Close"
-            >
-                ×
-            </button>
+            <!-- MODAL HEADER -->
+            <div class="modal-header">
 
-            <div id="modalContent"></div>
+                <h2>
+                    Job Details
+                </h2>
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    id="closeModal"
+                    aria-label="Close">
+                    ×
+                </button>
+
+            </div>
+
+
+            <!-- MODAL CONTENT -->
+            <div
+                class="modal-content"
+                id="modalContent">
+
+            </div>
 
         </div>
 
@@ -484,9 +497,14 @@
 
 
 
-    <!-- JavaScript -->
+    <!-- =====================================================
+         JAVASCRIPT
+         ===================================================== -->
 
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/candidate-job-search.js"></script>
 
 </body>
+
 </html>

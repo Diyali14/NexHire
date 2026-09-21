@@ -21,42 +21,22 @@ public class RecruiterApplicationController {
     private final RecruiterApplicationService recruiterApplicationService;
 
     @GetMapping("/jobs/{jobId}/applications")
-    public ResponseEntity<List<RecruiterApplicationResponse>> getApplications(
-            @PathVariable Long jobId,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                recruiterApplicationService.getApplicationsForJob(
-                        jobId,
-                        authentication
-                )
-        );
+    public ResponseEntity<List<RecruiterApplicationResponse>> getApplications(@PathVariable Long jobId, Authentication authentication) {
+
+        return ResponseEntity.ok(recruiterApplicationService.getApplicationsForJob(jobId, authentication));
+
     }
 
     @GetMapping("/jobs/{jobId}/applications/{applicationId}")
-    public ResponseEntity<Map<String, Object>> getApplicationDetails(
-            @PathVariable Long jobId,
-            @PathVariable Long applicationId,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                recruiterApplicationService.getApplicationDetails(
-                        jobId,
-                        applicationId,
-                        authentication
-                )
-        );
+    public ResponseEntity<Map<String, Object>> getApplicationDetails(@PathVariable Long jobId, @PathVariable Long applicationId, Authentication authentication) {
+
+        return ResponseEntity.ok(recruiterApplicationService.getApplicationDetails(jobId, applicationId, authentication));
     }
 
     @GetMapping("/applications/{applicationId}/resume/download")
-    public ResponseEntity<byte[]> downloadCandidateResume(
-            @PathVariable Long applicationId,
-            Authentication authentication
-    ) {
-        Map<String, Object> result = recruiterApplicationService.downloadCandidateResume(
-                applicationId,
-                authentication
-        );
+    public ResponseEntity<byte[]> downloadCandidateResume(@PathVariable Long applicationId, Authentication authentication) {
+
+        Map<String, Object> result = recruiterApplicationService.downloadCandidateResume(applicationId, authentication);
 
         byte[] fileBytes = (byte[]) result.get("fileBytes");
         String fileName = (String) result.get("fileName");
@@ -65,8 +45,6 @@ public class RecruiterApplicationController {
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDisposition(ContentDisposition.attachment().filename(fileName != null ? fileName : "candidate_resume.pdf").build());
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(fileBytes);
+        return ResponseEntity.ok().headers(headers).body(fileBytes);
     }
 }

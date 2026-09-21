@@ -22,12 +22,7 @@ public class JobMessageConsumer {
     private final JobParsedDataService jobParsedDataService;
     private final ObjectMapper objectMapper;
 
-    public JobMessageConsumer(
-            JobRepository jobRepository,
-            AiParserService aiParserService,
-            JobParsedDataService jobParsedDataService,
-            ObjectMapper objectMapper
-    ) {
+    public JobMessageConsumer(JobRepository jobRepository, AiParserService aiParserService, JobParsedDataService jobParsedDataService, ObjectMapper objectMapper) {
         this.jobRepository = jobRepository;
         this.aiParserService = aiParserService;
         this.jobParsedDataService = jobParsedDataService;
@@ -39,11 +34,8 @@ public class JobMessageConsumer {
 
         log.info("JD PROCESSING STARTED - Job ID: {}, Title: {}", message.getJobId(), message.getJobTitle());
 
-        Job job = jobRepository
-                .findById(message.getJobId())
-                .orElseThrow(() ->
-                        new RuntimeException("Job not found for ID: " + message.getJobId())
-                );
+        Job job = jobRepository.findById(message.getJobId())
+                .orElseThrow(() -> new RuntimeException("Job not found for ID: " + message.getJobId()));
 
         // Idempotency check: if already completed, do not re-process
         if (job.getProcessingStatus() == JobProcessingStatus.COMPLETED) {
@@ -62,6 +54,7 @@ public class JobMessageConsumer {
             // 2. Get plain-text job description
             String jobDescription = message.getJobDescription();
             if (jobDescription == null || jobDescription.isBlank()) {
+
                 throw new IllegalArgumentException("Job description cannot be empty");
             }
 
@@ -75,11 +68,7 @@ public class JobMessageConsumer {
             String parserVersion = root.hasNonNull("modelVersion") ? root.get("modelVersion").asText() : null;
 
             // 5. Save complete parsed JSON
-            jobParsedDataService.saveParsedData(
-                    message.getJobId(),
-                    parsedJson,
-                    parserVersion
-            );
+            jobParsedDataService.saveParsedData(message.getJobId(), parsedJson, parserVersion);
 
             log.info("Parsed JD data saved successfully for Job ID {}", message.getJobId());
 

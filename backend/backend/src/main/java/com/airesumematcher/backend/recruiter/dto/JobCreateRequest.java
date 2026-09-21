@@ -11,10 +11,7 @@ import lombok.*;
 public class JobCreateRequest {
 
     @NotBlank(message = "Job title is required")
-    @Size(
-            max = 255,
-            message = "Job title must not exceed 255 characters"
-    )
+    @Size(max = 255, message = "Job title must not exceed 255 characters")
     private String jobTitle;
 
     @NotBlank(message = "Job description is required")

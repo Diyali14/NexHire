@@ -20,13 +20,8 @@ public class JwtService {
     private final SecretKey secretKey;
     private final long expiration;
 
-    public JwtService(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") long expiration
-    ) {
-        this.secretKey = Keys.hmacShaKeyFor(
-                secret.getBytes(StandardCharsets.UTF_8)
-        );
+    public JwtService(@Value("${jwt.secret:${JWT_SECRET:nexhiredefaultjwtsecretkeywhichmustbeatleast256bitslong123456}}") String secret, @Value("${jwt.expiration:${JWT_SECRET_EXPIRATION:86400000}}") long expiration) {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expiration = expiration;
     }
 
@@ -38,9 +33,7 @@ public class JwtService {
                 .claims(claims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date())
-                .expiration(
-                        new Date(System.currentTimeMillis() + expiration)
-                )
+                .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(secretKey)
                 .compact();
     }
@@ -49,25 +42,17 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public boolean isTokenValid(
-            String token,
-            UserDetails userDetails
-    ) {
+    public boolean isTokenValid(String token, UserDetails userDetails) {
         String username = extractUsername(token);
 
-        return username.equalsIgnoreCase(userDetails.getUsername())
-                && !isTokenExpired(token);
+        return username.equalsIgnoreCase(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
-        return extractClaim(token, Claims::getExpiration)
-                .before(new Date());
+        return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 
-    private <T> T extractClaim(
-            String token,
-            Function<Claims, T> resolver
-    ) {
+    private <T> T extractClaim(String token, Function<Claims, T> resolver) {
 
         Claims claims = Jwts.parser()
                 .verifyWith(secretKey)

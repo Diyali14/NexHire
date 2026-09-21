@@ -49,73 +49,42 @@ public class JobApplication {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "job_id",
-            nullable = false
-    )
+    @JoinColumn(name = "job_id", nullable = false)
     private Job job;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "candidate_id",
-            nullable = false
-    )
+    @JoinColumn(name = "candidate_id", nullable = false)
     private User candidate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "resume_id",
-            nullable = false
-    )
+    @JoinColumn(name = "resume_id", nullable = false)
     private Resume resume;
 
     @Enumerated(EnumType.STRING)
-    @Column(
-            name = "status",
-            nullable = false,
-            length = 30
-    )
+    @Column(name = "status", nullable = false, length = 30)
     @Builder.Default
-    private JobApplicationStatus status =
-            JobApplicationStatus.MATCHING_PENDING;
+    private JobApplicationStatus status = JobApplicationStatus.MATCHING_PENDING;
 
     @Column(name = "overall_score")
     private Integer overallScore;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(
-            name = "matcher_result",
-            columnDefinition = "jsonb"
-    )
+    @Column(name = "matcher_result", columnDefinition = "jsonb")
     private String matcherResult;
 
-    @Column(
-            name = "matcher_version",
-            length = 100
-    )
+    @Column(name = "matcher_version", length = 100)
     private String matcherVersion;
 
-    @Column(
-            name = "error_message",
-            columnDefinition = "TEXT"
-    )
+    @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 
-    @Column(
-            name = "created_at",
-            nullable = false
-    )
+    @Column(name = "created_at", nullable = false)
     @Builder.Default
-    private LocalDateTime createdAt =
-            LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(
-            name = "updated_at",
-            nullable = false
-    )
+    @Column(name = "updated_at", nullable = false)
     @Builder.Default
-    private LocalDateTime updatedAt =
-            LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @PreUpdate
     public void preUpdate() {

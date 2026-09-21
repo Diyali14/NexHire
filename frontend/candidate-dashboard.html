@@ -19,7 +19,6 @@
         <div class="container navbar">
 
             <!-- Brand -->
-
             <a href="candidate-dashboard.html" class="brand">
 
                 <span class="brand-mark">
@@ -34,41 +33,48 @@
 
             </a>
 
-
-            
-
-
             <!-- Right Side -->
-
             <div class="nav-actions">
 
+                <!-- Theme Toggle -->
                 <button
                     class="icon-button theme-toggle"
                     id="themeToggle"
                     type="button"
-                    aria-label="Toggle theme">
+                    aria-label="Toggle theme"
+                    title="Toggle theme">
 
                     ☼
 
                 </button>
 
-
+                <!-- Profile -->
                 <div class="profile-menu">
 
                     <button
                         class="profile-button"
                         id="profileButton"
-                        type="button">
+                        type="button"
+                        aria-expanded="false"
+                        aria-haspopup="true">
 
-                        <span class="profile-avatar">
+                        <span
+                            class="profile-avatar"
+                            id="headerAvatar">
+
                             K
+
                         </span>
 
                         <span class="profile-details">
 
-                            <strong>Kaushik</strong>
+                            <strong id="headerName">
+                                Kaushik
+                            </strong>
 
-                            <small>Candidate</small>
+                            <small>
+                                Candidate
+                            </small>
 
                         </span>
 
@@ -78,7 +84,7 @@
 
                     </button>
 
-
+                    <!-- Profile Dropdown -->
                     <div
                         class="profile-dropdown"
                         id="profileDropdown">
@@ -90,6 +96,19 @@
                         <a href="candidate-profile.html">
                             Edit Profile
                         </a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <button
+                            type="button"
+                            class="logout-button"
+                            id="logoutButton">
+
+                            <span>↪</span>
+
+                            Logout
+
+                        </button>
 
                     </div>
 
@@ -106,7 +125,6 @@
 
     <main class="candidate-layout">
 
-
         <!-- ================= SIDEBAR ================= -->
 
         <aside class="sidebar">
@@ -117,98 +135,54 @@
                     CANDIDATE
                 </div>
 
-
                 <nav class="sidebar-nav">
 
+                    <!-- Dashboard -->
                     <a
                         href="candidate-dashboard.html"
                         class="sidebar-link active">
 
-                        <span class="sidebar-icon">⌂</span>
+                        <span class="sidebar-icon">
+                            ⌂
+                        </span>
 
-                        <span>Dashboard</span>
-
-                    </a>
-
-
-                    <a
-                        href="candidate-profile.html"
-                        class="sidebar-link">
-
-                        <span class="sidebar-icon">◯</span>
-
-                        <span>Profile</span>
+                        <span>
+                            Dashboard
+                        </span>
 
                     </a>
 
-
+                    <!-- Resume -->
                     <a
                         href="ResumeUpload.html"
                         class="sidebar-link">
 
-                        <span class="sidebar-icon">↑</span>
+                        <span class="sidebar-icon">
+                            ↑
+                        </span>
 
-                        <span>Upload Resume</span>
-
-                    </a>
-
-
-                    <a
-                        href="candidate-job-Search.html"
-                        class="sidebar-link">
-
-                        <span class="sidebar-icon">⌕</span>
-
-                        <span>Job Search</span>
+                        <span>
+                            Upload Resume
+                        </span>
 
                     </a>
 
-
+                    <!-- Job Search -->
                     <a
-                        href="candidate-recommended-jobs.html"
+                        href="candidate-job-search.html"
                         class="sidebar-link">
 
-                        <span class="sidebar-icon">✦</span>
+                        <span class="sidebar-icon">
+                            ⌕
+                        </span>
 
-                        <span>Recommended Jobs</span>
-
-                    </a>
-
-
-                    <a
-                        href="candidate-ai-assistant.html"
-                        class="sidebar-link">
-
-                        <span class="sidebar-icon">✧</span>
-
-                        <span>AI Assistant</span>
+                        <span>
+                            Job Search
+                        </span>
 
                     </a>
 
                 </nav>
-
-
-                <!-- Sidebar Bottom -->
-
-                <div class="sidebar-help">
-
-                    <div class="help-icon">
-                        ?
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            Need help?
-                        </strong>
-
-                        <span>
-                            Ask NexHire AI
-                        </span>
-
-                    </div>
-
-                </div>
 
             </div>
 
@@ -219,8 +193,7 @@
 
         <section class="dashboard-content">
 
-
-            <!-- Dashboard Header -->
+            <!-- ================= DASHBOARD HEADER ================= -->
 
             <div class="dashboard-heading">
 
@@ -231,8 +204,9 @@
                     </span>
 
                     <h1>
-                        Good morning,
-                        <span>Kaushik.</span>
+                        <span id="welcomeName">
+                            Kaushik.
+                        </span>
                     </h1>
 
                     <p>
@@ -242,14 +216,15 @@
 
                 </div>
 
-
                 <a
-                    href="candidate-job-Search.html"
+                    href="candidate-job-search.html"
                     class="button button-primary">
 
                     Find Jobs
 
-                    <span>→</span>
+                    <span>
+                        →
+                    </span>
 
                 </a>
 
@@ -262,10 +237,13 @@
 
                 <div class="profile-main">
 
-                    <div class="large-avatar">
-                        K
-                    </div>
+                    <div
+                        class="large-avatar"
+                        id="profileAvatar">
 
+                        K
+
+                    </div>
 
                     <div class="profile-info">
 
@@ -273,7 +251,7 @@
                             YOUR PROFILE
                         </span>
 
-                        <h2>
+                        <h2 id="candidateFullName">
                             Kaushik Debnath
                         </h2>
 
@@ -298,6 +276,8 @@
                 </div>
 
 
+                <!-- Profile Progress -->
+
                 <div class="profile-progress">
 
                     <div class="progress-heading">
@@ -312,18 +292,14 @@
 
                     </div>
 
-
                     <div class="progress-track">
 
                         <span style="width: 75%;"></span>
 
                     </div>
 
-
                     <a href="candidate-profile.html">
-
                         Complete profile →
-
                     </a>
 
                 </div>
@@ -335,7 +311,7 @@
 
             <section class="stats-grid">
 
-
+                <!-- Resume -->
                 <article class="stat-card">
 
                     <div class="stat-icon">
@@ -348,7 +324,7 @@
                             RESUME
                         </span>
 
-                        <strong>
+                        <strong id="resumeStatus">
                             Uploaded
                         </strong>
 
@@ -361,6 +337,7 @@
                 </article>
 
 
+                <!-- Skills -->
                 <article class="stat-card">
 
                     <div class="stat-icon">
@@ -373,7 +350,7 @@
                             SKILLS
                         </span>
 
-                        <strong>
+                        <strong id="skillsCount">
                             8 Skills
                         </strong>
 
@@ -386,6 +363,7 @@
                 </article>
 
 
+                <!-- Projects -->
                 <article class="stat-card">
 
                     <div class="stat-icon">
@@ -398,8 +376,8 @@
                             PROJECTS
                         </span>
 
-                        <strong>
-                            3 Projects
+                        <strong id="projectsCount">
+                            2 Projects
                         </strong>
 
                         <small>
@@ -409,7 +387,6 @@
                     </div>
 
                 </article>
-
 
             </section>
 
@@ -431,7 +408,6 @@
                         </h2>
 
                     </div>
-
 
                     <a
                         href="candidate-profile.html"
@@ -478,7 +454,6 @@
 
                     </div>
 
-
                     <a
                         href="candidate-profile.html"
                         class="text-link">
@@ -492,7 +467,7 @@
 
                 <div class="projects-grid">
 
-
+                    <!-- Project 1 -->
                     <article class="project-card">
 
                         <div class="project-top">
@@ -507,7 +482,6 @@
 
                         </div>
 
-
                         <h3>
                             Quiz Application
                         </h3>
@@ -518,7 +492,6 @@
                             score calculation and question navigation.
                         </p>
 
-
                         <div class="project-tech">
 
                             <span>Java</span>
@@ -527,14 +500,19 @@
 
                         </div>
 
+                        <a
+                            href="#"
+                            class="project-link"
+                            onclick="return false;">
 
-                        <a href="#" class="project-link">
                             View project →
+
                         </a>
 
                     </article>
 
 
+                    <!-- Project 2 -->
                     <article class="project-card">
 
                         <div class="project-top">
@@ -549,7 +527,6 @@
 
                         </div>
 
-
                         <h3>
                             Weather App
                         </h3>
@@ -560,7 +537,6 @@
                             a web API.
                         </p>
 
-
                         <div class="project-tech">
 
                             <span>HTML</span>
@@ -569,103 +545,27 @@
 
                         </div>
 
+                        <a
+                            href="#"
+                            class="project-link"
+                            onclick="return false;">
 
-                        <a href="#" class="project-link">
                             View project →
+
                         </a>
 
                     </article>
 
-
                 </div>
 
             </section>
-
-
-            <!-- ================= RECOMMENDED PREVIEW ================= -->
-
-            <section class="dashboard-section">
-
-                <div class="section-heading-row">
-
-                    <div>
-
-                        <span class="section-kicker">
-                            FOR YOU
-                        </span>
-
-                        <h2>
-                            Recommended jobs
-                        </h2>
-
-                    </div>
-
-
-                    <a
-                        href="candidate-recommended-jobs.html"
-                        class="text-link">
-
-                        View recommendations →
-
-                    </a>
-
-                </div>
-
-
-                <div class="recommendation-card">
-
-                    <div class="recommend-job-icon">
-                        N
-                    </div>
-
-
-                    <div class="recommend-job-info">
-
-                        <span>
-                            SOFTWARE ENGINEER
-                        </span>
-
-                        <h3>
-                            Associate Software Engineer
-                        </h3>
-
-                        <p>
-                            Technology Company · Kolkata
-                        </p>
-
-                    </div>
-
-
-                    <div class="match-score">
-
-                        <strong>
-                            87%
-                        </strong>
-
-                        <span>
-                            Match
-                        </span>
-
-                    </div>
-
-
-                    <a
-                        href="candidate-job-details.html"
-                        class="button button-secondary">
-
-                        View Job
-
-                    </a>
-
-                </div>
-
-            </section>
-
 
         </section>
 
     </main>
 
+
+    <!-- ================= JAVASCRIPT ================= -->
 
     <script src="js/candidate-dashboard.js"></script>
 

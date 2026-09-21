@@ -22,9 +22,8 @@ public class CloudinaryConfig {
 
     @Bean
     public Cloudinary cloudinary() {
-        return new Cloudinary(
-                "cloudinary://" + apiKey + ":" + apiSecret + "@" + cloudName
-        );
+
+        return new Cloudinary("cloudinary://" + apiKey + ":" + apiSecret + "@" + cloudName);
     }
 
 //    @Bean

@@ -30,30 +30,23 @@ public class CandidateJobService {
     @Transactional(readOnly = true)
     public List<CandidateJobResponse> getAvailableJobs(String query, String sortBy) {
 
-        List<Job> jobs =
-                jobRepository
-                        .findAllByProcessingStatusOrderByCreatedAtDesc(
-                                JobProcessingStatus.COMPLETED
-                        );
+        List<Job> jobs = jobRepository.findAllByProcessingStatusOrderByCreatedAtDesc(JobProcessingStatus.COMPLETED);
 
-        List<CandidateJobResponse> responses = jobs.stream()
-                .map(this::toResponse)
-                .filter(resp -> {
+        List<CandidateJobResponse> responses = jobs.stream().map(this::toResponse).filter(resp -> {
                     if (query == null || query.isBlank()) {
                         return true;
                     }
+
                     String q = query.toLowerCase().trim();
                     boolean matchTitle = resp.getJobTitle() != null && resp.getJobTitle().toLowerCase().contains(q);
                     boolean matchDesc = resp.getJobDescription() != null && resp.getJobDescription().toLowerCase().contains(q);
                     boolean matchSkills = resp.getSkills() != null && resp.getSkills().toString().toLowerCase().contains(q);
                     return matchTitle || matchDesc || matchSkills;
-                })
-                .toList();
+                }).toList();
 
         if ("title".equalsIgnoreCase(sortBy)) {
-            return responses.stream()
-                    .sorted(Comparator.comparing(CandidateJobResponse::getJobTitle, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
-                    .toList();
+
+            return responses.stream().sorted(Comparator.comparing(CandidateJobResponse::getJobTitle, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER))).toList();
         }
 
         return responses;
@@ -62,20 +55,11 @@ public class CandidateJobService {
     @Transactional(readOnly = true)
     public CandidateJobResponse getJobDetails(Long jobId) {
 
-        Job job =
-                jobRepository
-                        .findById(jobId)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Job not found"
-                                )
-                        );
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new IllegalArgumentException("Job not found"));
 
         if (job.getProcessingStatus() != JobProcessingStatus.COMPLETED) {
 
-            throw new IllegalArgumentException(
-                    "This job is not available to candidates yet"
-            );
+            throw new IllegalArgumentException("This job is not available to candidates yet");
         }
 
         return toResponse(job);
@@ -84,10 +68,11 @@ public class CandidateJobService {
     private CandidateJobResponse toResponse(Job job) {
 
         String companyName = null;
+
         if (job.getRecruiter() != null) {
-            Optional<RecruiterProfile> recruiterProfile =
-                    recruiterProfileRepository.findByUserId(job.getRecruiter().getId());
+            Optional<RecruiterProfile> recruiterProfile = recruiterProfileRepository.findByUserId(job.getRecruiter().getId());
             if (recruiterProfile.isPresent()) {
+
                 companyName = recruiterProfile.get().getCompanyName();
             }
         }
@@ -108,18 +93,10 @@ public class CandidateJobService {
             }
         }
 
-        return CandidateJobResponse.builder()
-                .jobId(job.getId())
-                .jobTitle(job.getJobTitle())
-                .companyName(companyName)
-                .jobDescription(job.getJobDescription())
-                .experienceRequired(experienceRequired)
-                .educationRequired(educationRequired)
-                .skills(skills)
-                .parsedRequirements(parsedJsonNode)
-                .processingStatus(job.getProcessingStatus().name())
-                .createdAt(job.getCreatedAt())
-                .updatedAt(job.getUpdatedAt())
-                .build();
+        return CandidateJobResponse.builder().jobId(job.getId()).jobTitle(job.getJobTitle())
+                .companyName(companyName).jobDescription(job.getJobDescription()).experienceRequired(experienceRequired)
+                .educationRequired(educationRequired).skills(skills).parsedRequirements(parsedJsonNode)
+                .processingStatus(job.getProcessingStatus().name()).createdAt(job.getCreatedAt())
+                .updatedAt(job.getUpdatedAt()).build();
     }
 }

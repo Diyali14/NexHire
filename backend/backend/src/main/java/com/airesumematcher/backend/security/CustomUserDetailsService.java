@@ -11,22 +11,15 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailsService
-        implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email)
-            throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        User user = userRepository
-                .findByEmailIgnoreCase(email)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException(
-                                "User not found"
-                        )
-                );
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
@@ -35,14 +28,6 @@ public class CustomUserDetailsService
                 true,
                 true,
                 true,
-                user.getRoles()
-                        .stream()
-                        .map(role ->
-                                new SimpleGrantedAuthority(
-                                        "ROLE_" + role.getName().name()
-                                )
-                        )
-                        .collect(Collectors.toSet())
-        );
+                user.getRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName().name())).collect(Collectors.toSet()));
     }
 }

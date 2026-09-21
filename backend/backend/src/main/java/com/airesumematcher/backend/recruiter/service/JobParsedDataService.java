@@ -16,74 +16,44 @@ public class JobParsedDataService {
     private final JobParsedDataRepository jobParsedDataRepository;
     private final ObjectMapper objectMapper;
 
-    public JobParsedDataService(
-            JobRepository jobRepository,
-            JobParsedDataRepository jobParsedDataRepository,
-            ObjectMapper objectMapper
-    ) {
+    public JobParsedDataService(JobRepository jobRepository, JobParsedDataRepository jobParsedDataRepository, ObjectMapper objectMapper) {
         this.jobRepository = jobRepository;
-        this.jobParsedDataRepository =
-                jobParsedDataRepository;
+        this.jobParsedDataRepository = jobParsedDataRepository;
         this.objectMapper = objectMapper;
     }
 
     @Transactional
-    public JobParsedData saveParsedData(
-            Long jobId,
-            String parsedJson,
-            String parserVersion
-    ) {
+    public JobParsedData saveParsedData(Long jobId, String parsedJson, String parserVersion) {
 
         if (jobId == null) {
-            throw new IllegalArgumentException(
-                    "Job ID is required"
-            );
+            throw new IllegalArgumentException("Job ID is required");
         }
 
         if (parsedJson == null || parsedJson.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Parsed job data cannot be empty"
-            );
+            throw new IllegalArgumentException("Parsed job data cannot be empty");
         }
 
         validateJson(parsedJson);
 
-        Job job =
-                jobRepository.findById(jobId)
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Job not found"
-                                )
-                        );
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
 
-        JobParsedData parsedData =
-                jobParsedDataRepository
-                        .findByJobId(jobId)
-                        .orElseGet(() ->
-                                JobParsedData.builder()
-                                        .job(job)
-                                        .build()
-                        );
+        JobParsedData parsedData = jobParsedDataRepository.findByJobId(jobId)
+                        .orElseGet(() -> JobParsedData.builder().job(job).build());
 
         parsedData.setParsedJson(parsedJson);
         parsedData.setParserVersion(parserVersion);
 
-        return jobParsedDataRepository.save(
-                parsedData
-        );
+        return jobParsedDataRepository.save(parsedData);
     }
 
     private void validateJson(String parsedJson) {
 
         try {
 
-            JsonNode jsonNode =
-                    objectMapper.readTree(parsedJson);
+            JsonNode jsonNode = objectMapper.readTree(parsedJson);
 
             if (jsonNode == null || !jsonNode.isObject()) {
-                throw new IllegalArgumentException(
-                        "Parsed job data must be a JSON object"
-                );
+                throw new IllegalArgumentException("Parsed job data must be a JSON object");
             }
 
         } catch (IllegalArgumentException e) {
@@ -92,10 +62,7 @@ public class JobParsedDataService {
 
         } catch (Exception e) {
 
-            throw new IllegalArgumentException(
-                    "Invalid JSON returned by job parser",
-                    e
-            );
+            throw new IllegalArgumentException("Invalid JSON returned by job parser", e);
         }
     }
 }

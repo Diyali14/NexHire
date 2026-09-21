@@ -21,41 +21,23 @@ public class RecruiterController {
     private final RecruiterProfileService recruiterService;
 
     @GetMapping("/me")
-    public RecruiterProfileResponse getMyProfile(
-            Authentication authentication
-    ) {
-        return recruiterService.getMyProfile(
-                authentication.getName()
-        );
+    public RecruiterProfileResponse getMyProfile(Authentication authentication) {
+        return recruiterService.getMyProfile(authentication.getName());
     }
 
     @PutMapping("/me")
-    public RecruiterProfileResponse updateMyProfile(
-            Authentication authentication,
-            @Valid @RequestBody RecruiterProfileRequest request
-    ) {
-        return recruiterService.updateProfile(
-                authentication.getName(),
-                request
-        );
+    public RecruiterProfileResponse updateMyProfile(Authentication authentication, @Valid @RequestBody RecruiterProfileRequest request) {
+        return recruiterService.updateProfile(authentication.getName(), request);
     }
 
     @PostMapping("/me/change-password")
-    public ResponseEntity<?> changePassword(
-            Authentication authentication,
-            @Valid @RequestBody ChangePasswordRequest request
-    ) {
-        recruiterService.changePassword(
-                authentication.getName(),
-                request
-        );
+    public ResponseEntity<?> changePassword(Authentication authentication, @Valid @RequestBody ChangePasswordRequest request) {
+        recruiterService.changePassword(authentication.getName(), request);
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
 
     @PostMapping("/me/password-reset")
-    public ResponseEntity<?> passwordReset(
-            @Valid @RequestBody PasswordResetRequest request
-    ) {
+    public ResponseEntity<?> passwordReset(@Valid @RequestBody PasswordResetRequest request) {
         recruiterService.resetPassword(request);
         return ResponseEntity.ok(Map.of("message", "Password reset successfully"));
     }

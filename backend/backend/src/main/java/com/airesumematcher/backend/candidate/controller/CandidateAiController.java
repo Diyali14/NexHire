@@ -15,64 +15,40 @@ public class CandidateAiController {
     private final CandidateAiService candidateAiService;
 
     @PostMapping("/{jobId}/interview-questions")
-    public ResponseEntity<JsonNode> generateInterviewQuestions(
-            @PathVariable Long jobId,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                candidateAiService.generateInterviewQuestions(jobId, authentication)
-        );
+    public ResponseEntity<Object> generateInterviewQuestions(@PathVariable Long jobId, Authentication authentication) {
+
+        return ResponseEntity.ok(candidateAiService.generateInterviewQuestions(jobId, authentication));
+
     }
 
     @GetMapping("/{jobId}/interview-questions")
-    public ResponseEntity<JsonNode> getInterviewQuestions(
-            @PathVariable Long jobId,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                candidateAiService.getInterviewQuestions(jobId, authentication)
-        );
+    public ResponseEntity<Object> getInterviewQuestions(@PathVariable Long jobId, Authentication authentication) {
+        return ResponseEntity.ok(candidateAiService.getInterviewQuestions(jobId, authentication));
     }
 
     @PostMapping("/{jobId}/skill-gap")
-    public ResponseEntity<JsonNode> analyzeSkillGap(
-            @PathVariable Long jobId,
-            @RequestParam(required = false) Long resumeId,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                candidateAiService.analyzeSkillGap(jobId, resumeId, authentication)
-        );
+    public ResponseEntity<Object> analyzeSkillGap(@PathVariable Long jobId, @RequestParam(required = false) Long resumeId, Authentication authentication) {
+
+        return ResponseEntity.ok(candidateAiService.analyzeSkillGap(jobId, resumeId, authentication));
     }
 
     @PostMapping("/{jobId}/analyze")
-    public ResponseEntity<JsonNode> analyzeSkillGapAlias(
-            @PathVariable Long jobId,
-            @RequestParam(required = false) Long resumeId,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                candidateAiService.analyzeSkillGap(jobId, resumeId, authentication)
-        );
+    public ResponseEntity<Object> analyzeSkillGapAlias(@PathVariable Long jobId, @RequestParam(required = false) Long resumeId, Authentication authentication) {
+
+        return ResponseEntity.ok(candidateAiService.analyzeSkillGap(jobId, resumeId, authentication));
+
     }
 
     @GetMapping("/{jobId}/skill-gap")
-    public ResponseEntity<JsonNode> getSkillGap(
-            @PathVariable Long jobId,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                candidateAiService.getSkillGap(jobId, authentication)
-        );
+    public ResponseEntity<Object> getSkillGap(@PathVariable Long jobId, Authentication authentication) {
+
+        return ResponseEntity.ok(candidateAiService.getSkillGap(jobId, authentication));
+
     }
 
     @GetMapping("/{jobId}/analyze")
-    public ResponseEntity<JsonNode> getSkillGapAlias(
-            @PathVariable Long jobId,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                candidateAiService.getSkillGap(jobId, authentication)
-        );
+    public ResponseEntity<Object> getSkillGapAlias(@PathVariable Long jobId, Authentication authentication) {
+        return ResponseEntity.ok(candidateAiService.getSkillGap(jobId, authentication));
+
     }
 }

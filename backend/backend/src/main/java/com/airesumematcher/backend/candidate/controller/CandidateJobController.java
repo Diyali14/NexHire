@@ -16,21 +16,14 @@ public class CandidateJobController {
     private final CandidateJobService candidateJobService;
 
     @GetMapping
-    public ResponseEntity<List<CandidateJobResponse>> getAvailableJobs(
-            @RequestParam(required = false) String query,
-            @RequestParam(required = false, defaultValue = "recent") String sortBy
-    ) {
-        return ResponseEntity.ok(
-                candidateJobService.getAvailableJobs(query, sortBy)
-        );
+    public ResponseEntity<List<CandidateJobResponse>> getAvailableJobs(@RequestParam(required = false) String query, @RequestParam(required = false, defaultValue = "recent") String sortBy) {
+
+        return ResponseEntity.ok(candidateJobService.getAvailableJobs(query, sortBy));
     }
 
     @GetMapping("/{jobId}")
-    public ResponseEntity<CandidateJobResponse> getJobDetails(
-            @PathVariable Long jobId
-    ) {
-        return ResponseEntity.ok(
-                candidateJobService.getJobDetails(jobId)
-        );
+    public ResponseEntity<CandidateJobResponse> getJobDetails(@PathVariable Long jobId) {
+
+        return ResponseEntity.ok(candidateJobService.getJobDetails(jobId));
     }
 }

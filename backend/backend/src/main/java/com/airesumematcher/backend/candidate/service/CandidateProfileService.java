@@ -24,56 +24,39 @@ public class CandidateProfileService {
     @Transactional(readOnly = true)
     public CandidateProfileResponse getMyProfile(String email) {
 
-        User user = userRepository
-                .findByEmailIgnoreCase(email)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("User not found")
-                );
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        CandidateProfile profile =
-                candidateProfileRepository
-                        .findByUserId(user.getId())
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Candidate profile not found"
-                                )
-                        );
+        CandidateProfile profile = candidateProfileRepository.findByUserId(user.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Candidate profile not found"));
 
         return toResponse(profile);
     }
 
     @Transactional
-    public CandidateProfileResponse updateMyProfile(
-            String email,
-            CandidateProfileUpdateRequest request
-    ) {
+    public CandidateProfileResponse updateMyProfile(String email, CandidateProfileUpdateRequest request) {
 
-        User user = userRepository
-                .findByEmailIgnoreCase(email)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("User not found")
-                );
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        CandidateProfile profile =
-                candidateProfileRepository
-                        .findByUserId(user.getId())
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Candidate profile not found"
-                                )
-                        );
+        CandidateProfile profile = candidateProfileRepository.findByUserId(user.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Candidate profile not found"));
 
         if (request.getFirstName() != null) {
+
             user.setFirstName(request.getFirstName());
         }
         if (request.getLastName() != null) {
+
             user.setLastName(request.getLastName());
         }
         if (request.getPhone() != null) {
+
             user.setPhone(request.getPhone());
         }
         if (request.getEmail() != null && !request.getEmail().equalsIgnoreCase(user.getEmail())) {
             if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
+
                 throw new IllegalArgumentException("Email is already taken");
             }
             user.setEmail(request.getEmail());
@@ -82,27 +65,29 @@ public class CandidateProfileService {
         userRepository.save(user);
 
         if (request.getLinkedinUrl() != null) {
+
             profile.setLinkedinUrl(request.getLinkedinUrl());
         }
         if (request.getGithubUrl() != null) {
+
             profile.setGithubUrl(request.getGithubUrl());
         }
         if (request.getBio() != null) {
+
             profile.setBio(request.getBio());
         }
 
-        CandidateProfile savedProfile =
-                candidateProfileRepository.save(profile);
+        CandidateProfile savedProfile = candidateProfileRepository.save(profile);
 
         return toResponse(savedProfile);
     }
 
     @Transactional
     public void changePassword(String email, ChangePasswordRequest request) {
-        User user = userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
+
             throw new IllegalArgumentException("Invalid old password");
         }
 
@@ -112,16 +97,13 @@ public class CandidateProfileService {
 
     @Transactional
     public void resetPassword(PasswordResetRequest request) {
-        User user = userRepository.findByEmailIgnoreCase(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("User not found for provided email"));
+        User user = userRepository.findByEmailIgnoreCase(request.getEmail()).orElseThrow(() -> new IllegalArgumentException("User not found for provided email"));
 
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
     }
 
-    private CandidateProfileResponse toResponse(
-            CandidateProfile profile
-    ) {
+    private CandidateProfileResponse toResponse(CandidateProfile profile) {
 
         User user = profile.getUser();
 

@@ -25,18 +25,12 @@ public class ResumeProject {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "resume_parsed_data_id",
-            nullable = false
-    )
+    @JoinColumn(name = "resume_parsed_data_id", nullable = false)
     private ResumeParsedData parsedData;
 
     @Column(name = "name")
     private String name;
 
-    @Column(
-            name = "description",
-            columnDefinition = "TEXT"
-    )
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 }

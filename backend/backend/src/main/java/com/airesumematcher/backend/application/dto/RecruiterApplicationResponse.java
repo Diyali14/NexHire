@@ -1,5 +1,6 @@
 package com.airesumematcher.backend.application.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -38,4 +39,6 @@ public class RecruiterApplicationResponse {
     private Object missingSkills;
 
     private String summary;
+
+    private Object matcherResult;
 }

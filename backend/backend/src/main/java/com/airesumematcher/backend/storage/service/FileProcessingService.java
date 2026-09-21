@@ -12,26 +12,17 @@ public class FileProcessingService {
     private final DocumentConversionService documentConversionService;
     private final CloudinaryStorageService cloudinaryStorageService;
 
-    public FileProcessingService(
-            DocumentConversionService documentConversionService,
-            CloudinaryStorageService cloudinaryStorageService
-    ) {
-        this.documentConversionService =
-                documentConversionService;
+    public FileProcessingService(DocumentConversionService documentConversionService, CloudinaryStorageService cloudinaryStorageService) {
+        this.documentConversionService = documentConversionService;
 
-        this.cloudinaryStorageService =
-                cloudinaryStorageService;
+        this.cloudinaryStorageService = cloudinaryStorageService;
     }
 
-    public Map<String, Object> processAndUpload(
-            MultipartFile file,
-            String publicId
-    ) {
+    public Map<String, Object> processAndUpload(MultipartFile file, String publicId) {
 
         validateFile(file);
 
-        String extension =
-                getExtension(file.getOriginalFilename());
+        String extension = getExtension(file.getOriginalFilename());
 
         byte[] pdfBytes;
         String originalFileType;
@@ -46,10 +37,7 @@ public class FileProcessingService {
 
                 } catch (Exception e) {
 
-                    throw new RuntimeException(
-                            "Unable to read PDF file",
-                            e
-                    );
+                    throw new RuntimeException("Unable to read PDF file", e);
                 }
 
                 originalFileType = "PDF";
@@ -57,33 +45,22 @@ public class FileProcessingService {
 
             case "docx" -> {
 
-                pdfBytes =
-                        documentConversionService
-                                .convertDocxToPdf(file);
+                pdfBytes = documentConversionService.convertDocxToPdf(file);
 
                 originalFileType = "DOCX";
             }
 
             case "txt" -> {
 
-                pdfBytes =
-                        documentConversionService
-                                .convertTxtToPdf(file);
-
+                pdfBytes = documentConversionService.convertTxtToPdf(file);
                 originalFileType = "TXT";
             }
 
-            default -> throw new RuntimeException(
-                    "Unsupported file type. "
-                            + "Only PDF, DOCX and TXT are allowed."
-            );
+            default -> throw new RuntimeException("Unsupported file type. " + "Only PDF, DOCX and TXT are allowed.");
         }
 
         Map<String, Object> uploadResult =
-                cloudinaryStorageService.uploadPdf(
-                        pdfBytes,
-                        publicId
-                );
+                cloudinaryStorageService.uploadPdf(pdfBytes, publicId);
 
         return Map.of(
                 "message",
@@ -114,45 +91,30 @@ public class FileProcessingService {
                 uploadResult.get("format"),
 
                 "bytes",
-                uploadResult.get("bytes")
-        );
+                uploadResult.get("bytes"));
     }
 
     private void validateFile(MultipartFile file) {
 
         if (file == null || file.isEmpty()) {
 
-            throw new RuntimeException(
-                    "File is empty"
-            );
+            throw new RuntimeException("File is empty");
         }
 
-        String extension =
-                getExtension(file.getOriginalFilename());
+        String extension = getExtension(file.getOriginalFilename());
+        if (!extension.equals("pdf") && !extension.equals("docx") && !extension.equals("txt")) {
 
-        if (!extension.equals("pdf")
-                && !extension.equals("docx")
-                && !extension.equals("txt")) {
-
-            throw new RuntimeException(
-                    "Unsupported file type. "
-                            + "Only PDF, DOCX and TXT are allowed."
-            );
+            throw new RuntimeException("Unsupported file type. " + "Only PDF, DOCX and TXT are allowed.");
         }
     }
 
     private String getExtension(String fileName) {
 
-        if (fileName == null
-                || !fileName.contains(".")) {
+        if (fileName == null || !fileName.contains(".")) {
 
             return "";
         }
 
-        return fileName
-                .substring(
-                        fileName.lastIndexOf('.') + 1
-                )
-                .toLowerCase(Locale.ROOT);
+        return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase(Locale.ROOT);
     }
 }

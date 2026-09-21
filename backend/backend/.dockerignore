@@ -1,7 +1,34 @@
-.git
-.gitignore
-.env
-target
-.idea
+
+# Maven
+target/
+.mvn/timing.properties
+
+# IDE
+.idea/
 *.iml
-.vscode
+*.iws
+*.ipr
+.vscode/
+
+# Git
+.git/
+.gitignore
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local storage
+storage/
+
+# Documentation
+README.md
+

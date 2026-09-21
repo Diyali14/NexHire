@@ -10,20 +10,12 @@ public class JobMessageProducer {
 
     private final RabbitTemplate rabbitTemplate;
 
-    public JobMessageProducer(
-            RabbitTemplate rabbitTemplate
-    ) {
+    public JobMessageProducer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void publish(
-            JobProcessingMessage message
-    ) {
+    public void publish(JobProcessingMessage message) {
 
-        rabbitTemplate.convertAndSend(
-                RabbitMQConfig.JOB_EXCHANGE,
-                RabbitMQConfig.JOB_ROUTING_KEY,
-                message
-        );
+        rabbitTemplate.convertAndSend(RabbitMQConfig.JOB_EXCHANGE, RabbitMQConfig.JOB_ROUTING_KEY, message);
     }
 }

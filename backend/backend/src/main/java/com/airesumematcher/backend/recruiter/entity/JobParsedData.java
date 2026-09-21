@@ -41,11 +41,7 @@ public class JobParsedData {
     // =========================================================
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "job_id",
-            nullable = false,
-            unique = true
-    )
+    @JoinColumn(name = "job_id", nullable = false, unique = true)
     private Job job;
 
 
@@ -54,11 +50,7 @@ public class JobParsedData {
     // =========================================================
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(
-            name = "parsed_json",
-            nullable = false,
-            columnDefinition = "jsonb"
-    )
+    @Column(name = "parsed_json", nullable = false, columnDefinition = "jsonb")
     private String parsedJson;
 
 
@@ -66,10 +58,7 @@ public class JobParsedData {
     // PARSER VERSION
     // =========================================================
 
-    @Column(
-            name = "parser_version",
-            length = 50
-    )
+    @Column(name = "parser_version", length = 50)
     private String parserVersion;
 
 
@@ -77,22 +66,14 @@ public class JobParsedData {
     // TIMESTAMPS
     // =========================================================
 
-    @Column(
-            name = "created_at",
-            nullable = false
-    )
+    @Column(name = "created_at", nullable = false)
     @Builder.Default
-    private LocalDateTime createdAt =
-            LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
 
-    @Column(
-            name = "updated_at",
-            nullable = false
-    )
+    @Column(name = "updated_at", nullable = false)
     @Builder.Default
-    private LocalDateTime updatedAt =
-            LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
 
     @PreUpdate

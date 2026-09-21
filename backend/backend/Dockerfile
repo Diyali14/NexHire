@@ -1,31 +1,36 @@
-# ==============================
-# Build Stage
-# ==============================
-FROM eclipse-temurin:25-jdk AS build
+
+# ================================
+# Stage 1: Build
+# ================================
+FROM maven:3.9.11-eclipse-temurin-25 AS builder
 
 WORKDIR /app
 
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml ./
+# Copy Maven project files
+COPY pom.xml ./
 
-RUN chmod +x mvnw
+# Download dependencies
+RUN mvn dependency:go-offline -B
 
-RUN ./mvnw dependency:go-offline -B
-
+# Copy source code
 COPY src ./src
 
-RUN ./mvnw clean package -DskipTests
+# Build Spring Boot application
+RUN mvn clean package -DskipTests
 
 
-# ==============================
-# Runtime Stage
-# ==============================
+# ================================
+# Stage 2: Run
+# ================================
 FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar app.jar
+# Copy generated JAR
+COPY --from=builder /app/target/*.jar app.jar
 
+# Render provides PORT dynamically
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
+

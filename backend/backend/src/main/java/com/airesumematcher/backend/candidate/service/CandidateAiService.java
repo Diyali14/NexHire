@@ -51,18 +51,17 @@ public class CandidateAiService {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public JsonNode generateInterviewQuestions(Long jobId, Authentication authentication) {
+    public Object generateInterviewQuestions(Long jobId, Authentication authentication) {
         User candidate = getAuthenticatedCandidate(authentication);
 
-        Job job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new IllegalArgumentException("Job not found"));
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new IllegalArgumentException("Job not found"));
 
         if (job.getProcessingStatus() != JobProcessingStatus.COMPLETED) {
+
             throw new IllegalStateException("Job is not ready for interview question generation");
         }
 
-        JobParsedData jobParsedData = jobParsedDataRepository.findByJobId(jobId)
-                .orElseThrow(() -> new IllegalStateException("Parsed job requirements not found"));
+        JobParsedData jobParsedData = jobParsedDataRepository.findByJobId(jobId).orElseThrow(() -> new IllegalStateException("Parsed job requirements not found"));
 
         // Call AI endpoint with exact parsed JD JSON
         String rawResponse = aiInterviewQuestionService.generateInterviewQuestions(jobParsedData.getParsedJson());
@@ -70,7 +69,11 @@ public class CandidateAiService {
         JsonNode responseNode;
         try {
             responseNode = objectMapper.readTree(rawResponse);
+            while (responseNode != null && responseNode.isTextual()) {
+                responseNode = objectMapper.readTree(responseNode.asText());
+            }
         } catch (Exception e) {
+
             throw new RuntimeException("Failed to parse interview questions response", e);
         }
 
@@ -79,42 +82,44 @@ public class CandidateAiService {
         Optional<JobApplication> appOpt = jobApplicationRepository.findByJobIdAndCandidateId(jobId, candidate.getId());
         Long applicationId = appOpt.map(JobApplication::getId).orElse(null);
 
-        InterviewQuestion record = InterviewQuestion.builder()
-                .candidate(candidate)
-                .job(job)
-                .applicationId(applicationId)
-                .rawResponse(rawResponse)
-                .totalQuestions(totalQuestions)
-                .build();
+        InterviewQuestion record = InterviewQuestion.builder().candidate(candidate).job(job).applicationId(applicationId).rawResponse(rawResponse).totalQuestions(totalQuestions).build();
 
         interviewQuestionRepository.save(record);
 
-        return responseNode;
+        return toResponseBody(responseNode);
     }
 
     @Transactional(readOnly = true)
-    public JsonNode getInterviewQuestions(Long jobId, Authentication authentication) {
+    public Object getInterviewQuestions(Long jobId, Authentication authentication) {
         User candidate = getAuthenticatedCandidate(authentication);
 
-        InterviewQuestion record = interviewQuestionRepository
-                .findTopByCandidateIdAndJobIdOrderByCreatedAtDesc(candidate.getId(), jobId)
+        InterviewQuestion record = interviewQuestionRepository.findTopByCandidateIdAndJobIdOrderByCreatedAtDesc(candidate.getId(), jobId)
                 .orElseThrow(() -> new IllegalArgumentException("Interview questions not found for this job"));
 
         try {
-            return objectMapper.readTree(record.getRawResponse());
+
+            JsonNode node = objectMapper.readTree(record.getRawResponse());
+            while (node != null && node.isTextual()) {
+
+                node = objectMapper.readTree(node.asText());
+            }
+            return toResponseBody(node);
         } catch (Exception e) {
+
             throw new RuntimeException("Stored interview questions JSON is invalid", e);
         }
     }
 
     @Transactional
-    public JsonNode analyzeSkillGap(Long jobId, Long resumeId, Authentication authentication) {
+    public Object analyzeSkillGap(Long jobId, Long resumeId, Authentication authentication) {
+
         User candidate = getAuthenticatedCandidate(authentication);
 
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new IllegalArgumentException("Job not found"));
 
         if (job.getProcessingStatus() != JobProcessingStatus.COMPLETED) {
+
             throw new IllegalStateException("Job is not ready for skill gap analysis");
         }
 
@@ -124,12 +129,16 @@ public class CandidateAiService {
         // If resumeId not supplied, try to find from existing application or latest candidate resume
         Long targetResumeId = resumeId;
         if (targetResumeId == null) {
+
             Optional<JobApplication> appOpt = jobApplicationRepository.findByJobIdAndCandidateId(jobId, candidate.getId());
             if (appOpt.isPresent()) {
+
                 targetResumeId = appOpt.get().getResume().getId();
             } else {
+
                 List<Resume> resumes = resumeRepository.findAllByCandidateIdOrderByCreatedAtDesc(candidate.getId());
                 if (resumes.isEmpty()) {
+
                     throw new IllegalArgumentException("No resume found for candidate. Please upload a resume first.");
                 }
                 targetResumeId = resumes.get(0).getId();
@@ -150,6 +159,11 @@ public class CandidateAiService {
         JsonNode responseNode;
         try {
             responseNode = objectMapper.readTree(rawResponse);
+
+            while (responseNode != null && responseNode.isTextual()) {
+
+                responseNode = objectMapper.readTree(responseNode.asText());
+            }
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse skill gap analysis response", e);
         }
@@ -172,11 +186,12 @@ public class CandidateAiService {
 
         skillGapResultRepository.save(resultRecord);
 
-        return responseNode;
+        return toResponseBody(responseNode);
     }
 
     @Transactional(readOnly = true)
-    public JsonNode getSkillGap(Long jobId, Authentication authentication) {
+    public Object getSkillGap(Long jobId, Authentication authentication) {
+
         User candidate = getAuthenticatedCandidate(authentication);
 
         SkillGapResult record = skillGapResultRepository
@@ -184,9 +199,26 @@ public class CandidateAiService {
                 .orElseThrow(() -> new IllegalArgumentException("Skill gap analysis not found for this job"));
 
         try {
-            return objectMapper.readTree(record.getRawResponse());
+            JsonNode node = objectMapper.readTree(record.getRawResponse());
+            while (node != null && node.isTextual()) {
+
+                node = objectMapper.readTree(node.asText());
+            }
+            return toResponseBody(node);
         } catch (Exception e) {
             throw new RuntimeException("Stored skill gap JSON is invalid", e);
+        }
+    }
+
+    private Object toResponseBody(JsonNode node) {
+        if (node == null || node.isNull() || node.isMissingNode()) {
+            return java.util.Map.of();
+        }
+        try {
+
+            return objectMapper.treeToValue(node, Object.class);
+        } catch (Exception e) {
+            return java.util.Map.of();
         }
     }
 

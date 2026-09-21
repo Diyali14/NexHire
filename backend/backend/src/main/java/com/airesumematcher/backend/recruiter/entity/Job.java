@@ -32,48 +32,27 @@ public class Job {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "recruiter_id",
-            nullable = false
-    )
+    @JoinColumn(name = "recruiter_id", nullable = false)
     private User recruiter;
 
-    @Column(
-            name = "job_title",
-            nullable = false,
-            length = 255
-    )
+    @Column(name = "job_title", nullable = false, length = 255)
     private String jobTitle;
 
-    @Column(
-            name = "job_description",
-            nullable = false,
-            columnDefinition = "TEXT"
-    )
+    @Column(name = "job_description", nullable = false, columnDefinition = "TEXT")
     private String jobDescription;
 
 
 
     @Enumerated(EnumType.STRING)
-    @Column(
-            name = "processing_status",
-            nullable = false,
-            length = 20
-    )
+    @Column(name = "processing_status", nullable = false, length = 20)
     @Builder.Default
     private JobProcessingStatus processingStatus = JobProcessingStatus.STORED;
 
-    @Column(
-            name = "created_at",
-            nullable = false
-    )
+    @Column(name = "created_at", nullable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(
-            name = "updated_at",
-            nullable = false
-    )
+    @Column(name = "updated_at", nullable = false)
     @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 

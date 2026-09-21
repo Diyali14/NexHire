@@ -1,10 +1,18 @@
+/* =========================================================
+   NEXHIRE — CANDIDATE
+   Resume Upload Page
+   ========================================================= */
+
 document.addEventListener("DOMContentLoaded", function () {
 
-    /* ================= THEME ================= */
+    /* =========================================================
+       THEME
+       Light mode  → ☼
+       Dark mode   → ☀
+       ========================================================= */
 
     const themeToggle =
         document.getElementById("themeToggle");
-
 
     function applyTheme(theme) {
 
@@ -16,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             if (themeToggle) {
-
                 themeToggle.textContent = "☀";
 
                 themeToggle.setAttribute(
@@ -24,6 +31,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     "Switch to light mode"
                 );
 
+                themeToggle.setAttribute(
+                    "title",
+                    "Switch to light mode"
+                );
             }
 
         } else {
@@ -33,7 +44,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             if (themeToggle) {
-
                 themeToggle.textContent = "☼";
 
                 themeToggle.setAttribute(
@@ -41,26 +51,23 @@ document.addEventListener("DOMContentLoaded", function () {
                     "Switch to dark mode"
                 );
 
+                themeToggle.setAttribute(
+                    "title",
+                    "Switch to dark mode"
+                );
             }
-
         }
-
     }
 
 
     const savedTheme =
         localStorage.getItem("nexhire-theme");
 
-
-    if (savedTheme === "dark") {
-
-        applyTheme("dark");
-
-    } else {
-
-        applyTheme("light");
-
-    }
+    applyTheme(
+        savedTheme === "dark"
+            ? "dark"
+            : "light"
+    );
 
 
     if (themeToggle) {
@@ -74,35 +81,25 @@ document.addEventListener("DOMContentLoaded", function () {
                         "data-theme"
                     );
 
+                const newTheme =
+                    currentTheme === "dark"
+                        ? "light"
+                        : "dark";
 
-                if (currentTheme === "dark") {
+                applyTheme(newTheme);
 
-                    applyTheme("light");
-
-                    localStorage.setItem(
-                        "nexhire-theme",
-                        "light"
-                    );
-
-                } else {
-
-                    applyTheme("dark");
-
-                    localStorage.setItem(
-                        "nexhire-theme",
-                        "dark"
-                    );
-
-                }
-
+                localStorage.setItem(
+                    "nexhire-theme",
+                    newTheme
+                );
             }
         );
-
     }
 
 
-
-    /* ================= PROFILE DROPDOWN ================= */
+    /* =========================================================
+       PROFILE DROPDOWN
+       ========================================================= */
 
     const profileButton =
         document.getElementById("profileButton");
@@ -111,7 +108,10 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("profileDropdown");
 
 
-    if (profileButton && profileDropdown) {
+    if (
+        profileButton &&
+        profileDropdown
+    ) {
 
         profileButton.addEventListener(
             "click",
@@ -119,10 +119,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 event.stopPropagation();
 
-                profileDropdown.classList.toggle(
-                    "open"
-                );
+                const isOpen =
+                    profileDropdown.classList.toggle(
+                        "open"
+                    );
 
+                profileButton.setAttribute(
+                    "aria-expanded",
+                    isOpen ? "true" : "false"
+                );
             }
         );
 
@@ -132,24 +137,31 @@ document.addEventListener("DOMContentLoaded", function () {
             function (event) {
 
                 if (
-                    !profileDropdown.contains(event.target) &&
-                    !profileButton.contains(event.target)
+                    !profileDropdown.contains(
+                        event.target
+                    ) &&
+                    !profileButton.contains(
+                        event.target
+                    )
                 ) {
 
                     profileDropdown.classList.remove(
                         "open"
                     );
 
+                    profileButton.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
                 }
-
             }
         );
-
     }
 
 
-
-    /* ================= RESUME UPLOAD ================= */
+    /* =========================================================
+       RESUME UPLOAD ELEMENTS
+       ========================================================= */
 
     const uploadZone =
         document.getElementById("uploadZone");
@@ -175,44 +187,66 @@ document.addEventListener("DOMContentLoaded", function () {
     const analyzeButton =
         document.getElementById("analyzeButton");
 
+    const processingOverlay =
+        document.getElementById("processingOverlay");
+
+
+    /* =========================================================
+       FILE RULES
+       ========================================================= */
 
     const MAX_FILE_SIZE =
-        5 * 1024 * 1024;
-
+        5 * 1024 * 1024; // 5 MB
 
     const allowedExtensions = [
         "pdf",
-        "docx",
+        "jpeg",
+        "jpg",
         "txt"
     ];
 
 
+    /* =========================================================
+       ERROR FUNCTIONS
+       ========================================================= */
 
     function showError(message) {
 
-        uploadError.textContent = message;
+        if (!uploadError) {
+            return;
+        }
 
-        uploadError.classList.add("show");
+        uploadError.textContent =
+            message;
 
+        uploadError.classList.add(
+            "show"
+        );
     }
 
 
     function clearError() {
 
+        if (!uploadError) {
+            return;
+        }
+
         uploadError.textContent = "";
 
-        uploadError.classList.remove("show");
-
+        uploadError.classList.remove(
+            "show"
+        );
     }
 
 
+    /* =========================================================
+       FILE SIZE FORMAT
+       ========================================================= */
 
     function formatFileSize(bytes) {
 
         if (bytes < 1024) {
-
             return bytes + " B";
-
         }
 
         if (bytes < 1024 * 1024) {
@@ -221,17 +255,46 @@ document.addEventListener("DOMContentLoaded", function () {
                 (bytes / 1024).toFixed(1) +
                 " KB"
             );
-
         }
 
         return (
             (bytes / (1024 * 1024)).toFixed(2) +
             " MB"
         );
-
     }
 
 
+    /* =========================================================
+       RESET SELECTED FILE
+       ========================================================= */
+
+    function resetSelectedFile() {
+
+        if (resumeInput) {
+            resumeInput.value = "";
+        }
+
+        if (selectedFile) {
+            selectedFile.classList.remove("show");
+        }
+
+        if (fileName) {
+            fileName.textContent = "";
+        }
+
+        if (fileSize) {
+            fileSize.textContent = "";
+        }
+
+        if (analyzeButton) {
+            analyzeButton.disabled = true;
+        }
+    }
+
+
+    /* =========================================================
+       HANDLE SELECTED FILE
+       ========================================================= */
 
     function handleFile(file) {
 
@@ -242,6 +305,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
+        /* Get extension */
+
         const extension =
             file.name
                 .split(".")
@@ -249,18 +314,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 .toLowerCase();
 
 
-        if (!allowedExtensions.includes(extension)) {
+        /* Check extension */
+
+        if (
+            !allowedExtensions.includes(
+                extension
+            )
+        ) {
 
             showError(
-                "Invalid file format. Please upload PDF, DOCX or TXT."
+                "Invalid file format. Please upload PDF, JPEG or TXT."
             );
 
-            resumeInput.value = "";
+            resetSelectedFile();
 
             return;
-
         }
 
+
+        /* Check file size */
 
         if (file.size > MAX_FILE_SIZE) {
 
@@ -268,57 +340,74 @@ document.addEventListener("DOMContentLoaded", function () {
                 "File size must be less than 5 MB."
             );
 
-            resumeInput.value = "";
+            resetSelectedFile();
 
             return;
-
         }
 
 
-        fileName.textContent =
-            file.name;
+        /* Show file information */
 
+        if (fileName) {
+            fileName.textContent =
+                file.name;
+        }
 
-        fileSize.textContent =
-            formatFileSize(file.size);
+        if (fileSize) {
+            fileSize.textContent =
+                formatFileSize(file.size);
+        }
 
+        if (selectedFile) {
+            selectedFile.classList.add("show");
+        }
 
-        selectedFile.classList.add("show");
-
-
-        analyzeButton.disabled = false;
-
+        if (analyzeButton) {
+            analyzeButton.disabled = false;
+        }
     }
 
 
+    /* =========================================================
+       CLICK TO UPLOAD
+       ========================================================= */
 
-    if (uploadZone && resumeInput) {
+    if (
+        uploadZone &&
+        resumeInput
+    ) {
 
         uploadZone.addEventListener(
             "click",
             function () {
 
                 resumeInput.click();
-
             }
         );
 
+
+        /* File selected */
 
         resumeInput.addEventListener(
             "change",
             function () {
 
-                if (resumeInput.files.length > 0) {
+                if (
+                    resumeInput.files &&
+                    resumeInput.files.length > 0
+                ) {
 
                     handleFile(
                         resumeInput.files[0]
                     );
-
                 }
-
             }
         );
 
+
+        /* =====================================================
+           DRAG OVER
+           ===================================================== */
 
         uploadZone.addEventListener(
             "dragover",
@@ -329,10 +418,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 uploadZone.classList.add(
                     "dragover"
                 );
-
             }
         );
 
+
+        /* =====================================================
+           DRAG LEAVE
+           ===================================================== */
 
         uploadZone.addEventListener(
             "dragleave",
@@ -341,10 +433,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 uploadZone.classList.remove(
                     "dragover"
                 );
-
             }
         );
 
+
+        /* =====================================================
+           DROP
+           ===================================================== */
 
         uploadZone.addEventListener(
             "drop",
@@ -361,59 +456,89 @@ document.addEventListener("DOMContentLoaded", function () {
                     event.dataTransfer.files;
 
 
-                if (files.length > 0) {
-
-                    handleFile(files[0]);
-
+                if (
+                    !files ||
+                    files.length === 0
+                ) {
+                    return;
                 }
 
+
+                const file =
+                    files[0];
+
+
+                /*
+                   Put dropped file into
+                   the input when supported.
+                */
+
+                try {
+
+                    const dataTransfer =
+                        new DataTransfer();
+
+                    dataTransfer.items.add(
+                        file
+                    );
+
+                    resumeInput.files =
+                        dataTransfer.files;
+
+                } catch (error) {
+
+                    console.warn(
+                        "Could not assign dropped file to input.",
+                        error
+                    );
+                }
+
+
+                handleFile(file);
             }
         );
-
     }
 
 
-
-    /* ================= REMOVE FILE ================= */
+    /* =========================================================
+       REMOVE FILE
+       ========================================================= */
 
     if (removeFile) {
 
         removeFile.addEventListener(
             "click",
-            function () {
+            function (event) {
 
-                resumeInput.value = "";
+                event.stopPropagation();
 
-                selectedFile.classList.remove(
-                    "show"
-                );
-
-                analyzeButton.disabled = true;
+                resetSelectedFile();
 
                 clearError();
-
             }
         );
-
     }
 
 
-
-    /* ================= UPLOAD / PROCESS ================= */
-
-    const processingOverlay =
-        document.getElementById(
-            "processingOverlay"
-        );
-
+    /* =========================================================
+       UPLOAD RESUME TO BACKEND
+       ========================================================= */
 
     if (analyzeButton) {
 
         analyzeButton.addEventListener(
             "click",
-            function () {
+            async function () {
+
+                clearError();
+
+
+                /* =================================================
+                   CHECK FILE
+                   ================================================= */
 
                 if (
+                    !resumeInput ||
                     !resumeInput.files ||
                     resumeInput.files.length === 0
                 ) {
@@ -423,73 +548,211 @@ document.addEventListener("DOMContentLoaded", function () {
                     );
 
                     return;
-
                 }
 
 
-                processingOverlay.classList.add(
-                    "show"
+                const file =
+                    resumeInput.files[0];
+
+
+                /* =================================================
+                   CHECK LOGIN
+                   ================================================= */
+
+                const token =
+                    sessionStorage.getItem(
+                        "token"
+                    );
+
+
+                console.log(
+                    "Token available:",
+                    !!token
                 );
 
 
-                /*
-                 * Frontend demonstration only.
-                 *
-                 * Later this section will send
-                 * the resume to the backend API.
-                 */
+                if (!token) {
 
-                setTimeout(
-                    function () {
+                    showError(
+                        "Please login first."
+                    );
+
+                    return;
+                }
+
+
+                /* =================================================
+                   CREATE FORM DATA
+                   ================================================= */
+
+                const formData =
+                    new FormData();
+
+                formData.append(
+                    "file",
+                    file
+                );
+
+
+                /* =================================================
+                   SHOW PROCESSING
+                   ================================================= */
+
+                if (processingOverlay) {
+
+                    processingOverlay.classList.add(
+                        "show"
+                    );
+                }
+
+                analyzeButton.disabled = true;
+
+
+                try {
+
+                    /* =================================================
+                       API CALL
+
+                       POST /api/v1/resumes
+                    ================================================= */
+
+                    const result =
+                        await apiPostFormData(
+                            "/resumes",
+                            formData
+                        );
+
+
+                    console.log(
+                        "Resume API response:",
+                        result
+                    );
+
+
+                    /* =================================================
+                       HIDE PROCESSING
+                    ================================================= */
+
+                    if (processingOverlay) {
 
                         processingOverlay.classList.remove(
                             "show"
                         );
+                    }
 
-                        alert(
-                            "Resume uploaded successfully!"
+
+                    /* =================================================
+                       SAVE RESUME ID
+                    ================================================= */
+
+                    if (
+                        result &&
+                        result.resumeId
+                    ) {
+
+                        localStorage.setItem(
+                            "resumeId",
+                            result.resumeId
+                        );
+                    }
+
+
+                    /* =================================================
+                       SUCCESS
+                    ================================================= */
+
+                    alert(
+                        result &&
+                        result.message
+                            ? result.message
+                            : "Resume uploaded successfully!"
+                    );
+
+
+                    /*
+                       Keep button disabled because
+                       the current file has already
+                       been uploaded.
+                    */
+
+                    analyzeButton.disabled = true;
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Resume upload error:",
+                        error
+                    );
+
+
+                    /* Hide processing */
+
+                    if (processingOverlay) {
+
+                        processingOverlay.classList.remove(
+                            "show"
+                        );
+                    }
+
+
+                    /* =================================================
+                       AUTHENTICATION ERROR
+                    ================================================= */
+
+                    if (error.status === 401) {
+
+                        showError(
+                            "Your login session has expired. Please login again."
                         );
 
-                    },
-                    1500
-                );
+                    } else if (error.status === 403) {
 
+                        showError(
+                            "Access denied. Please login again."
+                        );
+
+                    } else {
+
+                        showError(
+                            error.message ||
+                            "Unable to upload resume. Please try again."
+                        );
+                    }
+
+
+                    analyzeButton.disabled = false;
+                }
             }
         );
-
     }
 
 
-
-    /* ================= GUIDELINES MODAL ================= */
+    /* =========================================================
+       GUIDELINES MODAL
+       ========================================================= */
 
     const formatButton =
-        document.getElementById(
-            "formatButton"
-        );
+        document.getElementById("formatButton");
 
     const formatModal =
-        document.getElementById(
-            "formatModal"
-        );
+        document.getElementById("formatModal");
 
     const modalClose =
-        document.getElementById(
-            "modalClose"
-        );
+        document.getElementById("modalClose");
 
     const modalDone =
-        document.getElementById(
-            "modalDone"
-        );
+        document.getElementById("modalDone");
 
 
     function closeModal() {
 
-        formatModal.classList.remove(
-            "show"
-        );
+        if (formatModal) {
 
+            formatModal.classList.remove(
+                "show"
+            );
+        }
     }
 
 
@@ -499,13 +762,14 @@ document.addEventListener("DOMContentLoaded", function () {
             "click",
             function () {
 
-                formatModal.classList.add(
-                    "show"
-                );
+                if (formatModal) {
 
+                    formatModal.classList.add(
+                        "show"
+                    );
+                }
             }
         );
-
     }
 
 
@@ -515,7 +779,6 @@ document.addEventListener("DOMContentLoaded", function () {
             "click",
             closeModal
         );
-
     }
 
 
@@ -525,9 +788,10 @@ document.addEventListener("DOMContentLoaded", function () {
             "click",
             closeModal
         );
-
     }
 
+
+    /* Close modal when clicking outside */
 
     if (formatModal) {
 
@@ -536,16 +800,155 @@ document.addEventListener("DOMContentLoaded", function () {
             function (event) {
 
                 if (
-                    event.target === formatModal
+                    event.target ===
+                    formatModal
                 ) {
 
                     closeModal();
-
                 }
-
             }
         );
-
     }
 
+
+    /* =========================================================
+       ESCAPE KEY
+       ========================================================= */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Escape") {
+
+                closeModal();
+
+                if (profileDropdown) {
+
+                    profileDropdown.classList.remove(
+                        "open"
+                    );
+                }
+
+                if (profileButton) {
+
+                    profileButton.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
+                }
+            }
+        }
+    );
+
 });
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+const logoutButton =
+    document.getElementById("logoutButton");
+
+
+if (logoutButton) {
+
+    logoutButton.addEventListener(
+        "click",
+        function () {
+
+            const confirmLogout =
+                confirm(
+                    "Are you sure you want to logout?"
+                );
+
+
+            if (!confirmLogout) {
+                return;
+            }
+
+
+            /* Remove authentication */
+
+            sessionStorage.removeItem(
+                "token"
+            );
+
+
+            /* Remove candidate data */
+
+            localStorage.removeItem(
+                "resumeId"
+            );
+
+            localStorage.removeItem(
+                "candidateId"
+            );
+
+            localStorage.removeItem(
+                "candidateName"
+            );
+
+
+            /* Clear remaining session data */
+
+            sessionStorage.clear();
+
+
+            /* Redirect to login */
+
+            window.location.href =
+                "candidate-login.html";
+        }
+    );
+}
+
+
+/* =========================================================
+   PARSED RESUME DATA
+   TEST FROM BROWSER CONSOLE
+   ========================================================= */
+
+async function getParsedResumeData(resumeId) {
+
+    try {
+
+        console.log(
+            "Fetching parsed resume data for resume:",
+            resumeId
+        );
+
+
+        const data =
+            await apiGet(
+                `/resumes/${resumeId}/parsed-data`
+            );
+
+
+        console.log(
+            "Parsed Resume Data:",
+            data
+        );
+
+
+        return data;
+
+    } catch (error) {
+
+        console.error(
+            "Parsed Resume API Error:",
+            error
+        );
+
+        throw error;
+    }
+}
+
+
+/* =========================================================
+   MAKE TEST FUNCTION AVAILABLE
+   ========================================================= */
+
+window.getParsedResumeData =
+    getParsedResumeData;
