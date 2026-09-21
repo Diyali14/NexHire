@@ -27,35 +27,22 @@ public class DocumentConversionService {
      */
     public byte[] convertDocxToPdf(MultipartFile file) {
 
-        try (
-                InputStream inputStream = file.getInputStream();
-                ByteArrayOutputStream outputStream =
-                        new ByteArrayOutputStream()
-        ) {
+        try (InputStream inputStream = file.getInputStream();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
-            WordprocessingMLPackage wordMLPackage =
-                    WordprocessingMLPackage.load(inputStream);
+            WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(inputStream);
 
-            FOSettings foSettings =
-                    Docx4J.createFOSettings();
+            FOSettings foSettings = Docx4J.createFOSettings();
 
             foSettings.setWmlPackage(wordMLPackage);
 
-            Docx4J.toFO(
-                    foSettings,
-                    outputStream,
-                    Docx4J.FLAG_EXPORT_PREFER_XSL
-            );
+            Docx4J.toFO(foSettings, outputStream, Docx4J.FLAG_EXPORT_PREFER_XSL);
 
             return outputStream.toByteArray();
 
         } catch (Exception e) {
 
-            throw new RuntimeException(
-                    "DOCX to PDF conversion failed: "
-                            + e.getMessage(),
-                    e
-            );
+            throw new RuntimeException("DOCX to PDF conversion failed: " + e.getMessage(), e);
         }
     }
 
@@ -65,55 +52,30 @@ public class DocumentConversionService {
     public byte[] convertTxtToPdf(MultipartFile file) {
 
         try {
+            String text = new String(file.getBytes(), StandardCharsets.UTF_8);
 
-            String text = new String(
-                    file.getBytes(),
-                    StandardCharsets.UTF_8
-            );
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                 PDDocument document = new PDDocument()) {
 
-            try (
-                    ByteArrayOutputStream outputStream =
-                            new ByteArrayOutputStream();
-
-                    PDDocument document =
-                            new PDDocument()
-            ) {
-
-                PDType1Font font =
-                        new PDType1Font(
-                                Standard14Fonts.FontName.HELVETICA
-                        );
+                PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
 
                 float fontSize = 10;
                 float leading = 14;
                 float margin = 50;
                 float bottomMargin = 50;
 
-                PDPage page =
-                        new PDPage(PDRectangle.A4);
+                PDPage page = new PDPage(PDRectangle.A4);
 
                 document.addPage(page);
 
-                PDPageContentStream contentStream =
-                        new PDPageContentStream(
-                                document,
-                                page
-                        );
+                PDPageContentStream contentStream = new PDPageContentStream(document, page);
 
                 contentStream.beginText();
-                contentStream.setFont(
-                        font,
-                        fontSize
-                );
+                contentStream.setFont(font, fontSize);
 
-                float y =
-                        PDRectangle.A4.getHeight()
-                                - margin;
+                float y = PDRectangle.A4.getHeight() - margin;
 
-                contentStream.newLineAtOffset(
-                        margin,
-                        y
-                );
+                contentStream.newLineAtOffset(margin, y);
 
                 for (String line : text.split("\\R", -1)) {
 
@@ -121,10 +83,7 @@ public class DocumentConversionService {
 
                     if (remaining.isEmpty()) {
 
-                        contentStream.newLineAtOffset(
-                                0,
-                                -leading
-                        );
+                        contentStream.newLineAtOffset(0, -leading);
 
                         y -= leading;
 
@@ -132,27 +91,14 @@ public class DocumentConversionService {
 
                         while (!remaining.isEmpty()) {
 
-                            String lineToWrite =
-                                    fitLine(
-                                            remaining,
-                                            font,
-                                            fontSize,
-                                            PDRectangle.A4.getWidth()
-                                                    - (2 * margin)
-                                    );
+                            String lineToWrite = fitLine(remaining, font, fontSize, PDRectangle.A4.getWidth() - (2 * margin));
 
-                            contentStream.showText(
-                                    sanitizeText(lineToWrite)
-                            );
+                            contentStream.showText(sanitizeText(lineToWrite));
 
-                            remaining =
-                                    remaining.substring(
-                                            lineToWrite.length()
-                                    );
+                            remaining = remaining.substring(lineToWrite.length());
 
                             if (!remaining.isEmpty()) {
-                                remaining =
-                                        remaining.stripLeading();
+                                remaining = remaining.stripLeading();
                             }
 
                             y -= leading;
@@ -162,34 +108,19 @@ public class DocumentConversionService {
                                 contentStream.endText();
                                 contentStream.close();
 
-                                page =
-                                        new PDPage(
-                                                PDRectangle.A4
-                                        );
+                                page = new PDPage(PDRectangle.A4);
 
                                 document.addPage(page);
 
-                                contentStream =
-                                        new PDPageContentStream(
-                                                document,
-                                                page
-                                        );
+                                contentStream = new PDPageContentStream(document, page);
 
                                 contentStream.beginText();
 
-                                contentStream.setFont(
-                                        font,
-                                        fontSize
-                                );
+                                contentStream.setFont(font, fontSize);
 
-                                y =
-                                        PDRectangle.A4.getHeight()
-                                                - margin;
+                                y = PDRectangle.A4.getHeight() - margin;
 
-                                contentStream.newLineAtOffset(
-                                        margin,
-                                        y
-                                );
+                                contentStream.newLineAtOffset(margin, y);
                             }
                         }
                     }
@@ -205,20 +136,11 @@ public class DocumentConversionService {
 
         } catch (Exception e) {
 
-            throw new RuntimeException(
-                    "TXT to PDF conversion failed: "
-                            + e.getMessage(),
-                    e
-            );
+            throw new RuntimeException("TXT to PDF conversion failed: " + e.getMessage(), e);
         }
     }
 
-    private String fitLine(
-            String text,
-            PDType1Font font,
-            float fontSize,
-            float maxWidth
-    ) throws IOException {
+    private String fitLine(String text, PDType1Font font, float fontSize, float maxWidth) throws IOException {
 
         if (text.isEmpty()) {
             return "";
@@ -228,13 +150,9 @@ public class DocumentConversionService {
 
         while (end > 1) {
 
-            String candidate =
-                    text.substring(0, end);
+            String candidate = text.substring(0, end);
 
-            float width =
-                    font.getStringWidth(candidate)
-                            / 1000
-                            * fontSize;
+            float width = font.getStringWidth(candidate) / 1000 * fontSize;
 
             if (width <= maxWidth) {
                 return candidate;
@@ -252,55 +170,33 @@ public class DocumentConversionService {
     public byte[] convertTextToPdf(String text) {
 
         if (text == null || text.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Text cannot be empty"
-            );
+            throw new IllegalArgumentException("Text cannot be empty");
         }
 
-        try (
-                ByteArrayOutputStream outputStream =
-                        new ByteArrayOutputStream();
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-                PDDocument document =
-                        new PDDocument()
-        ) {
+                PDDocument document = new PDDocument()) {
 
-            PDType1Font font =
-                    new PDType1Font(
-                            Standard14Fonts.FontName.HELVETICA
-                    );
+            PDType1Font font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
 
             float fontSize = 10;
             float leading = 14;
             float margin = 50;
             float bottomMargin = 50;
 
-            PDPage page =
-                    new PDPage(PDRectangle.A4);
+            PDPage page = new PDPage(PDRectangle.A4);
 
             document.addPage(page);
 
-            PDPageContentStream contentStream =
-                    new PDPageContentStream(
-                            document,
-                            page
-                    );
+            PDPageContentStream contentStream = new PDPageContentStream(document, page);
 
             contentStream.beginText();
 
-            contentStream.setFont(
-                    font,
-                    fontSize
-            );
+            contentStream.setFont(font, fontSize);
 
-            float y =
-                    PDRectangle.A4.getHeight()
-                            - margin;
+            float y = PDRectangle.A4.getHeight() - margin;
 
-            contentStream.newLineAtOffset(
-                    margin,
-                    y
-            );
+            contentStream.newLineAtOffset(margin, y);
 
             for (String line : text.split("\\R", -1)) {
 
@@ -308,10 +204,7 @@ public class DocumentConversionService {
 
                 if (remaining.isEmpty()) {
 
-                    contentStream.newLineAtOffset(
-                            0,
-                            -leading
-                    );
+                    contentStream.newLineAtOffset(0, -leading);
 
                     y -= leading;
 
@@ -319,27 +212,14 @@ public class DocumentConversionService {
 
                     while (!remaining.isEmpty()) {
 
-                        String lineToWrite =
-                                fitLine(
-                                        remaining,
-                                        font,
-                                        fontSize,
-                                        PDRectangle.A4.getWidth()
-                                                - (2 * margin)
-                                );
+                        String lineToWrite = fitLine(remaining, font, fontSize, PDRectangle.A4.getWidth() - (2 * margin));
 
-                        contentStream.showText(
-                                sanitizeText(lineToWrite)
-                        );
+                        contentStream.showText(sanitizeText(lineToWrite));
 
-                        remaining =
-                                remaining.substring(
-                                        lineToWrite.length()
-                                );
+                        remaining = remaining.substring(lineToWrite.length());
 
                         if (!remaining.isEmpty()) {
-                            remaining =
-                                    remaining.stripLeading();
+                            remaining = remaining.stripLeading();
                         }
 
                         y -= leading;
@@ -349,34 +229,19 @@ public class DocumentConversionService {
                             contentStream.endText();
                             contentStream.close();
 
-                            page =
-                                    new PDPage(
-                                            PDRectangle.A4
-                                    );
+                            page = new PDPage(PDRectangle.A4);
 
                             document.addPage(page);
 
-                            contentStream =
-                                    new PDPageContentStream(
-                                            document,
-                                            page
-                                    );
+                            contentStream = new PDPageContentStream(document, page);
 
                             contentStream.beginText();
 
-                            contentStream.setFont(
-                                    font,
-                                    fontSize
-                            );
+                            contentStream.setFont(font, fontSize);
 
-                            y =
-                                    PDRectangle.A4.getHeight()
-                                            - margin;
+                            y = PDRectangle.A4.getHeight() - margin;
 
-                            contentStream.newLineAtOffset(
-                                    margin,
-                                    y
-                            );
+                            contentStream.newLineAtOffset(margin, y);
                         }
                     }
                 }
@@ -391,18 +256,12 @@ public class DocumentConversionService {
 
         } catch (Exception e) {
 
-            throw new RuntimeException(
-                    "Text to PDF conversion failed: "
-                            + e.getMessage(),
-                    e
-            );
+            throw new RuntimeException("Text to PDF conversion failed: " + e.getMessage(), e);
         }
     }
 
     private String sanitizeText(String text) {
 
-        return text
-                .replace("\t", "    ")
-                .replace("\u0000", "");
+        return text.replace("\t", "    ").replace("\u0000", "");
     }
 }

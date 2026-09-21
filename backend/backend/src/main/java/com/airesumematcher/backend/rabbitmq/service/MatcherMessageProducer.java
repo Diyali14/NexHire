@@ -10,20 +10,12 @@ public class MatcherMessageProducer {
 
     private final RabbitTemplate rabbitTemplate;
 
-    public MatcherMessageProducer(
-            RabbitTemplate rabbitTemplate
-    ) {
+    public MatcherMessageProducer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void publish(
-            MatcherProcessingMessage message
-    ) {
+    public void publish(MatcherProcessingMessage message) {
 
-        rabbitTemplate.convertAndSend(
-                RabbitMQConfig.MATCHER_EXCHANGE,
-                RabbitMQConfig.MATCHER_ROUTING_KEY,
-                message
-        );
+        rabbitTemplate.convertAndSend(RabbitMQConfig.MATCHER_EXCHANGE, RabbitMQConfig.MATCHER_ROUTING_KEY, message);
     }
 }

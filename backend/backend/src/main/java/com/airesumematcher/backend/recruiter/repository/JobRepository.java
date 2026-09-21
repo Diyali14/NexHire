@@ -10,16 +10,9 @@ import java.util.Optional;
 public interface JobRepository
         extends JpaRepository<Job, Long> {
 
-    List<Job> findAllByRecruiterIdOrderByCreatedAtDesc(
-            Long recruiterId
-    );
+    List<Job> findAllByRecruiterIdOrderByCreatedAtDesc(Long recruiterId);
 
-    Optional<Job> findByIdAndRecruiterId(
-            Long id,
-            Long recruiterId
-    );
+    Optional<Job> findByIdAndRecruiterId(Long id, Long recruiterId);
 
-    List<Job> findAllByProcessingStatusOrderByCreatedAtDesc(
-            JobProcessingStatus processingStatus
-    );
+    List<Job> findAllByProcessingStatusOrderByCreatedAtDesc(JobProcessingStatus processingStatus);
 }

@@ -39,16 +39,10 @@ public class ResumeParsedDataService {
     private final ResumeLinkRepository resumeLinkRepository;
     private final ObjectMapper objectMapper;
 
-    public ResumeParsedDataService(
-            ResumeRepository resumeRepository,
-            ResumeParsedDataRepository resumeParsedDataRepository,
-            ResumeSkillRepository resumeSkillRepository,
-            ResumeEducationRepository resumeEducationRepository,
-            ResumeExperienceRepository resumeExperienceRepository,
-            ResumeProjectRepository resumeProjectRepository,
-            ResumeLinkRepository resumeLinkRepository,
-            ObjectMapper objectMapper
-    ) {
+    public ResumeParsedDataService(ResumeRepository resumeRepository, ResumeParsedDataRepository resumeParsedDataRepository,
+            ResumeSkillRepository resumeSkillRepository, ResumeEducationRepository resumeEducationRepository,
+            ResumeExperienceRepository resumeExperienceRepository, ResumeProjectRepository resumeProjectRepository,
+            ResumeLinkRepository resumeLinkRepository, ObjectMapper objectMapper) {
         this.resumeRepository = resumeRepository;
         this.resumeParsedDataRepository = resumeParsedDataRepository;
         this.resumeSkillRepository = resumeSkillRepository;
@@ -64,122 +58,59 @@ public class ResumeParsedDataService {
     // =========================================================
 
     @Transactional
-    public ResumeParsedData saveParsedData(
-            Long resumeId,
-            String parsedJson,
-            String parserVersion
-    ) {
+    public ResumeParsedData saveParsedData(Long resumeId, String parsedJson, String parserVersion) {
 
         if (resumeId == null) {
-            throw new IllegalArgumentException(
-                    "Resume ID is required"
-            );
+            throw new IllegalArgumentException("Resume ID is required");
         }
 
         if (parsedJson == null || parsedJson.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Parsed resume data cannot be empty"
-            );
+            throw new IllegalArgumentException("Parsed resume data cannot be empty");
         }
 
-        JsonNode root =
-                validateAndParseJson(parsedJson);
+        JsonNode root = validateAndParseJson(parsedJson);
 
-        JsonNode resumeNode =
-                root.path("resume");
+        JsonNode resumeNode = root.path("resume");
 
-        if (resumeNode.isMissingNode()
-                || !resumeNode.isObject()) {
+        if (resumeNode.isMissingNode() || !resumeNode.isObject()) {
 
-            throw new IllegalArgumentException(
-                    "Parser response does not contain a valid resume object"
-            );
+            throw new IllegalArgumentException("Parser response does not contain a valid resume object");
         }
 
-        Resume resume =
-                resumeRepository
-                        .findById(resumeId)
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Resume not found"
-                                )
-                        );
+        Resume resume = resumeRepository.findById(resumeId)
+                        .orElseThrow(() -> new RuntimeException("Resume not found"));
 
-        ResumeParsedData parsedData =
-                resumeParsedDataRepository
-                        .findByResumeId(resumeId)
-                        .orElseGet(() ->
-                                ResumeParsedData.builder()
-                                        .resume(resume)
-                                        .build()
-                        );
+        ResumeParsedData parsedData = resumeParsedDataRepository.findByResumeId(resumeId)
+                .orElseGet(() -> ResumeParsedData.builder().resume(resume).build());
 
         try {
-            parsedData.setParsedJson(
-                    objectMapper.writeValueAsString(root)
-            );
+            parsedData.setParsedJson(objectMapper.writeValueAsString(root));
         } catch (Exception e) {
             parsedData.setParsedJson(root.toString());
         }
 
-        parsedData.setParserVersion(
-                parserVersion != null ? parserVersion : (root.hasNonNull("parserVersion") ? root.get("parserVersion").asText() : null)
-        );
+        parsedData.setParserVersion(parserVersion != null ? parserVersion : (root.hasNonNull("parserVersion") ? root.get("parserVersion").asText() : null));
 
-        parsedData.setCandidateName(
-                getText(
-                        resumeNode,
-                        "name"
-                )
-        );
+        parsedData.setCandidateName(getText(resumeNode, "name"));
 
-        parsedData.setEmail(
-                getText(
-                        resumeNode,
-                        "email"
-                )
-        );
+        parsedData.setEmail(getText(resumeNode, "email"));
 
-        parsedData.setPhone(
-                getText(
-                        resumeNode,
-                        "phone"
-                )
-        );
+        parsedData.setPhone(getText(resumeNode, "phone"));
 
         parsedData.setYearsOfExperience(
-                getInteger(
-                        resumeNode,
-                        "years_of_experience"
-                )
-        );
+                getInteger(resumeNode, "years_of_experience"));
 
-        parsedData.setLanguage(
-                getText(
-                        root,
-                        "language"
-                )
-        );
+        parsedData.setLanguage(getText(root, "language"));
 
-        parsedData.setCertifications(
-                extractCertifications(
-                        resumeNode.path("certifications")
-                )
-        );
+        parsedData.setCertifications(extractCertifications(resumeNode.path("certifications")));
 
-        parsedData =
-                resumeParsedDataRepository.save(
-                        parsedData
-                );
+        parsedData = resumeParsedDataRepository.save(parsedData);
 
         return parsedData;
     }
 
     @Transactional
-    public ResumeParsedData saveParsedData(
-            Long resumeId,
-            ParsedResumeDto parsedDto
-    ) {
+    public ResumeParsedData saveParsedData(Long resumeId, ParsedResumeDto parsedDto) {
         try {
             String json = objectMapper.writeValueAsString(parsedDto);
             return saveParsedData(resumeId, json, parsedDto.getParserVersion());
@@ -192,33 +123,13 @@ public class ResumeParsedDataService {
     // =========================================================
 
     @Transactional(readOnly = true)
-    public ResumeParsedDataResponse getParsedData(
-            Long resumeId,
-            Long candidateId
-    ) {
+    public ResumeParsedDataResponse getParsedData(Long resumeId, Long candidateId) {
 
-        Resume resume =
-                resumeRepository
-                        .findByIdAndCandidateId(
-                                resumeId,
-                                candidateId
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Resume not found"
-                                )
-                        );
+        Resume resume = resumeRepository.findByIdAndCandidateId(resumeId, candidateId)
+                        .orElseThrow(() -> new RuntimeException("Resume not found"));
 
-        ResumeParsedData parsedData =
-                resumeParsedDataRepository
-                        .findByResumeId(
-                                resume.getId()
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Parsed resume data is not available yet"
-                                )
-                        );
+        ResumeParsedData parsedData = resumeParsedDataRepository.findByResumeId(resume.getId())
+                .orElseThrow(() -> new RuntimeException("Parsed resume data is not available yet"));
 
         /*
          * parsed_json is already JsonNode.
@@ -227,80 +138,41 @@ public class ResumeParsedDataService {
         JsonNode root;
 
         try {
-            root = objectMapper.readTree(
-                    parsedData.getParsedJson()
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(
-                    "Stored parsed resume JSON is invalid",
+            root = objectMapper.readTree(parsedData.getParsedJson());
+        } catch (Exception e) {throw new RuntimeException("Stored parsed resume JSON is invalid",
                     e
             );
         }
 
-        JsonNode resumeNode =
-                root.path("resume");
+        JsonNode resumeNode = root.path("resume");
 
         // =====================================================
         // PROFILE
         // =====================================================
 
-        ResumeParsedDataResponse.Profile profile =
-                ResumeParsedDataResponse.Profile.builder()
-                        .name(
-                                parsedData.getCandidateName()
-                        )
-                        .email(
-                                parsedData.getEmail()
-                        )
-                        .phone(
-                                parsedData.getPhone()
-                        )
-                        .yearsOfExperience(
-                                parsedData.getYearsOfExperience()
-                        )
-                        .language(
-                                parsedData.getLanguage()
-                        )
-                        .build();
+        ResumeParsedDataResponse.Profile profile = ResumeParsedDataResponse.Profile.builder()
+                .name(parsedData.getCandidateName())
+                .email(parsedData.getEmail())
+                .phone(parsedData.getPhone())
+                .yearsOfExperience(parsedData.getYearsOfExperience())
+                .language(parsedData.getLanguage())
+                .build();
 
         // =====================================================
         // SKILLS
         // =====================================================
 
-        List<ResumeParsedDataResponse.Skill> skills =
-                new ArrayList<>();
+        List<ResumeParsedDataResponse.Skill> skills = new ArrayList<>();
 
-        JsonNode skillsNode =
-                resumeNode.path("skills");
+        JsonNode skillsNode = resumeNode.path("skills");
 
         if (skillsNode.isArray()) {
 
-            for (JsonNode skillNode :
-                    skillsNode) {
-
-                skills.add(
-                        ResumeParsedDataResponse.Skill
-                                .builder()
-                                .name(
-                                        getText(
-                                                skillNode,
-                                                "name"
-                                        )
-                                )
-                                .normalizedName(
-                                        getText(
-                                                skillNode,
-                                                "normalizedName"
-                                        )
-                                )
-                                .confidence(
-                                        getDouble(
-                                                skillNode,
-                                                "confidence"
-                                        )
-                                )
-                                .build()
-                );
+            for (JsonNode skillNode : skillsNode) {skills.add(
+                    ResumeParsedDataResponse.Skill.builder().name(getText(skillNode, "name"))
+                                .normalizedName(getText(skillNode, "normalizedName"))
+                                .confidence(getDouble(skillNode, "confidence"))
+                                .build());
             }
         }
 
@@ -308,44 +180,20 @@ public class ResumeParsedDataService {
         // EDUCATION
         // =====================================================
 
-        List<ResumeParsedDataResponse.Education> education =
-                new ArrayList<>();
+        List<ResumeParsedDataResponse.Education> education = new ArrayList<>();
 
-        JsonNode educationNode =
-                resumeNode.path("education");
+        JsonNode educationNode = resumeNode.path("education");
 
         if (educationNode.isArray()) {
 
-            for (JsonNode educationItem :
-                    educationNode) {
+            for (JsonNode educationItem : educationNode) {
 
-                education.add(
-                        ResumeParsedDataResponse.Education
+                education.add(ResumeParsedDataResponse.Education
                                 .builder()
-                                .degree(
-                                        getText(
-                                                educationItem,
-                                                "degree"
-                                        )
-                                )
-                                .institution(
-                                        getText(
-                                                educationItem,
-                                                "institution"
-                                        )
-                                )
-                                .endYear(
-                                        getText(
-                                                educationItem,
-                                                "end_year"
-                                        )
-                                )
-                                .grade(
-                                        getText(
-                                                educationItem,
-                                                "grade"
-                                        )
-                                )
+                                .degree(getText(educationItem, "degree"))
+                                .institution(getText(educationItem, "institution"))
+                                .endYear(getText(educationItem, "end_year"))
+                                .grade(getText(educationItem, "grade"))
                                 .build()
                 );
             }
@@ -355,66 +203,25 @@ public class ResumeParsedDataService {
         // EXPERIENCE
         // =====================================================
 
-        List<ResumeParsedDataResponse.Experience> experience =
-                new ArrayList<>();
+        List<ResumeParsedDataResponse.Experience> experience = new ArrayList<>();
 
-        JsonNode experienceNode =
-                resumeNode.path("experience");
+        JsonNode experienceNode = resumeNode.path("experience");
 
         if (experienceNode.isArray()) {
 
-            for (JsonNode experienceItem :
-                    experienceNode) {
+            for (JsonNode experienceItem : experienceNode) {
 
-                experience.add(
-                        ResumeParsedDataResponse.Experience
+                experience.add(ResumeParsedDataResponse.Experience
                                 .builder()
-                                .company(
-                                        getText(
-                                                experienceItem,
-                                                "company"
-                                        )
-                                )
-                                .jobTitle(
-                                        getText(
-                                                experienceItem,
-                                                "job_title"
-                                        )
-                                )
-                                .location(
-                                        getText(
-                                                experienceItem,
-                                                "location"
-                                        )
-                                )
-                                .startDate(
-                                        getText(
-                                                experienceItem,
-                                                "start_date"
-                                        )
-                                )
-                                .endDate(
-                                        getText(
-                                                experienceItem,
-                                                "end_date"
-                                        )
-                                )
-                                .responsibilities(
-                                        experienceItem.path(
-                                                "responsibilities"
-                                        )
-                                )
-                                .technologies(
-                                        experienceItem.path(
-                                                "technologies"
-                                        )
-                                )
-                                .additionalInformation(
-                                        experienceItem.path(
-                                                "additional_information"
-                                        )
-                                )
-                                .build()
+                                .company(getText(experienceItem, "company"))
+                                .jobTitle(getText(experienceItem, "job_title"))
+                                .location(getText(experienceItem, "location"))
+                                .startDate(getText(experienceItem, "start_date"))
+                                .endDate(getText(experienceItem, "end_date"))
+                                .responsibilities(experienceItem.path("responsibilities"))
+                                .technologies(experienceItem.path("technologies"))
+                                .additionalInformation(experienceItem.path("additional_information"))
+                        .build()
                 );
             }
         }
@@ -423,34 +230,19 @@ public class ResumeParsedDataService {
         // PROJECTS
         // =====================================================
 
-        List<ResumeParsedDataResponse.Project> projects =
-                new ArrayList<>();
+        List<ResumeParsedDataResponse.Project> projects = new ArrayList<>();
 
-        JsonNode projectsNode =
-                resumeNode.path("projects");
+        JsonNode projectsNode = resumeNode.path("projects");
 
         if (projectsNode.isArray()) {
 
-            for (JsonNode projectNode :
-                    projectsNode) {
+            for (JsonNode projectNode : projectsNode) {
 
-                projects.add(
-                        ResumeParsedDataResponse.Project
+                projects.add(ResumeParsedDataResponse.Project
                                 .builder()
-                                .name(
-                                        getText(
-                                                projectNode,
-                                                "name"
-                                        )
-                                )
-                                .description(
-                                        getText(
-                                                projectNode,
-                                                "description"
-                                        )
-                                )
-                                .build()
-                );
+                                .name(getText(projectNode, "name"))
+                                .description(getText(projectNode, "description"))
+                                .build());
             }
         }
 
@@ -458,46 +250,38 @@ public class ResumeParsedDataService {
         // LINKS
         // =====================================================
 
-        JsonNode linksNode =
-                resumeNode.path("links");
+        JsonNode linksNode = resumeNode.path("links");
 
-        ResumeParsedDataResponse.Links links =
-                ResumeParsedDataResponse.Links.builder()
-                        .linkedin(
-                                getText(
-                                        linksNode,
-                                        "linkedin"
-                                )
-                        )
-                        .website(
-                                getText(
-                                        linksNode,
-                                        "website"
-                                )
-                        )
-                        .build();
+        ResumeParsedDataResponse.Links links = ResumeParsedDataResponse.Links.builder()
+                .linkedin(getText(linksNode, "linkedin"))
+                .website(getText(linksNode, "website"))
+                .build();
 
         // =====================================================
         // FINAL RESPONSE
         // =====================================================
 
+        Object parsedDataObject = null;
+        if (root != null) {
+            try {
+                parsedDataObject = objectMapper.treeToValue(root, Object.class);
+            } catch (Exception ignored) {
+            }
+        }
+
         return ResumeParsedDataResponse.builder()
-                .resumeId(
-                        resume.getId()
-                )
-                .parserVersion(
-                        parsedData.getParserVersion()
-                )
+                .resumeId(resume.getId())
+                .candidateId(candidateId)
+                .status(resume.getProcessingStatus().name())
+                .parserVersion(parsedData.getParserVersion())
                 .profile(profile)
                 .skills(skills)
                 .education(education)
                 .experience(experience)
                 .projects(projects)
-                .certifications(
-                        parsedData.getCertifications()
-                )
+                .certifications(parsedData.getCertifications())
                 .links(links)
-                .parsedData(root)
+                .parsedData(parsedDataObject)
                 .build();
     }
 
@@ -505,40 +289,21 @@ public class ResumeParsedDataService {
     // SAVE SKILLS
     // =========================================================
 
-    private void saveSkills(
-            ResumeParsedData parsedData,
-            JsonNode skillsNode
+    private void saveSkills(ResumeParsedData parsedData, JsonNode skillsNode
     ) {
 
         if (!skillsNode.isArray()) {
             return;
         }
 
-        for (JsonNode skillNode :
-                skillsNode) {
+        for (JsonNode skillNode : skillsNode) {
 
-            ResumeSkill skill =
-                    ResumeSkill.builder()
-                            .parsedData(parsedData)
-                            .name(
-                                    getText(
-                                            skillNode,
-                                            "name"
-                                    )
-                            )
-                            .normalizedName(
-                                    getText(
-                                            skillNode,
-                                            "normalizedName"
-                                    )
-                            )
-                            .confidence(
-                                    getDouble(
-                                            skillNode,
-                                            "confidence"
-                                    )
-                            )
-                            .build();
+            ResumeSkill skill = ResumeSkill.builder()
+                    .parsedData(parsedData)
+                    .name(getText(skillNode, "name"))
+                    .normalizedName(getText(skillNode, "normalizedName"))
+                    .confidence(getDouble(skillNode, "confidence"))
+                    .build();
 
             resumeSkillRepository.save(skill);
         }
@@ -548,50 +313,24 @@ public class ResumeParsedDataService {
     // SAVE EDUCATION
     // =========================================================
 
-    private void saveEducation(
-            ResumeParsedData parsedData,
-            JsonNode educationNode
-    ) {
+    private void saveEducation(ResumeParsedData parsedData, JsonNode educationNode) {
 
         if (!educationNode.isArray()) {
             return;
         }
 
-        for (JsonNode educationNodeItem :
-                educationNode) {
+        for (JsonNode educationNodeItem : educationNode) {
 
-            ResumeEducation education =
-                    ResumeEducation.builder()
-                            .parsedData(parsedData)
-                            .degree(
-                                    getText(
-                                            educationNodeItem,
-                                            "degree"
-                                    )
-                            )
-                            .institution(
-                                    getText(
-                                            educationNodeItem,
-                                            "institution"
-                                    )
-                            )
-                            .endYear(
-                                    getText(
-                                            educationNodeItem,
-                                            "end_year"
-                                    )
-                            )
-                            .grade(
-                                    getText(
-                                            educationNodeItem,
-                                            "grade"
-                                    )
-                            )
-                            .build();
+            ResumeEducation education = ResumeEducation
+                    .builder()
+                    .parsedData(parsedData)
+                    .degree(getText(educationNodeItem, "degree"))
+                    .institution(getText(educationNodeItem, "institution"))
+                    .endYear(getText(educationNodeItem, "end_year"))
+                    .grade(getText(educationNodeItem, "grade"))
+                    .build();
 
-            resumeEducationRepository.save(
-                    education
-            );
+            resumeEducationRepository.save(education);
         }
     }
 
@@ -599,17 +338,13 @@ public class ResumeParsedDataService {
     // SAVE EXPERIENCE
     // =========================================================
 
-    private void saveExperience(
-            ResumeParsedData parsedData,
-            JsonNode experienceNode
-    ) {
+    private void saveExperience(ResumeParsedData parsedData, JsonNode experienceNode) {
 
         if (!experienceNode.isArray()) {
             return;
         }
 
-        for (JsonNode experienceNodeItem :
-                experienceNode) {
+        for (JsonNode experienceNodeItem : experienceNode) {
 
             /*
              * IMPORTANT:
@@ -618,65 +353,20 @@ public class ResumeParsedDataService {
              * They should be stored as JsonNode in JSONB
              * columns, not converted into String.
              */
-            ResumeExperience experience =
-                    ResumeExperience.builder()
-                            .parsedData(parsedData)
-                            .company(
-                                    getText(
-                                            experienceNodeItem,
-                                            "company"
-                                    )
-                            )
-                            .jobTitle(
-                                    getText(
-                                            experienceNodeItem,
-                                            "job_title"
-                                    )
-                            )
-                            .location(
-                                    getText(
-                                            experienceNodeItem,
-                                            "location"
-                                    )
-                            )
-                            .startDate(
-                                    getText(
-                                            experienceNodeItem,
-                                            "start_date"
-                                    )
-                            )
-                            .endDate(
-                                    getText(
-                                            experienceNodeItem,
-                                            "end_date"
-                                    )
-                            )
-                            .responsibilities(
-                                    toJsonString(
-                                            experienceNodeItem.path(
-                                                    "responsibilities"
-                                            )
-                                    )
-                            )
-                            .technologies(
-                                    toJsonString(
-                                            experienceNodeItem.path(
-                                                    "technologies"
-                                            )
-                                    )
-                            )
-                            .additionalInformation(
-                                    toJsonString(
-                                            experienceNodeItem.path(
-                                                    "additional_information"
-                                            )
-                                    )
-                            )
+            ResumeExperience experience = ResumeExperience
+                    .builder()
+                    .parsedData(parsedData)
+                    .company(getText(experienceNodeItem, "company"))
+                            .jobTitle(getText(experienceNodeItem, "job_title"))
+                            .location(getText(experienceNodeItem, "location"))
+                            .startDate(getText(experienceNodeItem, "start_date"))
+                            .endDate(getText(experienceNodeItem, "end_date"))
+                            .responsibilities(toJsonString(experienceNodeItem.path("responsibilities")))
+                            .technologies(toJsonString(experienceNodeItem.path("technologies")))
+                            .additionalInformation(toJsonString(experienceNodeItem.path("additional_information")))
                             .build();
 
-            resumeExperienceRepository.save(
-                    experience
-            );
+            resumeExperienceRepository.save(experience);
         }
     }
 
@@ -684,38 +374,22 @@ public class ResumeParsedDataService {
     // SAVE PROJECTS
     // =========================================================
 
-    private void saveProjects(
-            ResumeParsedData parsedData,
-            JsonNode projectsNode
-    ) {
+    private void saveProjects(ResumeParsedData parsedData, JsonNode projectsNode) {
 
         if (!projectsNode.isArray()) {
             return;
         }
 
-        for (JsonNode projectNode :
-                projectsNode) {
+        for (JsonNode projectNode : projectsNode) {
 
-            ResumeProject project =
-                    ResumeProject.builder()
-                            .parsedData(parsedData)
-                            .name(
-                                    getText(
-                                            projectNode,
-                                            "name"
-                                    )
-                            )
-                            .description(
-                                    getText(
-                                            projectNode,
-                                            "description"
-                                    )
-                            )
-                            .build();
+            ResumeProject project = ResumeProject
+                    .builder()
+                    .parsedData(parsedData)
+                    .name(getText(projectNode, "name"))
+                    .description(getText(projectNode, "description"))
+                    .build();
 
-            resumeProjectRepository.save(
-                    project
-            );
+            resumeProjectRepository.save(project);
         }
     }
 
@@ -723,39 +397,26 @@ public class ResumeParsedDataService {
     // SAVE LINKS
     // =========================================================
 
-    private void saveLinks(
-            ResumeParsedData parsedData,
-            JsonNode linksNode
-    ) {
+    private void saveLinks(ResumeParsedData parsedData, JsonNode linksNode) {
 
         if (!linksNode.isObject()) {
             return;
         }
 
-        String linkedin =
-                getText(
-                        linksNode,
-                        "linkedin"
-                );
+        String linkedin = getText(linksNode, "linkedin");
 
-        String website =
-                getText(
-                        linksNode,
-                        "website"
-                );
+        String website = getText(linksNode, "website");
 
-        if ((linkedin == null || linkedin.isBlank())
-                && (website == null || website.isBlank())) {
+        if ((linkedin == null || linkedin.isBlank()) && (website == null || website.isBlank())) {
 
             return;
         }
 
-        ResumeLink links =
-                ResumeLink.builder()
-                        .parsedData(parsedData)
-                        .linkedin(linkedin)
-                        .website(website)
-                        .build();
+        ResumeLink links = ResumeLink
+                .builder().parsedData(parsedData)
+                .linkedin(linkedin)
+                .website(website)
+                .build();
 
         resumeLinkRepository.save(links);
     }
@@ -764,23 +425,14 @@ public class ResumeParsedDataService {
     // JSON VALIDATION
     // =========================================================
 
-    private JsonNode validateAndParseJson(
-            String parsedJson
-    ) {
+    private JsonNode validateAndParseJson(String parsedJson) {
 
         try {
+            JsonNode jsonNode = objectMapper.readTree(parsedJson);
 
-            JsonNode jsonNode =
-                    objectMapper.readTree(
-                            parsedJson
-                    );
+            if (jsonNode == null || !jsonNode.isObject()) {
 
-            if (jsonNode == null
-                    || !jsonNode.isObject()) {
-
-                throw new IllegalArgumentException(
-                        "Parsed resume data must be a JSON object"
-                );
+                throw new IllegalArgumentException("Parsed resume data must be a JSON object");
             }
 
             return jsonNode;
@@ -791,10 +443,7 @@ public class ResumeParsedDataService {
 
         } catch (Exception e) {
 
-            throw new IllegalArgumentException(
-                    "Invalid JSON returned by resume parser",
-                    e
-            );
+            throw new IllegalArgumentException("Invalid JSON returned by resume parser", e);
         }
     }
 
@@ -802,49 +451,35 @@ public class ResumeParsedDataService {
     // JSON HELPERS
     // =========================================================
 
-    private String getText(
-            JsonNode node,
-            String field
+    private String getText(JsonNode node, String field
     ) {
 
-        if (node == null
-                || node.isMissingNode()
-                || node.isNull()) {
+        if (node == null || node.isMissingNode() || node.isNull()) {
 
             return null;
         }
 
-        JsonNode value =
-                node.path(field);
+        JsonNode value = node.path(field);
 
-        if (value.isMissingNode()
-                || value.isNull()) {
+        if (value.isMissingNode() || value.isNull()) {
 
             return null;
         }
 
-        String text =
-                value.asText();
+        String text = value.asText();
 
-        return text.isBlank()
-                ? null
-                : text;
+        return text.isBlank() ? null : text;
     }
 
-    private Integer getInteger(
-            JsonNode node,
-            String field
-    ) {
+    private Integer getInteger(JsonNode node, String field) {
 
         if (node == null) {
             return null;
         }
 
-        JsonNode value =
-                node.path(field);
+        JsonNode value = node.path(field);
 
-        if (value.isMissingNode()
-                || value.isNull()) {
+        if (value.isMissingNode() || value.isNull()) {
 
             return null;
         }
@@ -855,9 +490,7 @@ public class ResumeParsedDataService {
 
         try {
 
-            return Integer.parseInt(
-                    value.asText()
-            );
+            return Integer.parseInt(value.asText());
 
         } catch (Exception e) {
 
@@ -865,20 +498,15 @@ public class ResumeParsedDataService {
         }
     }
 
-    private Double getDouble(
-            JsonNode node,
-            String field
-    ) {
+    private Double getDouble(JsonNode node, String field) {
 
         if (node == null) {
             return null;
         }
 
-        JsonNode value =
-                node.path(field);
+        JsonNode value = node.path(field);
 
-        if (value.isMissingNode()
-                || value.isNull()) {
+        if (value.isMissingNode() || value.isNull()) {
 
             return null;
         }
@@ -889,9 +517,7 @@ public class ResumeParsedDataService {
 
         try {
 
-            return Double.parseDouble(
-                    value.asText()
-            );
+            return Double.parseDouble(value.asText());
 
         } catch (Exception e) {
 
@@ -903,30 +529,21 @@ public class ResumeParsedDataService {
     // CERTIFICATIONS
     // =========================================================
 
-    private String extractCertifications(
-            JsonNode certificationsNode
-    ) {
+    private String extractCertifications(JsonNode certificationsNode) {
 
-        if (certificationsNode == null
-                || certificationsNode.isMissingNode()
-                || certificationsNode.isNull()) {
+        if (certificationsNode == null || certificationsNode.isMissingNode() || certificationsNode.isNull()) {
 
             return null;
         }
 
         if (certificationsNode.isTextual()) {
 
-            String value =
-                    certificationsNode.asText();
+            String value = certificationsNode.asText();
 
-            return value.isBlank()
-                    ? null
-                    : value;
+            return value.isBlank() ? null : value;
         }
 
-        return toJsonString(
-                certificationsNode
-        );
+        return toJsonString(certificationsNode);
     }
 
     // =========================================================
@@ -935,9 +552,7 @@ public class ResumeParsedDataService {
 
     private String toJsonString(JsonNode node) {
 
-        if (node == null
-                || node.isMissingNode()
-                || node.isNull()) {
+        if (node == null || node.isMissingNode() || node.isNull()) {
 
             return null;
         }
@@ -945,10 +560,7 @@ public class ResumeParsedDataService {
         try {
             return objectMapper.writeValueAsString(node);
         } catch (Exception e) {
-            throw new IllegalArgumentException(
-                    "Failed to serialize JSON data",
-                    e
-            );
+            throw new IllegalArgumentException("Failed to serialize JSON data", e);
         }
     }
 }

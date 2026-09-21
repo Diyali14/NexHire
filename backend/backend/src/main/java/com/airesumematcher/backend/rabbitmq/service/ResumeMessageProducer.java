@@ -16,10 +16,6 @@ public class ResumeMessageProducer {
 
     public void publish(ResumeProcessingMessage message) {
 
-        rabbitTemplate.convertAndSend(
-                RabbitMQConfig.RESUME_EXCHANGE,
-                RabbitMQConfig.RESUME_ROUTING_KEY,
-                message
-        );
+        rabbitTemplate.convertAndSend(RabbitMQConfig.RESUME_EXCHANGE, RabbitMQConfig.RESUME_ROUTING_KEY, message);
     }
 }

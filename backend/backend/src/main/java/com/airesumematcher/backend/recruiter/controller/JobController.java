@@ -25,16 +25,8 @@ public class JobController {
     // =========================================================
 
     @PostMapping
-    public ResponseEntity<JobResponse> createJob(
-            @Valid @RequestBody JobCreateRequest request,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                jobService.createJob(
-                        request,
-                        authentication
-                )
-        );
+    public ResponseEntity<JobResponse> createJob(@Valid @RequestBody JobCreateRequest request, Authentication authentication) {
+        return ResponseEntity.ok(jobService.createJob(request, authentication));
     }
 
     // =========================================================
@@ -42,12 +34,8 @@ public class JobController {
     // =========================================================
 
     @GetMapping
-    public ResponseEntity<List<JobResponse>> getMyJobs(
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                jobService.getMyJobs(authentication)
-        );
+    public ResponseEntity<List<JobResponse>> getMyJobs(Authentication authentication) {
+        return ResponseEntity.ok(jobService.getMyJobs(authentication));
     }
 
     // =========================================================
@@ -55,13 +43,8 @@ public class JobController {
     // =========================================================
 
     @GetMapping("/{jobId}")
-    public ResponseEntity<JobResponse> getJob(
-            @PathVariable Long jobId,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                jobService.getJob(jobId, authentication)
-        );
+    public ResponseEntity<JobResponse> getJob(@PathVariable Long jobId, Authentication authentication) {
+        return ResponseEntity.ok(jobService.getJob(jobId, authentication));
     }
 
     // =========================================================
@@ -69,14 +52,8 @@ public class JobController {
     // =========================================================
 
     @PutMapping("/{jobId}")
-    public ResponseEntity<JobResponse> updateJob(
-            @PathVariable Long jobId,
-            @Valid @RequestBody JobCreateRequest request,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                jobService.updateJob(jobId, request, authentication)
-        );
+    public ResponseEntity<JobResponse> updateJob(@PathVariable Long jobId, @Valid @RequestBody JobCreateRequest request, Authentication authentication) {
+        return ResponseEntity.ok(jobService.updateJob(jobId, request, authentication));
     }
 
     // =========================================================
@@ -84,16 +61,9 @@ public class JobController {
     // =========================================================
 
     @GetMapping("/{jobId}/status")
-    public ResponseEntity<JobStatusResponse> getJobStatus(
-            @PathVariable Long jobId,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                jobService.getJobStatus(
-                        jobId,
-                        authentication
-                )
-        );
+    public ResponseEntity<JobStatusResponse> getJobStatus(@PathVariable Long jobId, Authentication authentication) {
+
+        return ResponseEntity.ok(jobService.getJobStatus(jobId, authentication));
     }
 
     // =========================================================
@@ -101,16 +71,8 @@ public class JobController {
     // =========================================================
 
     @GetMapping("/{jobId}/parsed-data")
-    public ResponseEntity<JobParsedDataResponse> getParsedJobData(
-            @PathVariable Long jobId,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                jobService.getParsedJobData(
-                        jobId,
-                        authentication
-                )
-        );
+    public ResponseEntity<JobParsedDataResponse> getParsedJobData(@PathVariable Long jobId, Authentication authentication) {
+        return ResponseEntity.ok(jobService.getParsedJobData(jobId, authentication));
     }
 
     // =========================================================
@@ -118,14 +80,9 @@ public class JobController {
     // =========================================================
 
     @DeleteMapping("/{jobId}")
-    public ResponseEntity<Void> deleteJob(
-            @PathVariable Long jobId,
-            Authentication authentication
-    ) {
-        jobService.deleteJob(
-                jobId,
-                authentication
-        );
+    public ResponseEntity<Void> deleteJob(@PathVariable Long jobId, Authentication authentication) {
+
+        jobService.deleteJob(jobId, authentication);
 
         return ResponseEntity.noContent().build();
     }

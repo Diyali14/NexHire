@@ -23,17 +23,11 @@ public class CandidateProfileUpdateRequest {
     private String phone;
 
     @Size(max = 500, message = "LinkedIn URL must not exceed 500 characters")
-    @Pattern(
-            regexp = "^(https?://)?(www\\.)?linkedin\\.com/.*$",
-            message = "Invalid LinkedIn URL"
-    )
+    @Pattern(regexp = "^(https?://)?(www\\.)?linkedin\\.com/.*$", message = "Invalid LinkedIn URL")
     private String linkedinUrl;
 
     @Size(max = 500, message = "GitHub URL must not exceed 500 characters")
-    @Pattern(
-            regexp = "^(https?://)?(www\\.)?github\\.com/.*$",
-            message = "Invalid GitHub URL"
-    )
+    @Pattern(regexp = "^(https?://)?(www\\.)?github\\.com/.*$", message = "Invalid GitHub URL")
     private String githubUrl;
 
     @Size(max = 2000, message = "Bio must not exceed 2000 characters")

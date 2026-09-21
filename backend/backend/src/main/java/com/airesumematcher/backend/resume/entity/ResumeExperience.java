@@ -27,10 +27,7 @@ public class ResumeExperience {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "resume_parsed_data_id",
-            nullable = false
-    )
+    @JoinColumn(name = "resume_parsed_data_id", nullable = false)
     private ResumeParsedData parsedData;
 
     @Column(name = "company")
@@ -49,23 +46,14 @@ public class ResumeExperience {
     private String endDate;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(
-            name = "responsibilities",
-            columnDefinition = "jsonb"
-    )
+    @Column(name = "responsibilities", columnDefinition = "jsonb")
     private String responsibilities;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(
-            name = "technologies",
-            columnDefinition = "jsonb"
-    )
+    @Column(name = "technologies", columnDefinition = "jsonb")
     private String technologies;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(
-            name = "additional_information",
-            columnDefinition = "jsonb"
-    )
+    @Column(name = "additional_information", columnDefinition = "jsonb")
     private String additionalInformation;
 }

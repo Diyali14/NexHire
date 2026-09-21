@@ -16,39 +16,21 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void changePassword(
-            String email,
-            PasswordChangeRequest request
-    ) {
+    public void changePassword(String email, PasswordChangeRequest request) {
 
-        User user = userRepository
-                .findByEmailIgnoreCase(email)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("User not found")
-                );
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        if (!passwordEncoder.matches(
-                request.getCurrentPassword(),
-                user.getPasswordHash()
-        )) {
-            throw new IllegalArgumentException(
-                    "Current password is incorrect"
-            );
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("Current password is incorrect");
         }
 
-        if (request.getCurrentPassword()
-                .equals(request.getNewPassword())) {
+        if (request.getCurrentPassword().equals(request.getNewPassword())) {
 
-            throw new IllegalArgumentException(
-                    "New password must be different from current password"
-            );
+            throw new IllegalArgumentException("New password must be different from current password");
         }
 
-        user.setPasswordHash(
-                passwordEncoder.encode(
-                        request.getNewPassword()
-                )
-        );
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
 
         userRepository.save(user);
     }

@@ -18,6 +18,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
 
 @Service
@@ -28,6 +31,7 @@ public class JobService {
     private final UserRepository userRepository;
     private final JobMessageProducer jobMessageProducer;
     private final JobParsedDataRepository jobParsedDataRepository;
+    private final ObjectMapper objectMapper;
 
 
     // =========================================================
@@ -35,45 +39,29 @@ public class JobService {
     // =========================================================
 
     @Transactional
-    public JobResponse createJob(
-            JobCreateRequest request,
-            Authentication authentication
-    ) {
+    public JobResponse createJob(JobCreateRequest request, Authentication authentication) {
 
-        User recruiter =
-                getAuthenticatedRecruiter(authentication);
+        User recruiter = getAuthenticatedRecruiter(authentication);
 
 
         // 1. Save job in database
 
-        Job job = Job.builder()
-                .recruiter(recruiter)
-                .jobTitle(request.getJobTitle().trim())
-                .jobDescription(request.getJobDescription().trim())
-                .processingStatus(JobProcessingStatus.STORED)
-                .build();
+        Job job = Job.builder().recruiter(recruiter).jobTitle(request.getJobTitle().trim()).jobDescription(request.getJobDescription().trim()).processingStatus(JobProcessingStatus.STORED).build();
 
         job = jobRepository.saveAndFlush(job);
 
 
         // 2. Publish job description to RabbitMQ
 
-        JobProcessingMessage message =
-                JobProcessingMessage.builder()
-                        .jobId(job.getId())
-                        .recruiterId(recruiter.getId())
-                        .jobTitle(job.getJobTitle())
-                        .jobDescription(job.getJobDescription())
-                        .build();
+        JobProcessingMessage message = JobProcessingMessage.builder().jobId(job.getId()).recruiterId(recruiter.getId()).jobTitle(job.getJobTitle())
+                        .jobDescription(job.getJobDescription()).build();
 
         jobMessageProducer.publish(message);
 
 
         // 3. Mark job as QUEUED
 
-        job.setProcessingStatus(
-                JobProcessingStatus.QUEUED
-        );
+        job.setProcessingStatus(JobProcessingStatus.QUEUED);
 
         job = jobRepository.save(job);
 
@@ -87,79 +75,43 @@ public class JobService {
     // =========================================================
 
     @Transactional(readOnly = true)
-    public JobStatusResponse getJobStatus(
-            Long jobId,
-            Authentication authentication
-    ) {
+    public JobStatusResponse getJobStatus(Long jobId, Authentication authentication) {
 
-        User recruiter =
-                getAuthenticatedRecruiter(authentication);
+        User recruiter = getAuthenticatedRecruiter(authentication);
 
 
         // Make sure recruiter owns this job
 
-        Job job =
-                jobRepository
-                        .findByIdAndRecruiterId(
-                                jobId,
-                                recruiter.getId()
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Job not found"
-                                )
-                        );
+        Job job = jobRepository.findByIdAndRecruiterId(jobId, recruiter.getId())
+                        .orElseThrow(() -> new RuntimeException("Job not found"));
 
 
-        boolean parsedDataAvailable =
-                jobParsedDataRepository
-                        .existsByJobId(jobId);
+        boolean parsedDataAvailable = jobParsedDataRepository.existsByJobId(jobId);
 
 
         String message;
 
         switch (job.getProcessingStatus()) {
 
-            case DRAFT ->
-                    message =
-                            "Job description is still being prepared.";
+            case DRAFT -> message = "Job description is still being prepared.";
 
-            case STORED ->
-                    message =
-                            "Job description is stored and waiting for parser processing.";
+            case STORED -> message = "Job description is stored and waiting for parser processing.";
 
-            case QUEUED ->
-                    message =
-                            "Job description is waiting to be processed.";
+            case QUEUED -> message = "Job description is waiting to be processed.";
 
-            case PROCESSING ->
-                    message =
-                            "Job description is currently being processed.";
+            case PROCESSING -> message = "Job description is currently being processed.";
 
-            case COMPLETED ->
-                    message =
-                            "Job description processing completed.";
+            case COMPLETED -> message = "Job description processing completed.";
 
-            case PARTIAL ->
-                    message =
-                            "Job description processing completed with partial data.";
+            case PARTIAL -> message = "Job description processing completed with partial data.";
 
-            case FAILED ->
-                    message =
-                            "Job description processing failed.";
+            case FAILED -> message = "Job description processing failed.";
 
-            default ->
-                    message =
-                            "Unknown job processing status.";
+            default -> message ="Unknown job processing status.";
         }
 
 
-        return JobStatusResponse.builder()
-                .jobId(jobId)
-                .status(job.getProcessingStatus().name())
-                .parsedDataAvailable(parsedDataAvailable)
-                .message(message)
-                .build();
+        return JobStatusResponse.builder().jobId(jobId).status(job.getProcessingStatus().name()).parsedDataAvailable(parsedDataAvailable).message(message).build();
     }
 
 
@@ -168,53 +120,39 @@ public class JobService {
     // =========================================================
 
     @Transactional(readOnly = true)
-    public JobParsedDataResponse getParsedJobData(
-            Long jobId,
-            Authentication authentication
-    ) {
+    public JobParsedDataResponse getParsedJobData(Long jobId, Authentication authentication) {
 
-        User recruiter =
-                getAuthenticatedRecruiter(authentication);
+        User recruiter = getAuthenticatedRecruiter(authentication);
 
 
         // 1. Verify that this recruiter owns the job
 
-        Job job =
-                jobRepository
-                        .findByIdAndRecruiterId(
-                                jobId,
-                                recruiter.getId()
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Job not found"
-                                )
-                        );
+        Job job = jobRepository.findByIdAndRecruiterId(jobId, recruiter.getId()).orElseThrow(() -> new RuntimeException("Job not found"));
 
 
         // 2. Get parsed JSON
 
-        JobParsedData parsedData =
-                jobParsedDataRepository
-                        .findByJobId(jobId)
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Parsed job data not found"
-                                )
-                        );
+        JobParsedData parsedData = jobParsedDataRepository.findByJobId(jobId).orElseThrow(() -> new RuntimeException("Parsed job data not found"));
 
 
         // 3. Return parsed data
+        Object parsedNode = null;
+        if (parsedData.getParsedJson() != null && !parsedData.getParsedJson().isBlank()) {
+            try {
+                JsonNode node = objectMapper.readTree(parsedData.getParsedJson());
+                while (node != null && node.isTextual()) {
 
-        return JobParsedDataResponse.builder()
-                .jobId(job.getId())
-                .parserVersion(
-                        parsedData.getParserVersion()
-                )
-                .parsedJson(
-                        parsedData.getParsedJson()
-                )
-                .build();
+                    node = objectMapper.readTree(node.asText());
+                }
+                parsedNode = objectMapper.treeToValue(node, Object.class);
+            } catch (Exception e) {
+
+                throw new RuntimeException("Stored parsed job JSON is invalid", e);
+            }
+        }
+
+        return JobParsedDataResponse.builder().jobId(job.getId())
+                .parserVersion(parsedData.getParserVersion()).parsedJson(parsedNode).build();
     }
 
 
@@ -224,44 +162,45 @@ public class JobService {
 
     @Transactional(readOnly = true)
     public List<JobResponse> getMyJobs(Authentication authentication) {
+
         User recruiter = getAuthenticatedRecruiter(authentication);
+
         return jobRepository.findAllByRecruiterIdOrderByCreatedAtDesc(recruiter.getId())
-                .stream()
-                .map(this::toResponse)
-                .toList();
+                .stream().map(this::toResponse).toList();
     }
 
     @Transactional(readOnly = true)
     public JobResponse getJob(Long jobId, Authentication authentication) {
+
         User recruiter = getAuthenticatedRecruiter(authentication);
+
         Job job = jobRepository.findByIdAndRecruiterId(jobId, recruiter.getId())
                 .orElseThrow(() -> new RuntimeException("Job not found or unauthorized"));
+
         return toResponse(job);
     }
 
     @Transactional
     public JobResponse updateJob(Long jobId, JobCreateRequest request, Authentication authentication) {
+
         User recruiter = getAuthenticatedRecruiter(authentication);
+
         Job job = jobRepository.findByIdAndRecruiterId(jobId, recruiter.getId())
                 .orElseThrow(() -> new RuntimeException("Job not found or unauthorized"));
 
         if (request.getJobTitle() != null && !request.getJobTitle().isBlank()) {
             job.setJobTitle(request.getJobTitle().trim());
         }
+
         if (request.getJobDescription() != null && !request.getJobDescription().isBlank()) {
             job.setJobDescription(request.getJobDescription().trim());
             // Re-trigger parsing if JD content changed
             job.setProcessingStatus(JobProcessingStatus.STORED);
             job = jobRepository.saveAndFlush(job);
 
-            jobMessageProducer.publish(
-                    JobProcessingMessage.builder()
-                            .jobId(job.getId())
-                            .recruiterId(recruiter.getId())
-                            .jobTitle(job.getJobTitle())
-                            .jobDescription(job.getJobDescription())
-                            .build()
-            );
+            jobMessageProducer.publish(JobProcessingMessage.builder().jobId(job.getId())
+                            .recruiterId(recruiter.getId()).jobTitle(job.getJobTitle())
+                            .jobDescription(job.getJobDescription()).build());
 
             job.setProcessingStatus(JobProcessingStatus.QUEUED);
         }
@@ -271,26 +210,13 @@ public class JobService {
     }
 
     @Transactional
-    public void deleteJob(
-            Long jobId,
-            Authentication authentication
-    ) {
+    public void deleteJob(Long jobId, Authentication authentication) {
 
-        User recruiter =
-                getAuthenticatedRecruiter(authentication);
+        User recruiter = getAuthenticatedRecruiter(authentication);
 
 
-        Job job =
-                jobRepository
-                        .findByIdAndRecruiterId(
-                                jobId,
-                                recruiter.getId()
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Job not found"
-                                )
-                        );
+        Job job = jobRepository.findByIdAndRecruiterId(jobId, recruiter.getId())
+                        .orElseThrow(() -> new RuntimeException("Job not found"));
 
 
         jobRepository.delete(job);
@@ -301,19 +227,12 @@ public class JobService {
     // GET AUTHENTICATED RECRUITER
     // =========================================================
 
-    private User getAuthenticatedRecruiter(
-            Authentication authentication
-    ) {
+    private User getAuthenticatedRecruiter(Authentication authentication) {
 
         String email = authentication.getName();
 
-        return userRepository
-                .findByEmailIgnoreCase(email)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Authenticated recruiter not found"
-                        )
-                );
+        return userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new RuntimeException("Authenticated recruiter not found"));
     }
 
 
@@ -323,21 +242,9 @@ public class JobService {
 
     private JobResponse toResponse(Job job) {
 
-        return JobResponse.builder()
-                .jobId(job.getId())
-                .recruiterId(
-                        job.getRecruiter().getId()
-                )
-                .jobTitle(job.getJobTitle())
-                .jobDescription(
-                        job.getJobDescription()
-                )
-                .storageUrl(null)
-                .processingStatus(
-                        job.getProcessingStatus().name()
-                )
-                .createdAt(job.getCreatedAt())
-                .updatedAt(job.getUpdatedAt())
-                .build();
+        return JobResponse.builder().jobId(job.getId()).recruiterId(job.getRecruiter().getId())
+                .jobTitle(job.getJobTitle()).jobDescription(job.getJobDescription()).storageUrl(null)
+                .processingStatus(job.getProcessingStatus().name()).createdAt(job.getCreatedAt())
+                .updatedAt(job.getUpdatedAt()).build();
     }
 }

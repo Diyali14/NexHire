@@ -19,18 +19,10 @@ public class JobApplicationController {
     private final JobApplicationService jobApplicationService;
 
     @PostMapping("/{jobId}/apply")
-    public ResponseEntity<?> apply(
-            @PathVariable Long jobId,
-            @Valid @RequestBody JobApplicationRequest request,
-            Authentication authentication
-    ) {
+    public ResponseEntity<?> apply(@PathVariable Long jobId, @Valid @RequestBody JobApplicationRequest request, Authentication authentication) {
 
         JobApplication application =
-                jobApplicationService.createApplication(
-                        jobId,
-                        request,
-                        authentication
-                );
+                jobApplicationService.createApplication(jobId, request, authentication);
 
         return ResponseEntity.ok(
                 Map.of(
@@ -39,8 +31,6 @@ public class JobApplicationController {
                         "resumeId", request.getResumeId(),
                         "status", application.getStatus().name(),
                         "message",
-                        "Application submitted successfully. Matching is being processed."
-                )
-        );
+                        "Application submitted successfully. Matching is being processed."));
     }
 }

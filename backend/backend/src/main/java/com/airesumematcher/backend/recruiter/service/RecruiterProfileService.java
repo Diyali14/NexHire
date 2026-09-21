@@ -24,56 +24,41 @@ public class RecruiterProfileService {
     @Transactional(readOnly = true)
     public RecruiterProfileResponse getMyProfile(String email) {
 
-        User user = userRepository
-                .findByEmailIgnoreCase(email)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("User not found")
-                );
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        RecruiterProfile profile =
-                recruiterProfileRepository
-                        .findByUserId(user.getId())
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Recruiter profile not found"
-                                )
-                        );
+        RecruiterProfile profile = recruiterProfileRepository.findByUserId(user.getId()).orElseThrow(() ->
+                                new IllegalArgumentException("Recruiter profile not found"));
 
         return toResponse(profile);
     }
 
     @Transactional
-    public RecruiterProfileResponse updateProfile(
-            String email,
-            RecruiterProfileRequest request
-    ) {
+    public RecruiterProfileResponse updateProfile(String email, RecruiterProfileRequest request) {
 
-        User user = userRepository
-                .findByEmailIgnoreCase(email)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("User not found")
-                );
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        RecruiterProfile profile =
-                recruiterProfileRepository
-                        .findByUserId(user.getId())
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Recruiter profile not found"
-                                )
-                        );
+        RecruiterProfile profile = recruiterProfileRepository
+                .findByUserId(user.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Recruiter profile not found"));
 
         if (request.getFirstName() != null) {
+
             user.setFirstName(request.getFirstName());
         }
         if (request.getLastName() != null) {
+
             user.setLastName(request.getLastName());
         }
         if (request.getPhone() != null) {
+
             user.setPhone(request.getPhone());
         }
         if (request.getEmail() != null && !request.getEmail().equalsIgnoreCase(user.getEmail())) {
+
             if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
+
                 throw new IllegalArgumentException("Email is already taken");
             }
             user.setEmail(request.getEmail());
@@ -82,14 +67,15 @@ public class RecruiterProfileService {
         userRepository.save(user);
 
         if (request.getCompanyName() != null) {
+
             profile.setCompanyName(request.getCompanyName());
         }
         if (request.getDesignation() != null) {
+
             profile.setDesignation(request.getDesignation());
         }
 
-        RecruiterProfile savedProfile =
-                recruiterProfileRepository.save(profile);
+        RecruiterProfile savedProfile = recruiterProfileRepository.save(profile);
 
         return toResponse(savedProfile);
     }
@@ -100,6 +86,7 @@ public class RecruiterProfileService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
+
             throw new IllegalArgumentException("Invalid old password");
         }
 
@@ -116,21 +103,12 @@ public class RecruiterProfileService {
         userRepository.save(user);
     }
 
-    private RecruiterProfileResponse toResponse(
-            RecruiterProfile profile
-    ) {
+    private RecruiterProfileResponse toResponse(RecruiterProfile profile) {
 
         User user = profile.getUser();
 
-        return RecruiterProfileResponse.builder()
-                .id(profile.getId())
-                .userId(user.getId())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .phone(user.getPhone())
-                .companyName(profile.getCompanyName())
-                .designation(profile.getDesignation())
-                .build();
+        return RecruiterProfileResponse.builder().id(profile.getId()).userId(user.getId()).email(user.getEmail())
+                .firstName(user.getFirstName()).lastName(user.getLastName()).phone(user.getPhone())
+                .companyName(profile.getCompanyName()).designation(profile.getDesignation()).build();
     }
 }

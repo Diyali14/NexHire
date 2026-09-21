@@ -16,26 +16,26 @@ public class MatcherPayloadService {
         this.objectMapper = objectMapper;
     }
 
-    public String buildPayload(
-            ResumeParsedData resumeParsedData,
-            JobParsedData jobParsedData
-    ) {
+    public String buildPayload(ResumeParsedData resumeParsedData, JobParsedData jobParsedData) {
         try {
             // 1. Read stored resume JSON
             JsonNode resumeRoot = objectMapper.readTree(resumeParsedData.getParsedJson());
             if (resumeRoot == null || !resumeRoot.isObject()) {
+
                 throw new IllegalArgumentException("Stored parsed resume JSON is not a valid JSON object");
             }
 
             // Determine candidate object: exact resume parser response
             JsonNode candidateNode = resumeRoot;
             if (resumeRoot.has("parsedData") && resumeRoot.path("parsedData").isObject()) {
+
                 candidateNode = resumeRoot.path("parsedData");
             }
 
             // 2. Read stored JD JSON
             JsonNode jobRoot = objectMapper.readTree(jobParsedData.getParsedJson());
             if (jobRoot == null || !jobRoot.isObject()) {
+
                 throw new IllegalArgumentException("Stored parsed job JSON is not a valid JSON object");
             }
 

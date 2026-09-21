@@ -5,8 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ResumeLinkRepository
-        extends JpaRepository<ResumeLink, Long> {
+public interface ResumeLinkRepository extends JpaRepository<ResumeLink, Long> {
 
     Optional<ResumeLink> findByParsedDataId(Long parsedDataId);
 

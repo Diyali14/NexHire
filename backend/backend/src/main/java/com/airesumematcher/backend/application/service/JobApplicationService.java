@@ -39,27 +39,15 @@ public class JobApplicationService {
     private final MatcherMessageProducer matcherMessageProducer;
 
     @Transactional
-    public JobApplication createApplication(
-            Long jobId,
-            JobApplicationRequest request,
-            Authentication authentication
-    ) {
+    public JobApplication createApplication(Long jobId, JobApplicationRequest request, Authentication authentication) {
 
-        User candidate =
-                getAuthenticatedCandidate(authentication);
+        User candidate = getAuthenticatedCandidate(authentication);
 
         // =====================================================
         // 1. GET JOB
         // =====================================================
 
-        Job job =
-                jobRepository
-                        .findById(jobId)
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Job not found"
-                                )
-                        );
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
 
         // =====================================================
         // 2. JOB MUST HAVE PARSED DATA
@@ -67,109 +55,61 @@ public class JobApplicationService {
 
         if (!jobParsedDataRepository.existsByJobId(jobId)) {
 
-            throw new IllegalStateException(
-                    "This job is not ready for applications yet"
-            );
+            throw new IllegalStateException("This job is not ready for applications yet");
         }
 
         // =====================================================
         // 3. PREVENT DUPLICATE APPLICATION
         // =====================================================
 
-        if (applicationRepository
-                .existsByJobIdAndCandidateId(
-                        jobId,
-                        candidate.getId()
-                )) {
+        if (applicationRepository.existsByJobIdAndCandidateId(jobId, candidate.getId())) {
 
-            throw new IllegalStateException(
-                    "You have already applied for this job"
-            );
+            throw new IllegalStateException("You have already applied for this job");
         }
 
         // =====================================================
         // 4. GET CANDIDATE'S RESUME
         // =====================================================
 
-        Resume resume =
-                resumeRepository
-                        .findByIdAndCandidateId(
-                                request.getResumeId(),
-                                candidate.getId()
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Resume not found"
-                                )
-                        );
+        Resume resume = resumeRepository.findByIdAndCandidateId(request.getResumeId(), candidate.getId())
+                .orElseThrow(() -> new RuntimeException("Resume not found"));
 
         // =====================================================
         // 5. RESUME MUST BE COMPLETELY PROCESSED
         // =====================================================
 
-        if (resume.getProcessingStatus()
-                != ProcessingStatus.COMPLETED) {
+        if (resume.getProcessingStatus() != ProcessingStatus.COMPLETED) {
 
-            throw new IllegalStateException(
-                    "Selected resume has not finished processing yet"
-            );
+            throw new IllegalStateException("Selected resume has not finished processing yet");
         }
 
-        if (!resumeParsedDataRepository
-                .existsByResumeId(resume.getId())) {
+        if (!resumeParsedDataRepository.existsByResumeId(resume.getId())) {
 
-            throw new IllegalStateException(
-                    "Parsed resume data is not available yet"
-            );
+            throw new IllegalStateException("Parsed resume data is not available yet");
         }
 
         // =====================================================
         // 6. CREATE APPLICATION
         // =====================================================
 
-        JobApplication application =
-                JobApplication.builder()
-                        .job(job)
-                        .candidate(candidate)
-                        .resume(resume)
-                        .status(
-                                JobApplicationStatus.MATCHING_PENDING
-                        )
-                        .build();
+        JobApplication application = JobApplication.builder().job(job).candidate(candidate).resume(resume).status(JobApplicationStatus.MATCHING_PENDING).build();
 
-        application =
-                applicationRepository.saveAndFlush(
-                        application
-                );
+        application = applicationRepository.saveAndFlush(application);
 
         // =====================================================
         // 7. SEND ONLY IDS TO RABBITMQ
         // =====================================================
 
-        matcherMessageProducer.publish(
-                MatcherProcessingMessage.builder()
-                        .applicationId(application.getId())
-                        .jobId(job.getId())
-                        .candidateId(candidate.getId())
-                        .resumeId(resume.getId())
-                        .build()
-        );
+        matcherMessageProducer.publish(MatcherProcessingMessage.builder().applicationId(application.getId()).jobId(job.getId()).candidateId(candidate.getId()).resumeId(resume.getId()).build());
 
         return application;
     }
 
-    private User getAuthenticatedCandidate(
-            Authentication authentication
-    ) {
+    private User getAuthenticatedCandidate(Authentication authentication) {
 
         String email = authentication.getName();
 
-        return userRepository
-                .findByEmailIgnoreCase(email)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Authenticated candidate not found"
-                        )
-                );
+        return userRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new RuntimeException(
+                "Authenticated candidate not found"));
     }
 }

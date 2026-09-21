@@ -46,6 +46,7 @@ public class ParsedDataMapperService {
     }
 
     public ParsedJdDto jsonToJd(String json) {
+
         try {
             return objectMapper.readValue(json, ParsedJdDto.class);
         } catch (JsonProcessingException e) {

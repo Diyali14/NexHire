@@ -10,27 +10,16 @@ public class AiMatcherService {
 
     private final RestClient restClient;
 
-    public AiMatcherService(
-            @Value("${ai.matcher.base-url}") String baseUrl
-    ) {
-        this.restClient =
-                RestClient.builder()
-                        .baseUrl(baseUrl)
-                        .build();
+    public AiMatcherService(@Value("${ai.matcher.base-url}") String baseUrl) {
+
+        this.restClient = RestClient.builder().baseUrl(baseUrl).build();
     }
 
-    public String match(
-            String requestJson
-    ) {
+    public String match(String requestJson) {
 
-        return restClient.post()
-                .uri("/ai/v1/match")
-                .contentType(
-                        MediaType.APPLICATION_JSON
-                )
-                .body(requestJson)
-                .retrieve()
-                .body(String.class);
+        return restClient.post().uri("/ai/v1/match")
+                .contentType(MediaType.APPLICATION_JSON).body(requestJson).retrieve().body(String.class);
+
     }
 }
 

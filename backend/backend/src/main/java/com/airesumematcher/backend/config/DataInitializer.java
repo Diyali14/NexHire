@@ -20,20 +20,14 @@ public class DataInitializer implements CommandLineRunner {
 
             if (roleRepository.findByName(roleName).isEmpty()) {
 
-                Role role = Role.builder()
-                        .name(roleName)
-                        .build();
+                Role role = Role.builder().name(roleName).build();
 
                 roleRepository.save(role);
 
-                System.out.println(
-                        "Created role: " + roleName
-                );
+                System.out.println("Created role: " + roleName);
             }
         }
 
-        System.out.println(
-                "Database role initialization completed."
-        );
+        System.out.println("Database role initialization completed.");
     }
 }

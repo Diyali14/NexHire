@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 @Getter
 @Builder
 @AllArgsConstructor
@@ -13,5 +15,5 @@ public class JobParsedDataResponse {
 
     private String parserVersion;
 
-    private String parsedJson;
+    private Object parsedJson;
 }
