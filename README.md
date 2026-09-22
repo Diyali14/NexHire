@@ -1150,11 +1150,11 @@ https://nex-hire-resume-matcher.vercel.app/
 
 ## Backend API
 
-https://nexhire-backend-5zv7.onrender.com
+[https://nexhire-backend-5zv7.onrender.com](https://nexhire-deployment-899831107400.asia-south2.run.app
 
 ## API Documentation
 
-https://nex-hire-resume-matcher.vercel.app/
+[https://nex-hire-resume-matcher.vercel.app/](https://nexhire-deployment-899831107400.asia-south2.run.app/swagger-ui/index.html)
 
 Only expose API documentation here if Swagger/OpenAPI is actually enabled and publicly accessible.
 
