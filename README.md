@@ -1146,7 +1146,7 @@ https://github.com/Diyali14/NexHire
 
 ## Live Application
 
-**[INSERT LIVE FRONTEND URL HERE]**
+https://nex-hire-resume-matcher.vercel.app/
 
 ## Backend API
 
@@ -1203,35 +1203,7 @@ Screenshots can be stored under:
 docs/screenshots/
 ```
 
-The following paths are placeholders and should only be used after the corresponding screenshots have been added to the repository.
-
-### Landing Page
-
-![NexHire Landing Page](docs/screenshots/landing-page.png)
-
-### Candidate Dashboard
-
-![Candidate Dashboard](docs/screenshots/candidate-dashboard.png)
-
-### Resume Processing
-
-![Resume Processing](docs/screenshots/resume-processing.png)
-
-### Job Matching
-
-![Job Matching](docs/screenshots/job-matching.png)
-
-### Skill Gap Analysis
-
-![Skill Gap](docs/screenshots/skill-gap.png)
-
-### Recruiter Dashboard
-
-![Recruiter Dashboard](docs/screenshots/recruiter-dashboard.png)
-
-### Applicant Ranking
-
-![Applicant Ranking](docs/screenshots/applicant-ranking.png)
+Will be added later
 
 ---
 
@@ -1241,10 +1213,10 @@ The following paths are placeholders and should only be used after the correspon
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Diyali Mukherjee**    | Spring Boot backend, REST APIs, Authentication, Database integration, RabbitMQ integration, Backend orchestration, Server-side integration |
 | **Soham Jana**         | FastAPI AI service, Model integration, Resume/JD parsing, Semantic matching, Skill-gap analysis, Interview-question generation             |
-| **Soumi Sahu**         | Candidate-side frontend                                                                                                                    |
-| **Nandini Sethy**      | Candidate-side frontend                                                                                                                    |
-| **Kaushik Debnath**     | Recruiter-side frontend                                                                                                                    |
-| **Ritesh Kumar Pathak** | Recruiter-side frontend                                                                                                                    |
+| **Soumi Sahu**         | frontendRecruiter-side frontend                                                                                                                    |
+| **Nandini Sethy**      | Recruiter-side frontend                                                                                                                    |
+| **Kaushik Debnath**     | Candidate-side frontend                                                                                                                    |
+| **Ritesh Kumar Pathak** | Candidate-side frontend                                                                                                                    |
 
 ---
 
