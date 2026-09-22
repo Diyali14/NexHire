@@ -1213,7 +1213,7 @@ Will be added later
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Diyali Mukherjee**    | Spring Boot backend, REST APIs, Authentication, Database integration, RabbitMQ integration, Backend orchestration, Server-side integration |
 | **Soham Jana**         | FastAPI AI service, Model integration, Resume/JD parsing, Semantic matching, Skill-gap analysis, Interview-question generation             |
-| **Soumi Sahu**         | frontendRecruiter-side frontend                                                                                                                    |
+| **Soumi Sahu**         | Recruiter-side frontend                                                                                                                    |
 | **Nandini Sethy**      | Recruiter-side frontend                                                                                                                    |
 | **Kaushik Debnath**     | Candidate-side frontend                                                                                                                    |
 | **Ritesh Kumar Pathak** | Candidate-side frontend                                                                                                                    |
