@@ -1,7 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "JobAnalysisResponse",
-  "type": "object",
-  "required": ["title", "requiredSkills", "language", "modelVersion"],
-  "properties": {"title": {"type": "string"}, "requiredSkills": {"type": "array", "items": {"type": "object", "required": ["name", "normalizedName", "importance"], "properties": {"importance": {"enum": ["HIGH", "MEDIUM", "LOW"]}}}}, "experienceRequired": {"type": ["integer", "null"]}, "language": {"type": "string"}, "modelVersion": {"type": "string"}}
-}
