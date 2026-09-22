@@ -1087,3 +1087,364 @@ Open the configured frontend URL in a browser.
 NexHire can use Docker for packaging backend and service components.
 
 A high-level deployment architecture is:
+
+```mermaid
+flowchart TD
+    F[Frontend]
+    B[Spring Boot Backend]
+    DB[(PostgreSQL)]
+    MQ[RabbitMQ]
+    C[Cloudinary]
+    AI[FastAPI AI Service]
+    LM[LM Studio / Configured Model]
+    G[Gemini Fallback]
+
+    F --> B
+    B --> DB
+    B --> MQ
+    B --> C
+    B --> AI
+    MQ --> AI
+    AI --> LM
+    AI --> G
+```
+
+Potential deployment responsibilities:
+
+* Frontend serves the web interface.
+* Spring Boot provides application APIs.
+* PostgreSQL stores application data.
+* RabbitMQ manages asynchronous processing.
+* Cloudinary handles configured file storage.
+* FastAPI provides AI operations.
+* LM Studio can provide locally or privately hosted model inference.
+* Gemini can act as a configured fallback.
+
+The actual infrastructure may distribute these components across different services or hosts.
+
+### Backend Deployment
+
+Current backend deployment reference:
+
+```text
+https://nexhire-backend-5zv7.onrender.com
+```
+
+### Private Networking
+
+Tailscale/private networking may be used where required to keep internal AI-service communication away from public exposure.
+
+NexHire does not claim that every component is deployed on the same infrastructure.
+
+---
+
+# 23. Live Links
+
+## GitHub
+
+https://github.com/Diyali14/NexHire
+
+## Live Application
+
+**[INSERT LIVE FRONTEND URL HERE]**
+
+## Backend API
+
+https://nexhire-backend-5zv7.onrender.com
+
+## API Documentation
+
+**[INSERT SWAGGER / OPENAPI URL IF AVAILABLE]**
+
+Only expose API documentation here if Swagger/OpenAPI is actually enabled and publicly accessible.
+
+Private AI-service URLs and credentials should not be exposed in this section.
+
+---
+
+# 24. Demo Workflow
+
+The following workflow can be used for an academic project evaluation or technical demonstration.
+
+## Candidate Demo
+
+1. Open the landing page.
+2. Log in as a candidate.
+3. Upload a sample resume.
+4. Show resume-processing status.
+5. Show the parsed candidate profile.
+6. Search available jobs.
+7. Open a job.
+8. Show candidate-job match information.
+9. Show the skill-gap analysis.
+10. Generate interview questions.
+11. Submit an application.
+12. Show application tracking.
+
+## Recruiter Demo
+
+1. Log in as a recruiter.
+2. Create a job.
+3. Show job-description processing.
+4. Open the applicant list.
+5. Review candidate matching information.
+6. Inspect the match explanation.
+7. Open a candidate profile.
+8. Download the resume.
+9. Update the application status.
+
+---
+
+# 25. Screenshots
+
+Screenshots can be stored under:
+
+```text
+docs/screenshots/
+```
+
+The following paths are placeholders and should only be used after the corresponding screenshots have been added to the repository.
+
+### Landing Page
+
+![NexHire Landing Page](docs/screenshots/landing-page.png)
+
+### Candidate Dashboard
+
+![Candidate Dashboard](docs/screenshots/candidate-dashboard.png)
+
+### Resume Processing
+
+![Resume Processing](docs/screenshots/resume-processing.png)
+
+### Job Matching
+
+![Job Matching](docs/screenshots/job-matching.png)
+
+### Skill Gap Analysis
+
+![Skill Gap](docs/screenshots/skill-gap.png)
+
+### Recruiter Dashboard
+
+![Recruiter Dashboard](docs/screenshots/recruiter-dashboard.png)
+
+### Applicant Ranking
+
+![Applicant Ranking](docs/screenshots/applicant-ranking.png)
+
+---
+
+# 26. Team
+
+| Team Member             | Contributions                                                                                                                              |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Diyali Mukherjee**    | Spring Boot backend, REST APIs, Authentication, Database integration, RabbitMQ integration, Backend orchestration, Server-side integration |
+| **Shoham Jana**         | FastAPI AI service, Model integration, Resume/JD parsing, Semantic matching, Skill-gap analysis, Interview-question generation             |
+| **Shoumi Sahu**         | Candidate-side frontend                                                                                                                    |
+| **Nandini Shetty**      | Candidate-side frontend                                                                                                                    |
+| **Kaushik Debnath**     | Recruiter-side frontend                                                                                                                    |
+| **Ritesh Kumar Pathak** | Recruiter-side frontend                                                                                                                    |
+
+---
+
+# 27. Project Status
+
+## Current Implementation
+
+The current implementation includes:
+
+* Candidate authentication
+* Recruiter authentication
+* JWT-based authorization
+* Resume processing
+* Job creation
+* AI parsing
+* Semantic matching
+* Skill-gap analysis
+* Interview-question generation
+* Candidate applications
+* Recruiter applicant management
+* Backend deployment
+* Asynchronous processing through RabbitMQ
+* PostgreSQL persistence
+* Cloudinary-based file storage
+
+The platform is suitable for academic demonstration, technical evaluation, portfolio presentation, and continued development.
+
+The project should **not** be interpreted as claiming complete production readiness or autonomous recruitment capability.
+
+---
+
+# 28. Limitations
+
+NexHire has several practical limitations that are important when interpreting its results.
+
+* Resume formatting can affect extraction quality.
+* Scanned documents may require additional vision/OCR processing.
+* AI-generated information may contain errors.
+* Semantic similarity is not a complete measure of candidate suitability.
+* Matching scores depend on extracted and normalized data.
+* Embedding availability depends on model configuration.
+* Hiring decisions should not be fully automated.
+* Candidate personal information requires secure handling.
+* Model outputs require validation and human review.
+* Different document formats can require different processing pipelines.
+* AI model behavior can vary depending on model configuration and input quality.
+
+---
+
+# 29. Responsible AI
+
+## Human-in-the-Loop
+
+NexHire provides decision support rather than autonomous hiring decisions.
+
+Recruiters should review candidate information, resumes, requirements, and AI-generated results before making employment decisions.
+
+## Explainability
+
+The platform can expose information such as:
+
+* Matched skills
+* Missing skills
+* Skill importance
+* Experience-related information
+* Human-readable matching explanations
+
+This allows users to inspect some of the factors contributing to the decision-support output.
+
+## Data Privacy
+
+Candidate resumes and personal information must be protected through:
+
+* Secure storage
+* Controlled access
+* Authentication
+* Authorization
+* Appropriate credential management
+* Secure service communication
+
+## Bias Awareness
+
+Semantic matching does not guarantee fairness.
+
+AI-assisted recruitment systems can still reflect biases originating from:
+
+* Training data
+* Job descriptions
+* Resume data
+* Extraction errors
+* Model behavior
+* Matching methodology
+
+Bias evaluation and monitoring remain important areas for continued development.
+
+## AI Reliability
+
+AI-generated information should be treated as potentially incomplete or incorrect.
+
+Human review remains necessary, particularly for employment-related decisions.
+
+---
+
+# 30. Future Enhancements
+
+The following are future enhancements rather than claims about the current implementation:
+
+* Multi-language resume support
+* Improved OCR for scanned documents
+* Recruiter analytics dashboard
+* Email and notification system
+* Calendar and interview scheduling
+* Candidate feedback loop
+* Bias and fairness monitoring
+* Model evaluation dashboard
+* Human-in-the-loop screening workflows
+* Resume improvement suggestions
+* Skill-learning recommendations
+* Additional embedding models
+* Model versioning
+* A/B testing
+* Kubernetes/container orchestration
+* Audit logging
+* Stronger privacy controls
+
+---
+
+# 31. Academic and Engineering Highlights
+
+NexHire demonstrates several software engineering and AI engineering concepts:
+
+* Full-stack application architecture
+* RESTful API design
+* JWT authentication
+* Role-based authorization
+* Relational database design
+* Database migrations
+* Asynchronous messaging
+* Event-driven processing
+* AI-service integration
+* Semantic embeddings
+* LLM integration
+* File processing
+* Structured data extraction
+* Service separation
+* Containerization
+* Deployment
+* Git/GitHub collaboration
+
+The project demonstrates how conventional application architecture can be combined with document-processing and AI services without placing all application responsibilities inside a single service.
+
+---
+
+# 32. Why NexHire Is Technically Interesting
+
+The primary engineering challenge in NexHire is the transformation of unstructured recruitment information into structured, comparable and actionable information.
+
+The core pipeline is:
+
+```text
+Unstructured Documents
+        │
+        ▼
+Information Extraction
+        │
+        ▼
+Normalized Structured Data
+        │
+        ▼
+Semantic Representation
+        │
+        ▼
+Candidate-Job Matching
+        │
+        ▼
+Explainable Results
+        │
+        ▼
+Actionable Recommendations
+```
+
+This requires coordination between multiple technical layers:
+
+* A browser-based frontend
+* A Java/Spring Boot backend
+* Relational database persistence
+* Secure authentication
+* File storage
+* RabbitMQ-based asynchronous processing
+* A Python/FastAPI AI service
+* Document parsing
+* LLM processing
+* Embedding-based semantic comparison
+* Structured output validation
+* Deployment infrastructure
+
+Therefore, NexHire is not simply a CRUD recruitment application. It combines **full-stack development, distributed service communication, asynchronous processing, document processing, and AI-assisted analysis** within a single application workflow.
+
+---
+
+# 33. License
+
+License information will be added here.
