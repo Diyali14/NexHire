@@ -1,695 +1,661 @@
 /* =========================================================
-   NexHire — Authentication JavaScript
-   Shared by candidate/recruiter login and signup pages.
+   NEXHIRE — AUTHENTICATION
+   Candidate & Recruiter Login / Signup
    ========================================================= */
 
 (function () {
-  "use strict";
-
-  const root = document.documentElement;
-
-  const API_BASE_URL =
-    window.NEXHIRE_API_BASE_URL ||
-    "https://nexhire-backend-5zv7.onrender.com/api/v1";
-
-  /* =========================================================
-     THEME
-     ========================================================= */
-
-  const systemTheme = () =>
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-
-  const applyTheme = (theme, persist = true) => {
-    root.dataset.theme = theme;
-
-    if (persist) {
-      localStorage.setItem("nexhire-theme", theme);
-    }
-
-    document.querySelectorAll(".theme-toggle").forEach((button) => {
-      const dark = theme === "dark";
-
-      button.setAttribute("aria-pressed", String(dark));
-      button.setAttribute(
-        "aria-label",
-        dark ? "Switch to light mode" : "Switch to dark mode"
-      );
-    });
-  };
-
-  applyTheme(
-    localStorage.getItem("nexhire-theme") || systemTheme(),
-    false
-  );
-
-  /* =========================================================
-     ICONS
-     ========================================================= */
-
-  function refreshIcons() {
-    if (window.lucide) {
-      lucide.createIcons();
-    }
-  }
-
-  /* =========================================================
-     MESSAGES & ERRORS
-     ========================================================= */
-
-  function setMessage(element, message, type) {
-    if (!element) return;
-
-    element.textContent = message || "";
-
-    element.className =
-      "form-message" +
-      (message ? " show" : "") +
-      (type ? ` ${type}` : "");
-  }
-
-  function setFieldError(input, message) {
-    const field = input?.closest(".form-field");
-    const error = field?.querySelector(".field-error");
-
-    if (error) {
-      error.textContent = message || "";
-    }
-
-    input?.setAttribute("aria-invalid", message ? "true" : "false");
-  }
-
-  function clearErrors(form) {
-    form
-      .querySelectorAll(".field-error")
-      .forEach((el) => (el.textContent = ""));
-
-    form
-      .querySelectorAll("[aria-invalid]")
-      .forEach((el) => el.setAttribute("aria-invalid", "false"));
-  }
-
-  /* =========================================================
-     PASSWORD TOGGLE
-     ========================================================= */
-
-  function togglePassword(button) {
-    const input = document.getElementById(button.dataset.target);
-
-    if (!input) return;
-
-    const show = input.type === "password";
-
-    input.type = show ? "text" : "password";
-
-    button.setAttribute(
-      "aria-label",
-      show ? "Hide password" : "Show password"
-    );
-
-    button.innerHTML = `<i data-lucide="${
-      show ? "eye-off" : "eye"
-    }"></i>`;
-
-    refreshIcons();
-  }
-
-  /* =========================================================
-     PASSWORD STRENGTH
-     ========================================================= */
-
-  function passwordScore(password) {
-    let score = 0;
-
-    if (password.length >= 8) score++;
-    if (/[a-z]/.test(password)) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/\d/.test(password)) score++;
-    if (/[^A-Za-z0-9]/.test(password)) score++;
-
-    return score;
-  }
-
-  function updateStrength(input) {
-    const wrapper = input
-      .closest(".form-field")
-      ?.querySelector(".password-strength");
-
-    if (!wrapper) return;
-
-    const bar = wrapper.querySelector(".strength-track span");
-    const text = wrapper.querySelector(".strength-text");
-
-    const score = passwordScore(input.value);
-
-    const widths = [
-      "0%",
-      "20%",
-      "40%",
-      "60%",
-      "80%",
-      "100%",
-    ];
-
-    const labels = [
-      "",
-      "Very weak",
-      "Weak",
-      "Fair",
-      "Strong",
-      "Very strong",
-    ];
-
-    bar.style.width = widths[score];
-
-    text.textContent = input.value
-      ? `Password strength: ${labels[score]}`
-      : "Use at least 8 characters with a mix of letters, numbers, and symbols.";
-  }
-
-  /* =========================================================
-     FORM VALIDATION
-     ========================================================= */
-
-  function validate(form) {
-    let valid = true;
-
-    const email = form.querySelector('input[type="email"]');
-    const password = form.querySelector('input[name="password"]');
-
-    const confirm = form.querySelector(
-      'input[name="confirmPassword"]'
-    );
-
-    const terms = form.querySelector('input[name="terms"]');
-
-    if (email && !email.validity.valid) {
-      setFieldError(email, "Please enter a valid email address.");
-      valid = false;
-    } else if (email) {
-      setFieldError(email, "");
-    }
-
-    if (password && password.value.length < 8) {
-      setFieldError(
-        password,
-        "Password must be at least 8 characters."
-      );
-
-      valid = false;
-    } else if (password) {
-      setFieldError(password, "");
-    }
-
-    if (confirm && confirm.value !== password?.value) {
-      setFieldError(confirm, "Passwords do not match.");
-      valid = false;
-    } else if (confirm) {
-      setFieldError(confirm, "");
-    }
-
-    if (terms && !terms.checked) {
-      setFieldError(
-        terms,
-        "Please accept the Terms & Conditions and Privacy Policy."
-      );
-
-      valid = false;
-    } else if (terms) {
-      setFieldError(terms, "");
-    }
-
-    return valid;
-  }
-
-  /* =========================================================
-     SERVER ERROR MESSAGE
-     ========================================================= */
-
-  function extractServerMessage(data, fallback) {
-    if (!data) return fallback;
-
-    if (typeof data.message === "string") {
-      return data.message;
-    }
-
-    if (typeof data.error === "string") {
-      return data.error;
-    }
-
-    if (data.errors && typeof data.errors === "object") {
-      const first = Object.values(data.errors).find(
-        (value) => typeof value === "string"
-      );
-
-      if (first) {
-        return first;
-      }
-    }
-
-    return fallback;
-  }
-
-  /* =========================================================
-     CANDIDATE SIGNUP DATA
-     ========================================================= */
-
-  function collectCandidateSignupData(form) {
-    const candidateData = {
-      firstName:
-        form.querySelector('input[name="firstName"]')?.value.trim() || "",
-
-      lastName:
-        form.querySelector('input[name="lastName"]')?.value.trim() || "",
-
-      email:
-        form.querySelector('input[name="email"]')?.value.trim() || "",
-
-      phone:
-        form.querySelector('input[name="phone"]')?.value.trim() || "",
-
-      password:
-        form.querySelector('input[name="password"]')?.value || "",
-
-      confirmPassword:
-        form.querySelector('input[name="confirmPassword"]')?.value || "",
-
-      terms:
-        form.querySelector('input[name="terms"]')?.checked || false,
-    };
-
-    console.log("Candidate Signup Data:");
-    console.log({
-      ...candidateData,
-      password: "[hidden]",
-      confirmPassword: "[hidden]",
-    });
-
-    return candidateData;
-  }
-
-  /* =========================================================
-     RECRUITER SIGNUP DATA
-     ========================================================= */
-
-  function collectRecruiterSignupData(form) {
-    const recruiterData = {
-      firstName:
-        form.querySelector('input[name="firstName"]')?.value.trim() || "",
-
-      lastName:
-        form.querySelector('input[name="lastName"]')?.value.trim() || "",
-
-      email:
-        form.querySelector('input[name="email"]')?.value.trim() || "",
-
-      phone:
-        form.querySelector('input[name="phone"]')?.value.trim() || "",
-
-      password:
-        form.querySelector('input[name="password"]')?.value || "",
-
-      confirmPassword:
-        form.querySelector('input[name="confirmPassword"]')?.value || "",
-
-      terms:
-        form.querySelector('input[name="terms"]')?.checked || false,
-    };
-
-    console.log("Recruiter Signup Data:");
-    console.log({
-      ...recruiterData,
-      password: "[hidden]",
-      confirmPassword: "[hidden]",
-    });
-
-    return recruiterData;
-  }
-
-  /* =========================================================
-     LOGIN DATA COLLECTION
-     ========================================================= */
-
-  function collectLoginData(form, role) {
-    const loginData = {
-      email:
-        form.querySelector('input[name="email"]')?.value.trim() || "",
-
-      password:
-        form.querySelector('input[name="password"]')?.value || "",
-    };
-
-    console.log(
-      `${role.charAt(0).toUpperCase() + role.slice(1)} Login Data:`
-    );
-
-    console.log({
-      ...loginData,
-      password: "[hidden]",
-    });
-
-    return loginData;
-  }
-
-  /* =========================================================
-     BACKEND RESPONSE
-     ========================================================= */
-
-  function handleAuthResponse(data) {
-    if (!data || typeof data !== "object") return;
-
-    const accessToken = data.accessToken || data.token;
-
-    if (typeof accessToken === "string" && accessToken) {
-      sessionStorage.setItem(
-        "token",
-        accessToken
-      );
-    }
-  }
-
-  /* =========================================================
-     API REQUEST
-     ========================================================= */
-
-  async function request(path, payload) {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-
-      credentials: "include",
-
-      body: JSON.stringify(payload),
-    });
-
-    let data = null;
-
-    const contentType =
-      response.headers.get("content-type") || "";
-
-    if (contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      const text = await response.text();
-
-      data = text ? { message: text } : null;
-    }
-
-    if (!response.ok) {
-      const error = new Error(
-        extractServerMessage(
-          data,
-          "Unable to complete the request. Please try again."
-        )
-      );
-
-      error.status = response.status;
-      error.data = data;
-
-      throw error;
-    }
-
-    return data;
-  }
-
-  /* =========================================================
-     SUBMIT BUTTON
-     ========================================================= */
-
-  function setSubmitting(form, submitting, defaultText) {
-    const button = form.querySelector(
-      "button[type='submit']"
-    );
-
-    if (!button) return;
-
-    button.disabled = submitting;
-
-    button.innerHTML = submitting
-      ? `<i data-lucide="loader-circle" class="spin-icon"></i>${
-          form.dataset.mode === "login"
-            ? "Signing in..."
-            : "Creating account..."
-        }`
-      : `<i data-lucide="${
-          form.dataset.mode === "login"
-            ? "arrow-right"
-            : "user-plus"
-        }"></i>${defaultText}`;
-
-    refreshIcons();
-  }
-
-  /* =========================================================
-     REDIRECT
-     ========================================================= */
-
-  function redirectAfterAuth(role) {
-    window.location.href =
-      role === "candidate"
-        ? "candidate-dashboard.html"
-        : "recruiter_dashboard.html";
-  }
-
-  /* =========================================================
-     AUTH FORM SUBMISSION
-     ========================================================= */
-
-  async function submitAuth(form) {
-    clearErrors(form);
-
-    const message = form.querySelector(".form-message");
-
-    setMessage(message, "", "");
-
-    if (!validate(form)) {
-      return;
-    }
-
-    const role = form.dataset.role;
-    const mode = form.dataset.mode;
+    "use strict";
 
     /* =====================================================
-       COLLECT & PRINT FORM OBJECT
+       CONFIGURATION
        ===================================================== */
 
-    if (mode === "login") {
-      collectLoginData(form, role);
-    }
+    const CANDIDATE_DASHBOARD = "candidate-dashboard.html";
+    const RECRUITER_DASHBOARD = "recruiter_dashboard.html";
 
-    if (role === "candidate" && mode === "register") {
-      collectCandidateSignupData(form);
-    }
-
-    if (role === "recruiter" && mode === "register") {
-      collectRecruiterSignupData(form);
-    }
 
     /* =====================================================
-       API PAYLOAD
+       DOM HELPERS
        ===================================================== */
 
-    const email =
-      form.querySelector('input[type="email"]')?.value.trim();
+    function $(selector, parent = document) {
+        return parent.querySelector(selector);
+    }
 
-    const password =
-      form.querySelector('input[name="password"]')?.value;
+    function $$(selector, parent = document) {
+        return Array.from(parent.querySelectorAll(selector));
+    }
 
-    const payload = {
-      email,
-      password,
-    };
 
     /* =====================================================
-       ADD SIGNUP FIELDS
+       THEME MANAGEMENT
        ===================================================== */
 
-    if (mode === "register") {
-      const firstName =
-        form
-          .querySelector('input[name="firstName"]')
-          ?.value.trim() || "";
+    function applyTheme(theme) {
+        const selectedTheme = theme === "dark" ? "dark" : "light";
 
-      const lastName =
-        form
-          .querySelector('input[name="lastName"]')
-          ?.value.trim() || "";
+        document.documentElement.setAttribute(
+            "data-theme",
+            selectedTheme
+        );
 
-      const phone =
-        form
-          .querySelector('input[name="phone"]')
-          ?.value.trim() || "";
+        localStorage.setItem("nexhire-theme", selectedTheme);
 
-      payload.firstName = firstName;
-      payload.lastName = lastName;
-      payload.phone = phone;
+        updateThemeButtons(selectedTheme);
     }
 
-    const path =
-      mode === "login"
-        ? `/auth/${role}/login`
-        : `/auth/${role}/register`;
 
-    setSubmitting(form, true);
+    function updateThemeButtons(theme) {
+        const themeButtons = $$(
+            "#themeToggle, .theme-toggle, [data-theme-toggle]"
+        );
 
-    try {
-      const data = await request(path, payload);
+        themeButtons.forEach(function (button) {
+            button.textContent = theme === "dark" ? "☀" : "☾";
 
-      handleAuthResponse(data);
+            button.setAttribute(
+                "aria-label",
+                theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+            );
 
-      setMessage(
-        message,
-        mode === "login"
-          ? "Signed in successfully. Redirecting..."
-          : "Account created successfully. Redirecting...",
-        "success"
-      );
-
-      window.setTimeout(
-        () => redirectAfterAuth(role),
-        350
-      );
-    } catch (error) {
-      const messageText =
-        error.status === 401
-          ? "Invalid email or password."
-          : error.status === 409
-          ? "An account with this email already exists."
-          : error.message ||
-            "Unable to connect to the server. Please try again.";
-
-      setMessage(message, messageText, "error");
-
-      setSubmitting(
-        form,
-        false,
-        form.dataset.mode === "login"
-          ? "Login"
-          : role === "recruiter"
-          ? "Create Recruiter Account"
-          : "Create Account"
-      );
-    }
-  }
-
-  /* =========================================================
-     PAGE INITIALIZATION
-     ========================================================= */
-
-  document.addEventListener("DOMContentLoaded", () => {
-    refreshIcons();
-
-    /* Theme toggle */
-
-    document
-      .querySelectorAll(".theme-toggle")
-      .forEach((button) => {
-        button.addEventListener("click", () => {
-          applyTheme(
-            root.dataset.theme === "dark"
-              ? "light"
-              : "dark"
-          );
+            button.setAttribute(
+                "title",
+                theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+            );
         });
-      });
+    }
 
-    /* System theme change */
 
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .addEventListener("change", (event) => {
-        if (!localStorage.getItem("nexhire-theme")) {
-          applyTheme(
-            event.matches ? "dark" : "light",
-            false
-          );
+    function initializeTheme() {
+        const savedTheme = localStorage.getItem("nexhire-theme") || "light";
+
+        applyTheme(savedTheme);
+
+        const themeButtons = $$(
+            "#themeToggle, .theme-toggle, [data-theme-toggle]"
+        );
+
+        themeButtons.forEach(function (button) {
+            button.addEventListener("click", function () {
+                const currentTheme =
+                    document.documentElement.getAttribute("data-theme");
+
+                applyTheme(currentTheme === "dark" ? "light" : "dark");
+            });
+        });
+    }
+
+
+    /* =====================================================
+       ICON REFRESH
+       ===================================================== */
+
+    function refreshIcons() {
+        if (window.lucide && typeof window.lucide.createIcons === "function") {
+            window.lucide.createIcons();
         }
-      });
+    }
 
-    /* Password visibility */
 
-    document
-      .querySelectorAll(".password-toggle")
-      .forEach((button) => {
-        button.addEventListener("click", () => {
-          togglePassword(button);
-        });
-      });
+    /* =====================================================
+       MESSAGE HELPERS
+       ===================================================== */
 
-    /* Password strength */
+    function showMessage(message, type, form) {
+        const messageBox =
+            $("#authMessage", form) ||
+            $("#formMessage", form) ||
+            $(".auth-message", form) ||
+            $("#authMessage") ||
+            $("#formMessage");
 
-    document
-      .querySelectorAll('input[name="password"]')
-      .forEach((input) => {
-        input.addEventListener("input", () => {
-          updateStrength(input);
-        });
-      });
+        if (messageBox) {
+            messageBox.textContent = message;
+            messageBox.className = "auth-message " + (type || "info");
+            messageBox.style.display = "block";
+            messageBox.setAttribute("role", "alert");
+        } else {
+            // Fallback when the page does not contain a message element.
+            console.log("[NexHire]", message);
+        }
+    }
 
-    /* Authentication forms */
 
-    document
-      .querySelectorAll("form[data-auth-form]")
-      .forEach((form) => {
-        form.addEventListener("submit", (event) => {
-          event.preventDefault();
+    function clearMessage(form) {
+        const messageBox =
+            $("#authMessage", form) ||
+            $("#formMessage", form) ||
+            $(".auth-message", form) ||
+            $("#authMessage") ||
+            $("#formMessage");
 
-          submitAuth(form);
-        });
+        if (messageBox) {
+            messageBox.textContent = "";
+            messageBox.style.display = "none";
+        }
+    }
 
-        /* Field validation on blur */
 
-        form.querySelectorAll("input").forEach((input) => {
-          input.addEventListener("blur", () => {
-            if (
-              input.type === "email" &&
-              input.value &&
-              !input.validity.valid
-            ) {
-              setFieldError(
-                input,
-                "Please enter a valid email address."
-              );
+    /* =====================================================
+       INPUT VALIDATION
+       ===================================================== */
+
+    function setFieldError(input, message) {
+        if (!input) return;
+
+        input.classList.add("error");
+        input.setAttribute("aria-invalid", "true");
+
+        let errorElement = input.parentElement
+            ? $(".field-error", input.parentElement)
+            : null;
+
+        if (!errorElement) {
+            errorElement = document.createElement("small");
+            errorElement.className = "field-error";
+
+            if (input.parentElement) {
+                input.parentElement.appendChild(errorElement);
+            }
+        }
+
+        errorElement.textContent = message;
+        errorElement.style.display = "block";
+    }
+
+
+    function clearFieldError(input) {
+        if (!input) return;
+
+        input.classList.remove("error");
+        input.removeAttribute("aria-invalid");
+
+        const errorElement = input.parentElement
+            ? $(".field-error", input.parentElement)
+            : null;
+
+        if (errorElement) {
+            errorElement.textContent = "";
+            errorElement.style.display = "none";
+        }
+    }
+
+
+    function validateEmail(email) {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(email);
+    }
+
+
+    function validatePassword(password) {
+        return typeof password === "string" && password.length >= 8;
+    }
+
+
+    function validateForm(form) {
+        let isValid = true;
+
+        const emailInput = $(
+            'input[name="email"], input[type="email"], #email',
+            form
+        );
+
+        const passwordInput = $(
+            'input[name="password"], #password',
+            form
+        );
+
+        const firstNameInput = $(
+            'input[name="firstName"], #firstName',
+            form
+        );
+
+        const lastNameInput = $(
+            'input[name="lastName"], #lastName',
+            form
+        );
+
+        const phoneInput = $(
+            'input[name="phone"], input[type="tel"], #phone',
+            form
+        );
+
+        const confirmPasswordInput = $(
+            'input[name="confirmPassword"], #confirmPassword',
+            form
+        );
+
+        const mode = (form.dataset.mode || "login").toLowerCase();
+
+        [emailInput, passwordInput, firstNameInput, lastNameInput,
+            phoneInput, confirmPasswordInput].forEach(clearFieldError);
+
+        if (!emailInput || !emailInput.value.trim()) {
+            setFieldError(emailInput, "Please enter your email address.");
+            isValid = false;
+        } else if (!validateEmail(emailInput.value.trim())) {
+            setFieldError(emailInput, "Please enter a valid email address.");
+            isValid = false;
+        }
+
+        if (!passwordInput || !passwordInput.value) {
+            setFieldError(passwordInput, "Please enter your password.");
+            isValid = false;
+        } else if (!validatePassword(passwordInput.value)) {
+            setFieldError(
+                passwordInput,
+                "Password must contain at least 8 characters."
+            );
+            isValid = false;
+        }
+
+        if (mode === "register") {
+            if (!firstNameInput || !firstNameInput.value.trim()) {
+                setFieldError(firstNameInput, "Please enter your first name.");
+                isValid = false;
+            }
+
+            if (!lastNameInput || !lastNameInput.value.trim()) {
+                setFieldError(lastNameInput, "Please enter your last name.");
+                isValid = false;
+            }
+
+            if (phoneInput && phoneInput.value.trim()) {
+                const phonePattern = /^[+]?[\d\s()-]{7,20}$/;
+
+                if (!phonePattern.test(phoneInput.value.trim())) {
+                    setFieldError(phoneInput, "Please enter a valid phone number.");
+                    isValid = false;
+                }
             }
 
             if (
-              input.name === "confirmPassword" &&
-              input.value !==
-                form.querySelector(
-                  'input[name="password"]'
-                )?.value
+                confirmPasswordInput &&
+                confirmPasswordInput.value !== passwordInput.value
             ) {
-              setFieldError(
-                input,
-                "Passwords do not match."
-              );
+                setFieldError(confirmPasswordInput, "Passwords do not match.");
+                isValid = false;
             }
-          });
+        }
+
+        return isValid;
+    }
+
+
+    /* =====================================================
+       PASSWORD VISIBILITY
+       ===================================================== */
+
+    function initializePasswordToggles() {
+        const toggleButtons = $$(
+            ".password-toggle, [data-password-toggle], #togglePassword"
+        );
+
+        toggleButtons.forEach(function (button) {
+            button.addEventListener("click", function () {
+                const targetId = button.dataset.target;
+                let passwordInput = targetId
+                    ? document.getElementById(targetId)
+                    : button.parentElement
+                        ? $("input", button.parentElement)
+                        : null;
+
+                if (!passwordInput) return;
+
+                const isPassword = passwordInput.type === "password";
+
+                passwordInput.type = isPassword ? "text" : "password";
+
+                button.setAttribute(
+                    "aria-label",
+                    isPassword ? "Hide password" : "Show password"
+                );
+
+                button.setAttribute(
+                    "title",
+                    isPassword ? "Hide password" : "Show password"
+                );
+
+                refreshIcons();
+            });
         });
-      });
+    }
 
-    /* Forgot password */
 
-    document
-      .querySelectorAll(".forgot-password-link")
-      .forEach((link) => {
-        link.addEventListener("click", (event) => {
-          event.preventDefault();
+    /* =====================================================
+       PASSWORD STRENGTH
+       ===================================================== */
 
-          const message =
-            document.querySelector(".form-message");
+    function calculatePasswordStrength(password) {
+        let score = 0;
 
-          setMessage(
-            message,
-            "Password reset is ready for the backend forgot-password flow. No reset has been performed.",
-            ""
-          );
+        if (password.length >= 8) score++;
+        if (password.length >= 12) score++;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+        if (/\d/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+
+        if (!password) {
+            return {
+                score: 0,
+                label: ""
+            };
+        }
+
+        if (score <= 2) {
+            return {
+                score: score,
+                label: "Weak"
+            };
+        }
+
+        if (score <= 4) {
+            return {
+                score: score,
+                label: "Medium"
+            };
+        }
+
+        return {
+            score: score,
+            label: "Strong"
+        };
+    }
+
+
+    function initializePasswordStrength() {
+        const passwordInput = $(
+            'input[name="password"], #password'
+        );
+
+        const strengthText = $(
+            "#passwordStrengthText, .password-strength-text"
+        );
+
+        const strengthBar = $(
+            "#passwordStrengthBar, .password-strength-bar"
+        );
+
+        if (!passwordInput) return;
+
+        passwordInput.addEventListener("input", function () {
+            const result = calculatePasswordStrength(passwordInput.value);
+
+            if (strengthText) {
+                strengthText.textContent = result.label;
+            }
+
+            if (strengthBar) {
+                const percentage = (result.score / 5) * 100;
+                strengthBar.style.width = percentage + "%";
+                strengthBar.setAttribute("aria-valuenow", String(result.score));
+            }
         });
-      });
-  });
+    }
+
+
+    /* =====================================================
+       AUTH RESPONSE HANDLING
+       ===================================================== */
+
+    function handleAuthResponse(data, role) {
+        if (!data || typeof data !== "object") {
+            throw new Error("The server returned an invalid response.");
+        }
+
+        const token = data.token || data.accessToken || data.access_token;
+
+        if (!token) {
+            throw new Error(
+                "Authentication succeeded, but the server did not return a token."
+            );
+        }
+
+        // Use the same token key expected by api.js.
+        sessionStorage.setItem("token", token);
+
+        const userId = data.id || data.userId || data.user_id;
+        const userEmail = data.email || "";
+        const firstName = data.firstName || data.first_name || "";
+        const lastName = data.lastName || data.last_name || "";
+
+        const roles = Array.isArray(data.roles) ? data.roles : [];
+        const userRole = role || roles[0] || data.role || "";
+
+        if (userId !== undefined && userId !== null) {
+            sessionStorage.setItem("userId", String(userId));
+        }
+
+        if (userEmail) {
+            sessionStorage.setItem("userEmail", userEmail);
+        }
+
+        if (firstName) {
+            sessionStorage.setItem("firstName", firstName);
+        }
+
+        if (lastName) {
+            sessionStorage.setItem("lastName", lastName);
+        }
+
+        if (userRole) {
+            sessionStorage.setItem("userRole", String(userRole).toLowerCase());
+        }
+
+        sessionStorage.setItem("isAuthenticated", "true");
+    }
+
+
+    /* =====================================================
+       API REQUEST
+       Reuses the shared api.js helper.
+       ===================================================== */
+
+    async function request(path, payload) {
+        if (typeof apiPost !== "function") {
+            throw new Error(
+                "API helper is unavailable. Check that config.js and api.js load before auth.js."
+            );
+        }
+
+        return apiPost(path, payload);
+    }
+
+
+    /* =====================================================
+       FORM SUBMISSION
+       ===================================================== */
+
+    async function submitAuth(form) {
+        clearMessage(form);
+
+        if (!validateForm(form)) {
+            showMessage("Please correct the highlighted fields.", "error", form);
+            return;
+        }
+
+        const role = (form.dataset.role || "candidate").toLowerCase();
+        const mode = (form.dataset.mode || "login").toLowerCase();
+
+        const emailInput = $(
+            'input[name="email"], input[type="email"], #email',
+            form
+        );
+
+        const passwordInput = $(
+            'input[name="password"], #password',
+            form
+        );
+
+        const firstNameInput = $(
+            'input[name="firstName"], #firstName',
+            form
+        );
+
+        const lastNameInput = $(
+            'input[name="lastName"], #lastName',
+            form
+        );
+
+        const phoneInput = $(
+            'input[name="phone"], input[type="tel"], #phone',
+            form
+        );
+
+        const payload = {
+            email: emailInput.value.trim(),
+            password: passwordInput.value
+        };
+
+        if (mode === "register") {
+            payload.firstName = firstNameInput.value.trim();
+            payload.lastName = lastNameInput.value.trim();
+
+            if (phoneInput && phoneInput.value.trim()) {
+                payload.phone = phoneInput.value.trim();
+            }
+        }
+
+        const endpoint =
+            mode === "register"
+                ? `/auth/${role}/register`
+                : `/auth/${role}/login`;
+
+        const submitButton = $(
+            'button[type="submit"], input[type="submit"]',
+            form
+        );
+
+        const originalButtonText = submitButton
+            ? submitButton.textContent
+            : "";
+
+        if (submitButton) {
+            submitButton.disabled = true;
+
+            if (submitButton.tagName.toLowerCase() === "input") {
+                submitButton.value = "Please wait...";
+            } else {
+                submitButton.textContent = "Please wait...";
+            }
+        }
+
+        try {
+            const data = await request(endpoint, payload);
+
+            handleAuthResponse(data, role);
+
+            showMessage(
+                mode === "register"
+                    ? "Account created successfully. Redirecting..."
+                    : "Login successful. Redirecting...",
+                "success",
+                form
+            );
+
+            const destination =
+                role === "recruiter"
+                    ? RECRUITER_DASHBOARD
+                    : CANDIDATE_DASHBOARD;
+
+            window.setTimeout(function () {
+                window.location.href = destination;
+            }, 700);
+
+        } catch (error) {
+            console.error("NexHire authentication error:", error);
+
+            const status = error.status;
+            let message = error.message || "Something went wrong. Please try again.";
+
+            if (status === 400) {
+                message = "Please check the information you entered.";
+            } else if (status === 401) {
+                message = "Invalid email or password. Please try again.";
+            } else if (status === 403) {
+                message = "You are not authorized to perform this action.";
+            } else if (status === 409) {
+                message = "An account with this email may already exist.";
+            } else if (status >= 500) {
+                message = "The server is having a problem. Please try again later.";
+            }
+
+            showMessage(message, "error", form);
+
+        } finally {
+            if (submitButton) {
+                submitButton.disabled = false;
+
+                if (submitButton.tagName.toLowerCase() === "input") {
+                    submitButton.value = originalButtonText || "Submit";
+                } else {
+                    submitButton.textContent = originalButtonText || "Submit";
+                }
+            }
+        }
+    }
+
+
+    /* =====================================================
+       AUTH FORM INITIALIZATION
+       ===================================================== */
+
+    function initializeAuthForms() {
+        const forms = $$(
+            'form[data-role][data-mode], #loginForm, #signupForm, #registerForm'
+        );
+
+        forms.forEach(function (form) {
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                submitAuth(form);
+            });
+
+            $$("input", form).forEach(function (input) {
+                input.addEventListener("input", function () {
+                    clearFieldError(input);
+                });
+            });
+        });
+    }
+
+
+    /* =====================================================
+       FORGOT PASSWORD
+       ===================================================== */
+
+    function initializeForgotPassword() {
+        const forgotLinks = $$(
+            "#forgotPassword, .forgot-password, [data-forgot-password]"
+        );
+
+        forgotLinks.forEach(function (link) {
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+
+                const form = link.closest("form") || document;
+
+                showMessage(
+                    "Password reset is not connected yet. Please contact the NexHire team for assistance.",
+                    "info",
+                    form
+                );
+            });
+        });
+    }
+
+
+    /* =====================================================
+       INITIALIZATION
+       ===================================================== */
+
+    document.addEventListener("DOMContentLoaded", function () {
+        initializeTheme();
+        initializePasswordToggles();
+        initializePasswordStrength();
+        initializeAuthForms();
+        initializeForgotPassword();
+        refreshIcons();
+    });
+
 })();

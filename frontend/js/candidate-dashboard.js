@@ -18,7 +18,8 @@ document.addEventListener("DOMContentLoaded", function () {
        ===================================================== */
 
     const token =
-        sessionStorage.getItem("token");
+        sessionStorage.getItem("token") ||
+        localStorage.getItem("token");
 
 
     /* =====================================================
@@ -32,15 +33,15 @@ document.addEventListener("DOMContentLoaded", function () {
             ...(options.headers || {})
         };
 
-        if (options.body &&
-            !(options.body instanceof FormData)) {
-
+        if (
+            options.body &&
+            !(options.body instanceof FormData)
+        ) {
             headers["Content-Type"] =
                 "application/json";
         }
 
         if (token) {
-
             headers["Authorization"] =
                 "Bearer " + token;
         }
@@ -65,12 +66,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
-
         let data = null;
 
         const contentType =
             response.headers.get("content-type") || "";
-
 
         if (
             contentType.includes("application/json")
@@ -105,7 +104,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
-
         if (!response.ok) {
 
             const message =
@@ -126,9 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
-
         return data;
-
     }
 
 
@@ -138,7 +134,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const themeToggle =
         document.getElementById("themeToggle");
-
 
     const savedTheme =
         localStorage.getItem("nexhire-theme");
@@ -166,7 +161,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     "title",
                     "Switch to light mode"
                 );
-
             }
 
         } else {
@@ -188,11 +182,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     "title",
                     "Switch to dark mode"
                 );
-
             }
-
         }
-
     }
 
 
@@ -226,7 +217,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             }
         );
-
     }
 
 
@@ -238,7 +228,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById(
             "profileButton"
         );
-
 
     const profileDropdown =
         document.getElementById(
@@ -262,9 +251,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "aria-expanded",
                 "false"
             );
-
         }
-
     }
 
 
@@ -284,7 +271,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         "open"
                     );
 
-
                 if (isOpen) {
 
                     closeProfileDropdown();
@@ -299,9 +285,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         "aria-expanded",
                         "true"
                     );
-
                 }
-
             }
         );
 
@@ -322,7 +306,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     closeProfileDropdown();
 
                 }
-
             }
         );
 
@@ -336,10 +319,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     closeProfileDropdown();
 
                 }
-
             }
         );
-
     }
 
 
@@ -366,10 +347,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     }
                 );
-
             }
         );
-
     }
 
 
@@ -394,11 +373,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         "Are you sure you want to logout?"
                     );
 
-
                 if (!confirmLogout) {
-
                     return;
-
                 }
 
 
@@ -445,7 +421,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             }
         );
-
     }
 
 
@@ -463,7 +438,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             return;
-
         }
 
 
@@ -482,6 +456,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             updateProfileUI(profile);
+
+
+            /*
+             * Calculate profile completion
+             */
+            updateProfileCompletion(profile);
 
 
         } catch (error) {
@@ -503,192 +483,434 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 window.location.href =
                     "candidate-login.html";
-
             }
-
         }
-
     }
 
 
+    
     /* =====================================================
-       UPDATE PROFILE UI
+   UPDATE PROFILE UI
+   ===================================================== */
+
+function updateProfileUI(profile) {
+
+    if (!profile) {
+        return;
+    }
+
+
+    /* =================================================
+       GET NAME
+       ================================================= */
+
+    const firstName =
+        profile.firstName || "";
+
+    const lastName =
+        profile.lastName || "";
+
+    const fullName =
+        `${firstName} ${lastName}`.trim();
+
+    const displayName =
+        fullName || "Candidate";
+
+
+    /* =================================================
+       SAVE COMPLETE PROFILE
+       FOR OTHER CANDIDATE PAGES
+       ================================================= */
+
+    sessionStorage.setItem(
+        "candidateProfile",
+        JSON.stringify(profile)
+    );
+
+
+    /* =================================================
+       SAVE BASIC CANDIDATE INFORMATION
+       ================================================= */
+
+    sessionStorage.setItem(
+        "candidateName",
+        displayName
+    );
+
+    localStorage.setItem(
+        "candidateName",
+        displayName
+    );
+
+
+    if (profile.id !== null &&
+        profile.id !== undefined) {
+
+        sessionStorage.setItem(
+            "candidateId",
+            String(profile.id)
+        );
+
+        localStorage.setItem(
+            "candidateId",
+            String(profile.id)
+        );
+    }
+
+
+    /* =================================================
+       HEADER NAME
+       ================================================= */
+
+    const headerName =
+        document.getElementById(
+            "headerName"
+        );
+
+
+    if (headerName) {
+
+        headerName.textContent =
+            displayName;
+    }
+
+
+    /* =================================================
+       WELCOME NAME
+       ================================================= */
+
+    const welcomeName =
+        document.getElementById(
+            "welcomeName"
+        );
+
+
+    if (welcomeName) {
+
+        welcomeName.textContent =
+            (firstName || "Candidate") + ".";
+    }
+
+
+    /* =================================================
+       FULL NAME
+       ================================================= */
+
+    const candidateFullName =
+        document.getElementById(
+            "candidateFullName"
+        );
+
+
+    if (candidateFullName) {
+
+        candidateFullName.textContent =
+            displayName;
+    }
+
+
+    /* =================================================
+       AVATAR INITIAL
+       ================================================= */
+
+    const initial =
+        (
+            firstName ||
+            lastName ||
+            "C"
+        )
+            .charAt(0)
+            .toUpperCase();
+
+
+    const headerAvatar =
+        document.getElementById(
+            "headerAvatar"
+        );
+
+
+    const profileAvatar =
+        document.getElementById(
+            "profileAvatar"
+        );
+
+
+    if (headerAvatar) {
+
+        headerAvatar.textContent =
+            initial;
+    }
+
+
+    if (profileAvatar) {
+
+        profileAvatar.textContent =
+            initial;
+    }
+
+
+    /* =================================================
+       PROFILE BIO
+       ================================================= */
+
+    const profileDescription =
+        document.querySelector(
+            ".profile-info > p"
+        );
+
+
+    if (profileDescription) {
+
+        if (
+            profile.bio &&
+            String(profile.bio).trim() !== ""
+        ) {
+
+            profileDescription.textContent =
+                profile.bio;
+
+        } else {
+
+            profileDescription.textContent =
+                "Computer Science Engineering Student";
+        }
+    }
+
+
+    /* =================================================
+       OPTIONAL ROLE
+       ================================================= */
+
+    const candidateRole =
+        document.getElementById(
+            "candidateRole"
+        );
+
+
+    if (candidateRole) {
+
+        candidateRole.textContent =
+            "💼 Software Engineer";
+    }
+
+
+    /* =================================================
+       OPTIONAL LOCATION
+       ================================================= */
+
+    const candidateLocation =
+        document.getElementById(
+            "candidateLocation"
+        );
+
+
+    if (candidateLocation) {
+
+        candidateLocation.textContent =
+            "📍 Kolkata, India";
+    }
+
+
+    /* =================================================
+       DEBUG
+       ================================================= */
+
+    console.log(
+        "Candidate profile saved for other pages:",
+        profile
+    );
+}
+
+
+    /* =====================================================
+       PROFILE COMPLETION
        ===================================================== */
 
-    function updateProfileUI(profile) {
+    function updateProfileCompletion(profile) {
 
         if (!profile) {
             return;
         }
 
 
-        const firstName =
-            profile.firstName || "";
+        /*
+         * Profile fields considered for completion.
+         *
+         * 7 total fields:
+         * 1. First Name
+         * 2. Last Name
+         * 3. Email
+         * 4. Phone
+         * 5. LinkedIn
+         * 6. GitHub
+         * 7. Bio
+         */
 
+        const profileFields = [
 
-        const lastName =
-            profile.lastName || "";
+            profile.firstName,
 
+            profile.lastName,
 
-        const fullName =
-            `${firstName} ${lastName}`
-                .trim();
+            profile.email,
 
+            profile.phone,
 
-        const displayName =
-            fullName ||
-            firstName ||
-            "Candidate";
+            profile.linkedinUrl,
 
+            profile.githubUrl,
 
-        /* ---------------------------------------------
-           Save candidate information locally
-           --------------------------------------------- */
-
-        if (firstName) {
-
-            sessionStorage.setItem(
-                "candidateName",
-                displayName
-            );
-
-            localStorage.setItem(
-                "candidateName",
-                displayName
-            );
-
-        }
-
-
-        if (profile.id) {
-
-            sessionStorage.setItem(
-                "candidateId",
-                String(profile.id)
-            );
-
-            localStorage.setItem(
-                "candidateId",
-                String(profile.id)
-            );
-
-        }
-
-
-        /* ---------------------------------------------
-           Header name
-           --------------------------------------------- */
-
-        const headerName =
-            document.getElementById(
-                "headerName"
-            );
-
-
-        if (headerName) {
-
-            headerName.textContent =
-                firstName || "Candidate";
-
-        }
-
-
-        /* ---------------------------------------------
-           Welcome name
-           --------------------------------------------- */
-
-        const welcomeName =
-            document.getElementById(
-                "welcomeName"
-            );
-
-
-        if (welcomeName) {
-
-            welcomeName.textContent =
-                (firstName || "Candidate") + ".";
-
-        }
-
-
-        /* ---------------------------------------------
-           Full name
-           --------------------------------------------- */
-
-        const candidateFullName =
-            document.getElementById(
-                "candidateFullName"
-            );
-
-
-        if (candidateFullName) {
-
-            candidateFullName.textContent =
-                displayName;
-
-        }
-
-
-        /* ---------------------------------------------
-           Avatar
-           --------------------------------------------- */
-
-        const initial =
-            (firstName ||
-                displayName ||
-                "C")
-                .charAt(0)
-                .toUpperCase();
-
-
-        const headerAvatar =
-            document.getElementById(
-                "headerAvatar"
-            );
-
-
-        const profileAvatar =
-            document.getElementById(
-                "profileAvatar"
-            );
-
-
-        if (headerAvatar) {
-
-            headerAvatar.textContent =
-                initial;
-
-        }
-
-
-        if (profileAvatar) {
-
-            profileAvatar.textContent =
-                initial;
-
-        }
-
-
-        /* ---------------------------------------------
-           Profile bio
-           --------------------------------------------- */
-
-        const profileDescription =
-            document.querySelector(
-                ".profile-info > p"
-            );
-
-
-        if (
-            profileDescription &&
             profile.bio
-        ) {
 
-            profileDescription.textContent =
-                profile.bio;
+        ];
 
+
+        /*
+         * Count completed fields
+         */
+
+        const completedFields =
+            profileFields.filter(
+                function (field) {
+
+                    return (
+                        field !== null &&
+                        field !== undefined &&
+                        String(field).trim() !== ""
+                    );
+
+                }
+            ).length;
+
+
+        const totalFields =
+            profileFields.length;
+
+
+        /*
+         * Calculate percentage
+         */
+
+        const percentage =
+            Math.round(
+                (
+                    completedFields /
+                    totalFields
+                ) * 100
+            );
+
+
+        console.log(
+            "Profile Completion:",
+            percentage + "%"
+        );
+
+
+        /* =================================================
+           FIND DASHBOARD ELEMENTS
+           ================================================= */
+
+        const percentageElement =
+            document.getElementById(
+                "profileCompletionPercentage"
+            );
+
+
+        const progressBar =
+            document.getElementById(
+                "profileCompletionBar"
+            );
+
+
+        const completionText =
+            document.getElementById(
+                "profileCompletionText"
+            );
+
+
+        /*
+         * Alternative IDs/classes support
+         */
+
+        const percentageElementAlt =
+            document.querySelector(
+                ".profile-completion-percentage"
+            );
+
+
+        const progressBarAlt =
+            document.querySelector(
+                ".profile-progress-bar"
+            );
+
+
+        const completionTextAlt =
+            document.querySelector(
+                ".profile-completion-text"
+            );
+
+
+        /* =================================================
+           UPDATE PERCENTAGE
+           ================================================= */
+
+        const percentageTarget =
+            percentageElement ||
+            percentageElementAlt;
+
+
+        if (percentageTarget) {
+
+            percentageTarget.textContent =
+                percentage + "%";
         }
 
+
+        /* =================================================
+           UPDATE PROGRESS BAR
+           ================================================= */
+
+        const progressTarget =
+            progressBar ||
+            progressBarAlt;
+
+
+        if (progressTarget) {
+
+            progressTarget.style.width =
+                percentage + "%";
+
+            progressTarget.setAttribute(
+                "aria-valuenow",
+                String(percentage)
+            );
+        }
+
+
+        /* =================================================
+           UPDATE DESCRIPTION
+           ================================================= */
+
+        const textTarget =
+            completionText ||
+            completionTextAlt;
+
+
+        if (textTarget) {
+
+            if (percentage === 100) {
+
+                textTarget.textContent =
+                    "Your profile is complete.";
+
+            } else {
+
+                textTarget.textContent =
+                    "Your profile is " +
+                    percentage +
+                    "% complete.";
+            }
+        }
     }
 
 
@@ -700,9 +922,7 @@ document.addEventListener("DOMContentLoaded", function () {
     async function loadResumeInformation() {
 
         if (!token) {
-
             return;
-
         }
 
 
@@ -743,7 +963,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 resumeList =
                     resumes.content;
-
             }
 
 
@@ -755,7 +974,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
                 return;
-
             }
 
 
@@ -783,7 +1001,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     "resumeId",
                     String(resumeId)
                 );
-
             }
 
 
@@ -805,9 +1022,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Failed to load resume information:",
                 error
             );
-
         }
-
     }
 
 
@@ -830,7 +1045,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             resumeStatus.textContent =
                 status;
-
         }
 
 
@@ -852,11 +1066,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 small.textContent =
                     message;
-
             }
-
         }
-
     }
 
 
@@ -867,9 +1078,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function formatResumeStatus(status) {
 
         if (!status) {
-
             return "Uploaded";
-
         }
 
 
@@ -897,9 +1106,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             default:
                 return status;
-
         }
-
     }
 
 
@@ -930,9 +1137,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             default:
                 return "Resume available";
-
         }
-
     }
 
 
@@ -944,9 +1149,7 @@ document.addEventListener("DOMContentLoaded", function () {
     async function loadParsedResume() {
 
         if (!token) {
-
             return;
-
         }
 
 
@@ -966,7 +1169,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             return;
-
         }
 
 
@@ -997,9 +1199,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Parsed resume data is not available yet.",
                 error
             );
-
         }
-
     }
 
 
@@ -1010,16 +1210,9 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateResumeData(data) {
 
         if (!data) {
-
             return;
-
         }
 
-
-        /*
-         * Backend may return skills directly
-         * or inside parsedData.
-         */
 
         const parsedData =
             data.parsedData || data;
@@ -1037,7 +1230,6 @@ document.addEventListener("DOMContentLoaded", function () {
             updateSkills(
                 skills
             );
-
         }
 
 
@@ -1051,9 +1243,7 @@ document.addEventListener("DOMContentLoaded", function () {
             updateResumeProfile(
                 profile
             );
-
         }
-
     }
 
 
@@ -1077,21 +1267,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         if (validSkills.length === 0) {
-
             return;
-
         }
 
 
         /* Remove duplicates */
 
         const uniqueSkills =
-            [...new Set(
-                validSkills.map(
-                    skill =>
-                        skill.trim()
+            [
+                ...new Set(
+                    validSkills.map(
+                        skill =>
+                            skill.trim()
+                    )
                 )
-            )];
+            ];
 
 
         const skillsCard =
@@ -1122,7 +1312,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 }
             );
-
         }
 
 
@@ -1143,9 +1332,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         ? " Skill"
                         : " Skills"
                 );
-
         }
-
     }
 
 
@@ -1156,9 +1343,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateResumeProfile(profile) {
 
         if (!profile) {
-
             return;
-
         }
 
 
@@ -1180,9 +1365,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             candidateFullName.textContent =
                 name;
-
         }
-
     }
 
 
@@ -1205,7 +1388,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     }
                 );
-
             }
         );
 
@@ -1220,17 +1402,26 @@ document.addEventListener("DOMContentLoaded", function () {
             "Dashboard loaded without authentication token."
         );
 
-        /*
-         * We do not redirect immediately.
-         * Authentication is handled by the team.
-         */
-
     } else {
 
+        /*
+         * Load candidate profile.
+         *
+         * This also calculates:
+         * Profile Completion %
+         */
         loadCandidateProfile();
 
+
+        /*
+         * Load resume
+         */
         loadResumeInformation();
 
+
+        /*
+         * Load parsed resume
+         */
         loadParsedResume();
 
     }
