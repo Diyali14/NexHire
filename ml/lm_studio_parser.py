@@ -329,12 +329,30 @@ def parse_resume_with_lm_studio(text: str) -> dict[str, Any]:
     }
     prompt = (
         "Extract structured information from this resume. Return ONLY one valid JSON object "
-        "matching the schema below. Do not infer employment from an objective or project. "
-        "Do not put employers in education. Education must contain only real degrees/schools; "
-        "use end_year only, never start_year. Preserve missing values as empty strings/lists. "
-        "Ignore standalone Spring unless the resume explicitly says Spring Boot. "
-        "Keep responsibilities concise: maximum 8 items per job, maximum 180 characters each. "
-        "Keep technologies to the 20 most relevant items. Do not copy the entire resume into JSON.\n\n"
+        "matching the schema below.\n\n"
+
+        "GENERAL RULES:\n"
+        "- Do not infer employment from an objective or project section.\n"
+        "- Do not put employers in education. Education must contain only real degrees/schools; "
+        "use end_year only, never start_year.\n"
+        "- Preserve missing values as empty strings/lists.\n"
+        "- Ignore standalone 'Spring' unless the resume explicitly says 'Spring Boot'.\n"
+        "- Keep responsibilities concise: maximum 8 items per job, maximum 180 characters each.\n"
+        "- Do not copy the entire resume into JSON — summarize/structure it.\n\n"
+
+        "SKILLS EXTRACTION (read carefully, this is the field most often done wrong):\n"
+        "- Scan the ENTIRE resume for skills, not just a labeled 'Skills' section. Include tools, "
+        "languages, frameworks, and technologies mentioned in work experience bullets, project "
+        "descriptions, and certifications — not only ones explicitly listed under a 'Skills' heading.\n"
+        "- Normalize variants to a single canonical form (e.g. 'JS' and 'Javascript' -> 'JavaScript'; "
+        "'Node' and 'Node.js' -> 'Node.js'). Do not list the same skill twice under different spellings.\n"
+        "- Do not truncate the list to an arbitrary count. Include every distinct real skill you find, "
+        "deduplicated. If the resume genuinely lists 40 tools, return 40 — do not cut it down.\n"
+        "- Exclude soft skills (e.g. 'communication', 'teamwork') unless the schema has a separate field "
+        "for them — assume technical/professional skills only unless told otherwise.\n"
+        "- Do not invent or infer skills that aren't stated or clearly demonstrated (e.g. don't add "
+        "'Docker' just because the person mentions 'deployed a containerized app' unless Docker is named).\n\n"
+
         f"SCHEMA:\n{json.dumps(schema, ensure_ascii=True)}\n\n"
         f"RESUME TEXT:\n{text[:40000]}"
     )

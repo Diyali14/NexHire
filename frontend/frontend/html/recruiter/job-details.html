@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Details & Edit — NexHire Recruiter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../../css/theme.css">
+  <link rel="stylesheet" href="../../css/global.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="dashboard.html">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span class="brand-name">Nex<span>Hire</span></span>
+      </a>
+      <div class="side-label">RECRUITER WORKSPACE</div>
+      <nav class="side-nav">
+        <a href="dashboard.html" class="side-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="post-job.html" class="side-link"><i data-lucide="plus-circle"></i> Post New Job</a>
+        <a href="jobs.html" class="side-link active"><i data-lucide="briefcase"></i> My Jobs</a>
+        <a href="profile.html" class="side-link"><i data-lucide="user"></i> Recruiter Profile</a>
+        <a href="#" class="side-link logout" id="logoutBtn"><i data-lucide="log-out"></i> Logout</a>
+      </nav>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main style="display: flex; flex-direction: column; min-height: 100vh;">
+      <header class="topbar">
+        <div class="top-actions">
+          <button class="icon-button mobile-menu" id="mobileMenuBtn" aria-label="Open navigation menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <a href="jobs.html" class="crumb">&larr; Back to My Jobs</a>
+        </div>
+        <div class="top-actions">
+          <button class="theme-toggle icon-button" aria-label="Toggle theme">
+            <i data-lucide="moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div style="margin-bottom: 24px;" id="headerSection">
+          <h1>Job Details & Configuration</h1>
+          <p style="color: var(--text-muted);">View parsed JD information or edit job title and description.</p>
+        </div>
+
+        <div id="jobDetailsContainer">
+          <div class="skeleton-card">
+            <div class="skeleton-line skeleton-title"></div>
+            <div class="skeleton-line skeleton-text"></div>
+          </div>
+        </div>
+
+        <!-- Edit Form Card -->
+        <div class="card" style="margin-top: 24px;">
+          <h3>Update Job Description</h3>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 16px;">Updating the job description will restart the AI parser and re-queue parsing.</p>
+
+          <form id="editJobForm">
+            <div id="editJobMsg" class="form-message" style="margin-bottom: 16px;"></div>
+
+            <div class="form-field">
+              <label for="editJobTitle">Job Title</label>
+              <input class="form-control" type="text" id="editJobTitle" required>
+            </div>
+
+            <div class="form-field">
+              <label for="editJobDescription">Job Description</label>
+              <textarea class="form-control" id="editJobDescription" rows="8" required></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+              <button type="submit" class="button button-primary" id="saveJobBtn">
+                Save & Re-parse Job Description
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Raw Parsed Data Display -->
+        <div class="card" style="margin-top: 24px;" id="parsedDataCard">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3>Parsed Job Requirements Data</h3>
+            <span class="status-badge status-completed" id="parsedVersionBadge">Parser v2.0.0</span>
+          </div>
+          <pre id="parsedDataPre" style="background: var(--bg-tertiary); padding: 16px; border-radius: var(--radius-md); overflow-x: auto; font-size: 0.875rem; color: var(--text-primary);"></pre>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../js/config.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/theme.js"></script>
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/api/apiClient.js"></script>
+  <script src="../../js/api/jobApi.js"></script>
+  <script src="../../js/recruiter/job-details.js"></script>
+</body>
+</html>

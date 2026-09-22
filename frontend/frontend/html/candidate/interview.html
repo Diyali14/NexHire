@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interview Prep — NexHire Candidate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../../css/theme.css">
+  <link rel="stylesheet" href="../../css/global.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="dashboard.html">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span class="brand-name">Nex<span>Hire</span></span>
+      </a>
+      <div class="side-label">CANDIDATE PORTAL</div>
+      <nav class="side-nav">
+        <a href="dashboard.html" class="side-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="resume.html" class="side-link"><i data-lucide="file-text"></i> Resume / Upload</a>
+        <a href="jobs.html" class="side-link"><i data-lucide="briefcase"></i> Search Jobs</a>
+        <a href="applications.html" class="side-link"><i data-lucide="send"></i> My Applications</a>
+        <a href="interview.html" class="side-link active"><i data-lucide="messages-square"></i> Interview Prep</a>
+        <a href="profile.html" class="side-link"><i data-lucide="user"></i> My Profile</a>
+        <a href="#" class="side-link logout" id="logoutBtn"><i data-lucide="log-out"></i> Logout</a>
+      </nav>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main style="display: flex; flex-direction: column; min-height: 100vh;">
+      <header class="topbar">
+        <div class="top-actions">
+          <button class="icon-button mobile-menu" id="mobileMenuBtn" aria-label="Open navigation menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <span class="crumb">Candidate / Interview Prep</span>
+        </div>
+        <div class="top-actions">
+          <button class="theme-toggle icon-button" aria-label="Toggle theme">
+            <i data-lucide="moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div style="margin-bottom: 24px;">
+          <h1>AI Interview Preparation</h1>
+          <p style="color: var(--text-muted);">Generate tailored interview practice questions for jobs you have applied to.</p>
+        </div>
+
+        <!-- Job Selection Bar -->
+        <div class="card" style="margin-bottom: 24px;">
+          <form id="selectAppForm" style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 240px;">
+              <label for="appliedJobsSelect" style="font-size: 0.875rem; font-weight: 600; display: block; margin-bottom: 6px;">Select Applied Position</label>
+              <select class="form-control" id="appliedJobsSelect">
+                <option value="">Loading your applied jobs...</option>
+              </select>
+            </div>
+            <button type="submit" class="button button-primary" id="generateQuestionsBtn">
+              <i data-lucide="sparkles"></i> Generate AI Questions
+            </button>
+          </form>
+        </div>
+
+        <!-- Questions View -->
+        <div class="card" id="questionsCard" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+            <h3 id="jobTitleHeader">Interview Questions</h3>
+            <span class="status-badge status-completed" id="totalCountBadge">0 Questions</span>
+          </div>
+          <div id="questionsList"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../js/config.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/theme.js"></script>
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/api/apiClient.js"></script>
+  <script src="../../js/api/applicationApi.js"></script>
+  <script src="../../js/candidate/interview.js"></script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+/* =========================================================
+   NexHire — Global Theme System & Color Tokens
+   ========================================================= */
+
+:root {
+  /* Color Palette - Light Mode Defaults */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+
+  --accent-primary: #4f46e5;
+  --accent-primary-hover: #4338ca;
+  --accent-primary-light: rgba(79, 70, 229, 0.1);
+
+  --accent-secondary: #0ea5e9;
+  --accent-secondary-hover: #0284c7;
+
+  --border-color: #e2e8f0;
+  --border-color-hover: #cbd5e1;
+
+  --card-bg: #ffffff;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.5);
+
+  --status-queued-bg: #fef3c7;
+  --status-queued-text: #92400e;
+  
+  --status-processing-bg: #e0f2fe;
+  --status-processing-text: #075985;
+  
+  --status-completed-bg: #dcfce7;
+  --status-completed-text: #166534;
+  
+  --status-failed-bg: #fee2e2;
+  --status-failed-text: #991b1b;
+
+  --score-high-bg: #dcfce7;
+  --score-high-text: #15803d;
+
+  --score-mid-bg: #fef9c3;
+  --score-mid-text: #a16207;
+
+  --score-low-bg: #fee2e2;
+  --score-low-text: #b91c1c;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Space Grotesk', 'DM Sans', sans-serif;
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #0b0f19;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1f2937;
+
+  --text-primary: #f9fafb;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-inverse: #0f172a;
+
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #4f46e5;
+  --accent-primary-light: rgba(99, 102, 241, 0.15);
+
+  --accent-secondary: #38bdf8;
+  --accent-secondary-hover: #0ea5e9;
+
+  --border-color: #1e293b;
+  --border-color-hover: #334155;
+
+  --card-bg: #111827;
+  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --glass-bg: rgba(17, 24, 39, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.08);
+
+  --status-queued-bg: rgba(245, 158, 11, 0.15);
+  --status-queued-text: #fbbf24;
+
+  --status-processing-bg: rgba(14, 165, 233, 0.15);
+  --status-processing-text: #38bdf8;
+
+  --status-completed-bg: rgba(34, 197, 94, 0.15);
+  --status-completed-text: #4ade80;
+
+  --status-failed-bg: rgba(239, 68, 68, 0.15);
+  --status-failed-text: #f87171;
+
+  --score-high-bg: rgba(34, 197, 94, 0.15);
+  --score-high-text: #4ade80;
+
+  --score-mid-bg: rgba(234, 179, 8, 0.15);
+  --score-mid-text: #facc15;
+
+  --score-low-bg: rgba(239, 68, 68, 0.15);
+  --score-low-text: #f87171;
+}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Candidate Profile — NexHire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../../css/theme.css">
+  <link rel="stylesheet" href="../../css/global.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="dashboard.html">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span class="brand-name">Nex<span>Hire</span></span>
+      </a>
+      <div class="side-label">CANDIDATE PORTAL</div>
+      <nav class="side-nav">
+        <a href="dashboard.html" class="side-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="resume.html" class="side-link"><i data-lucide="file-text"></i> Resume / Upload</a>
+        <a href="jobs.html" class="side-link"><i data-lucide="briefcase"></i> Search Jobs</a>
+        <a href="applications.html" class="side-link"><i data-lucide="send"></i> My Applications</a>
+        <a href="interview.html" class="side-link"><i data-lucide="messages-square"></i> Interview Prep</a>
+        <a href="profile.html" class="side-link active"><i data-lucide="user"></i> My Profile</a>
+        <a href="#" class="side-link logout" id="logoutBtn"><i data-lucide="log-out"></i> Logout</a>
+      </nav>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main style="display: flex; flex-direction: column; min-height: 100vh;">
+      <header class="topbar">
+        <div class="top-actions">
+          <button class="icon-button mobile-menu" id="mobileMenuBtn" aria-label="Open navigation menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <span class="crumb">Candidate / Profile & Settings</span>
+        </div>
+        <div class="top-actions">
+          <button class="theme-toggle icon-button" aria-label="Toggle theme">
+            <i data-lucide="moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div style="margin-bottom: 24px;">
+          <h1>Candidate Profile & Security</h1>
+          <p style="color: var(--text-muted);">Manage your personal details, portfolio links, and account security.</p>
+        </div>
+
+        <!-- Editable Profile Form -->
+        <div class="card" style="margin-bottom: 32px;">
+          <h3>Personal Details</h3>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 20px;">Email address is read-only per security policy.</p>
+
+          <form id="profileForm">
+            <div id="profileMsg" class="form-message" style="margin-bottom: 16px;"></div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+              <div class="form-field">
+                <label for="firstName">First Name</label>
+                <input class="form-control" type="text" id="firstName" required>
+              </div>
+              <div class="form-field">
+                <label for="lastName">Last Name</label>
+                <input class="form-control" type="text" id="lastName" required>
+              </div>
+              <div class="form-field">
+                <label for="email">Email Address (Read-only)</label>
+                <input class="form-control" type="email" id="email" readonly style="background: var(--bg-tertiary); opacity: 0.8; cursor: not-allowed;">
+              </div>
+              <div class="form-field">
+                <label for="phone">Phone Number</label>
+                <input class="form-control" type="tel" id="phone" required>
+              </div>
+              <div class="form-field">
+                <label for="linkedinUrl">LinkedIn URL</label>
+                <input class="form-control" type="url" id="linkedinUrl" placeholder="https://linkedin.com/in/username">
+              </div>
+              <div class="form-field">
+                <label for="githubUrl">GitHub URL</label>
+                <input class="form-control" type="url" id="githubUrl" placeholder="https://github.com/username">
+              </div>
+            </div>
+
+            <div class="form-field" style="margin-top: 16px;">
+              <label for="bio">Bio & Professional Summary</label>
+              <textarea class="form-control" id="bio" rows="4" placeholder="Brief summary of your technical experience..."></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+              <button type="submit" class="button button-primary" id="saveProfileBtn">Save Profile Changes</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Change Password Card -->
+        <div class="card" style="margin-bottom: 32px;">
+          <h3>Change Password</h3>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 20px;">Update your password to keep your candidate account secure.</p>
+
+          <form id="changePasswordForm">
+            <div id="changePassMsg" class="form-message" style="margin-bottom: 16px;"></div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+              <div class="form-field">
+                <label for="oldPassword">Current Password</label>
+                <input class="form-control" type="password" id="oldPassword" required>
+              </div>
+              <div class="form-field">
+                <label for="newPassword">New Password</label>
+                <input class="form-control" type="password" id="newPassword" minlength="8" required>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+              <button type="submit" class="button button-secondary" id="changePassBtn">Update Password</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Password Reset Card -->
+        <div class="card">
+          <h3>Reset Password</h3>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 20px;">Direct password reset contract endpoint.</p>
+
+          <form id="resetPasswordForm">
+            <div id="resetPassMsg" class="form-message" style="margin-bottom: 16px;"></div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+              <div class="form-field">
+                <label for="resetEmail">Email Address</label>
+                <input class="form-control" type="email" id="resetEmail" required>
+              </div>
+              <div class="form-field">
+                <label for="resetNewPassword">Reset New Password</label>
+                <input class="form-control" type="password" id="resetNewPassword" minlength="8" required>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+              <button type="submit" class="button button-secondary" id="resetPassBtn">Reset Password</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../js/config.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/theme.js"></script>
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/api/apiClient.js"></script>
+  <script src="../../js/api/candidateApi.js"></script>
+  <script src="../../js/candidate/profile.js"></script>
+</body>
+</html>

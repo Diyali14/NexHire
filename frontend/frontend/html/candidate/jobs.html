@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Jobs — NexHire Candidate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../../css/theme.css">
+  <link rel="stylesheet" href="../../css/global.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="dashboard.html">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span class="brand-name">Nex<span>Hire</span></span>
+      </a>
+      <div class="side-label">CANDIDATE PORTAL</div>
+      <nav class="side-nav">
+        <a href="dashboard.html" class="side-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="resume.html" class="side-link"><i data-lucide="file-text"></i> Resume / Upload</a>
+        <a href="jobs.html" class="side-link active"><i data-lucide="briefcase"></i> Search Jobs</a>
+        <a href="applications.html" class="side-link"><i data-lucide="send"></i> My Applications</a>
+        <a href="interview.html" class="side-link"><i data-lucide="messages-square"></i> Interview Prep</a>
+        <a href="profile.html" class="side-link"><i data-lucide="user"></i> My Profile</a>
+        <a href="#" class="side-link logout" id="logoutBtn"><i data-lucide="log-out"></i> Logout</a>
+      </nav>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main style="display: flex; flex-direction: column; min-height: 100vh;">
+      <header class="topbar">
+        <div class="top-actions">
+          <button class="icon-button mobile-menu" id="mobileMenuBtn" aria-label="Open navigation menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <span class="crumb">Candidate / Search Jobs</span>
+        </div>
+        <div class="top-actions">
+          <button class="theme-toggle icon-button" aria-label="Toggle theme">
+            <i data-lucide="moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div style="margin-bottom: 24px;">
+          <h1>Explore Job Opportunities</h1>
+          <p style="color: var(--text-muted);">Search completed job posts, evaluate skill gaps, and apply with your uploaded resume.</p>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="card" style="margin-bottom: 24px; padding: 16px;">
+          <form id="jobSearchForm" style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 240px; position: relative;">
+              <input class="form-control" type="text" id="searchInput" placeholder="Search jobs by title or keyword..." style="padding-left: 38px;">
+              <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--text-muted);"></i>
+            </div>
+            <div style="width: 180px;">
+              <select class="form-control" id="sortBySelect">
+                <option value="recent">Most Recent</option>
+                <option value="title">Title (A-Z)</option>
+              </select>
+            </div>
+            <button type="submit" class="button button-primary">Search</button>
+          </form>
+        </div>
+
+        <!-- Job Cards Container -->
+        <div id="jobsContainer">
+          <div class="skeleton-card">
+            <div class="skeleton-line skeleton-title"></div>
+            <div class="skeleton-line skeleton-text"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../js/config.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/theme.js"></script>
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/api/apiClient.js"></script>
+  <script src="../../js/api/jobApi.js"></script>
+  <script src="../../js/candidate/jobs.js"></script>
+</body>
+</html>

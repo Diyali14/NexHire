@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume / Upload — NexHire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../../css/theme.css">
+  <link rel="stylesheet" href="../../css/global.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/candidate.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="dashboard.html">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span class="brand-name">Nex<span>Hire</span></span>
+      </a>
+      <div class="side-label">CANDIDATE PORTAL</div>
+      <nav class="side-nav">
+        <a href="dashboard.html" class="side-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="resume.html" class="side-link active"><i data-lucide="file-text"></i> Resume / Upload</a>
+        <a href="jobs.html" class="side-link"><i data-lucide="briefcase"></i> Search Jobs</a>
+        <a href="applications.html" class="side-link"><i data-lucide="send"></i> My Applications</a>
+        <a href="interview.html" class="side-link"><i data-lucide="messages-square"></i> Interview Prep</a>
+        <a href="profile.html" class="side-link"><i data-lucide="user"></i> My Profile</a>
+        <a href="#" class="side-link logout" id="logoutBtn"><i data-lucide="log-out"></i> Logout</a>
+      </nav>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main style="display: flex; flex-direction: column; min-height: 100vh;">
+      <header class="topbar">
+        <div class="top-actions">
+          <button class="icon-button mobile-menu" id="mobileMenuBtn" aria-label="Open navigation menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <span class="crumb">Candidate / Resume Upload</span>
+        </div>
+        <div class="top-actions">
+          <button class="theme-toggle icon-button" aria-label="Toggle theme">
+            <i data-lucide="moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div style="margin-bottom: 24px;">
+          <h1>Resume Management</h1>
+          <p style="color: var(--text-muted);">Upload your resume for asynchronous AI parsing, skill extraction, and job matching.</p>
+        </div>
+
+        <!-- Upload Dropzone Area -->
+        <div class="card" style="margin-bottom: 32px;">
+          <h3>Upload New Resume</h3>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 16px;">Supported file formats: <strong>PDF, JPG, JPEG, TXT, DOCX</strong></p>
+
+          <div id="dropzone" style="border: 2px dashed var(--border-color-hover); border-radius: var(--radius-lg); padding: 40px 20px; text-align: center; background: var(--bg-tertiary); cursor: pointer; transition: border-color 0.2s ease;">
+            <i data-lucide="upload-cloud" style="width: 48px; height: 48px; color: var(--accent-primary); margin-bottom: 12px;"></i>
+            <h4 style="margin-bottom: 4px;">Drag and drop your resume file here</h4>
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 16px;">or click to browse your files</p>
+            <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.txt,.docx" style="display: none;">
+            <button type="button" class="button button-secondary" id="browseBtn">Browse Files</button>
+          </div>
+
+          <!-- File Selection Preview -->
+          <div id="fileSelectedArea" style="display: none; margin-top: 16px; padding: 16px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <strong id="selectedFileName">filename.pdf</strong>
+                <div style="font-size: 0.8125rem; color: var(--text-muted);" id="selectedFileType">PDF Document</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="button button-secondary button-small" id="cancelFileBtn">Cancel</button>
+                <button type="button" class="button button-primary button-small" id="uploadFileBtn">
+                  <i data-lucide="upload"></i> Upload & Start AI Parsing
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Async Processing Status Monitor -->
+          <div id="processingMonitor" style="display: none; margin-top: 16px; padding: 16px; background: var(--status-processing-bg); border-radius: var(--radius-md); color: var(--status-processing-text);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <i data-lucide="loader-2" class="spin-icon" style="width: 24px; height: 24px;"></i>
+              <div>
+                <strong id="processingStatusText">Uploading & Queued for AI Processing...</strong>
+                <div style="font-size: 0.8125rem; opacity: 0.9;" id="processingDetailText">Please wait while our backend RabbitMQ worker parses your skills.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Uploaded Resumes List -->
+        <div class="card" style="margin-bottom: 32px;">
+          <h3>Uploaded Resumes</h3>
+          <div id="resumeListContainer" style="margin-top: 16px;">
+            <div class="skeleton-card">
+              <div class="skeleton-line skeleton-title"></div>
+              <div class="skeleton-line skeleton-text"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parsed Resume Data Display -->
+        <div class="card" id="parsedDataCard" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+            <h3>Parsed Resume Content</h3>
+            <span class="status-badge status-completed" id="parsedVersionBadge">Parser v2.0.0</span>
+          </div>
+          <div id="parsedDataBody"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../js/config.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/theme.js"></script>
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/api/apiClient.js"></script>
+  <script src="../../js/api/resumeApi.js"></script>
+  <script src="../../js/candidate/resume.js"></script>
+</body>
+</html>

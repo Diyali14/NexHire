@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post New Job — NexHire Recruiter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../../css/theme.css">
+  <link rel="stylesheet" href="../../css/global.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="dashboard.html">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span class="brand-name">Nex<span>Hire</span></span>
+      </a>
+      <div class="side-label">RECRUITER WORKSPACE</div>
+      <nav class="side-nav">
+        <a href="dashboard.html" class="side-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="post-job.html" class="side-link active"><i data-lucide="plus-circle"></i> Post New Job</a>
+        <a href="jobs.html" class="side-link"><i data-lucide="briefcase"></i> My Jobs</a>
+        <a href="profile.html" class="side-link"><i data-lucide="user"></i> Recruiter Profile</a>
+        <a href="#" class="side-link logout" id="logoutBtn"><i data-lucide="log-out"></i> Logout</a>
+      </nav>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main style="display: flex; flex-direction: column; min-height: 100vh;">
+      <header class="topbar">
+        <div class="top-actions">
+          <button class="icon-button mobile-menu" id="mobileMenuBtn" aria-label="Open navigation menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <span class="crumb">Recruiter Portal / Post New Job</span>
+        </div>
+        <div class="top-actions">
+          <button class="theme-toggle icon-button" aria-label="Toggle theme">
+            <i data-lucide="moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div style="margin-bottom: 24px;">
+          <h1>Post a New Job Opportunity</h1>
+          <p style="color: var(--text-muted);">Enter the job title and plain-text job description for automatic backend AI parsing.</p>
+        </div>
+
+        <div class="card" style="margin-bottom: 32px;">
+          <form id="postJobForm">
+            <div id="postJobMsg" class="form-message" style="margin-bottom: 16px;"></div>
+
+            <div class="form-field">
+              <label for="jobTitle">Job Title</label>
+              <input class="form-control" type="text" id="jobTitle" placeholder="e.g. Junior Python Developer" required>
+            </div>
+
+            <div class="form-field">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label for="jobDescription">Job Description (JD Text)</label>
+                <span id="charCount" style="font-size: 0.75rem; color: var(--text-muted);">0/5000</span>
+              </div>
+              <textarea class="form-control" id="jobDescription" rows="10" placeholder="We are looking for a developer experienced in Python, REST APIs, SQL..." maxlength="5000" required></textarea>
+            </div>
+
+            <!-- Processing Status Monitor -->
+            <div id="postProcessingMonitor" style="display: none; margin-bottom: 16px; padding: 16px; background: var(--status-processing-bg); border-radius: var(--radius-md); color: var(--status-processing-text);">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <i data-lucide="loader-2" class="spin-icon" style="width: 24px; height: 24px;"></i>
+                <div>
+                  <strong id="postStatusText">Job Created. Queued for AI parsing...</strong>
+                  <div style="font-size: 0.8125rem; opacity: 0.9;" id="postDetailText">RabbitMQ worker is extracting skills, education, and experience expectations.</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px;">
+              <a href="jobs.html" class="button button-secondary">Cancel</a>
+              <button type="submit" class="button button-primary" id="postBtn">
+                <i data-lucide="send"></i> Post Job & Extract Requirements
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../js/config.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/theme.js"></script>
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/api/apiClient.js"></script>
+  <script src="../../js/api/jobApi.js"></script>
+  <script src="../../js/recruiter/post-job.js"></script>
+</body>
+</html>
