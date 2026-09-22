@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MatchResult",
+  "type": "object",
+  "required": ["overallScore", "semanticScore", "skillScore", "experienceScore", "evidenceScore", "matchedSkills", "missingSkills", "evidence", "explanation", "modelVersion"],
+  "properties": {"overallScore": {"type": "number", "minimum": 0, "maximum": 100}, "semanticScore": {"type": "number", "minimum": 0, "maximum": 100}, "skillScore": {"type": "number", "minimum": 0, "maximum": 100}, "experienceScore": {"type": "number", "minimum": 0, "maximum": 100}, "evidenceScore": {"type": "number", "minimum": 0, "maximum": 100}, "matchedSkills": {"type": "array", "items": {"type": "string"}}, "missingSkills": {"type": "array", "items": {"type": "string"}}, "evidence": {"type": "object", "description": "Per-skill evidence contains evidenceSources with a source type and strength."}, "explanation": {"type": "string"}, "modelVersion": {"type": "string"}}
+}
