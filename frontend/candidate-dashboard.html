@@ -33,6 +33,7 @@
 
             </a>
 
+
             <!-- Right Side -->
             <div class="nav-actions">
 
@@ -48,6 +49,7 @@
 
                 </button>
 
+
                 <!-- Profile -->
                 <div class="profile-menu">
 
@@ -58,18 +60,21 @@
                         aria-expanded="false"
                         aria-haspopup="true">
 
+                        <!-- Dynamic Avatar -->
                         <span
                             class="profile-avatar"
                             id="headerAvatar">
 
-                            K
+                            C
 
                         </span>
 
+
+                        <!-- Dynamic Candidate Name -->
                         <span class="profile-details">
 
                             <strong id="headerName">
-                                Kaushik
+                                Candidate
                             </strong>
 
                             <small>
@@ -78,11 +83,13 @@
 
                         </span>
 
+
                         <span class="profile-arrow">
                             ▾
                         </span>
 
                     </button>
+
 
                     <!-- Profile Dropdown -->
                     <div
@@ -125,6 +132,7 @@
 
     <main class="candidate-layout">
 
+
         <!-- ================= SIDEBAR ================= -->
 
         <aside class="sidebar">
@@ -135,7 +143,9 @@
                     CANDIDATE
                 </div>
 
+
                 <nav class="sidebar-nav">
+
 
                     <!-- Dashboard -->
                     <a
@@ -152,6 +162,7 @@
 
                     </a>
 
+
                     <!-- Resume -->
                     <a
                         href="ResumeUpload.html"
@@ -166,6 +177,7 @@
                         </span>
 
                     </a>
+
 
                     <!-- Job Search -->
                     <a
@@ -189,9 +201,11 @@
         </aside>
 
 
+
         <!-- ================= CONTENT ================= -->
 
         <section class="dashboard-content">
+
 
             <!-- ================= DASHBOARD HEADER ================= -->
 
@@ -203,11 +217,16 @@
                         CANDIDATE DASHBOARD
                     </span>
 
+
+                    <!-- Dynamic Welcome Name -->
                     <h1>
+
                         <span id="welcomeName">
-                            Kaushik.
+                            Candidate.
                         </span>
+
                     </h1>
+
 
                     <p>
                         Manage your career profile, skills and job
@@ -215,6 +234,7 @@
                     </p>
 
                 </div>
+
 
                 <a
                     href="candidate-job-search.html"
@@ -231,19 +251,24 @@
             </div>
 
 
+
             <!-- ================= PROFILE SUMMARY ================= -->
 
             <section class="profile-card">
 
+
                 <div class="profile-main">
 
+
+                    <!-- Dynamic Large Avatar -->
                     <div
                         class="large-avatar"
                         id="profileAvatar">
 
-                        K
+                        C
 
                     </div>
+
 
                     <div class="profile-info">
 
@@ -251,23 +276,33 @@
                             YOUR PROFILE
                         </span>
 
+
+                        <!-- Dynamic Full Name -->
                         <h2 id="candidateFullName">
-                            Kaushik Debnath
+                            Candidate
                         </h2>
 
-                        <p>
-                            Computer Science Engineering Student
+
+                        <!-- Dynamic Bio / Role -->
+                        <p id="candidateHeadline">
+                            Candidate
                         </p>
+
 
                         <div class="profile-meta">
 
-                            <span>
-                                📍 Kolkata, India
+
+                            <!-- Dynamic Location -->
+                            <span id="candidateLocation">
+                                📍 Location not added
                             </span>
 
-                            <span>
+
+                            <!-- Dynamic Career Role -->
+                            <span id="candidateRole">
                                 💼 Software Engineer
                             </span>
+
 
                         </div>
 
@@ -276,7 +311,8 @@
                 </div>
 
 
-                <!-- Profile Progress -->
+
+                <!-- ================= PROFILE PROGRESS ================= -->
 
                 <div class="profile-progress">
 
@@ -286,17 +322,24 @@
                             Profile completion
                         </span>
 
-                        <strong>
-                            75%
+
+                        <strong id="profileCompletionPercentage">
+                            0%
                         </strong>
 
                     </div>
 
+
                     <div class="progress-track">
 
-                        <span style="width: 75%;"></span>
+                        <span
+                            id="profileCompletionBar"
+                            style="width: 0%;">
+
+                        </span>
 
                     </div>
+
 
                     <a href="candidate-profile.html">
                         Complete profile →
@@ -304,12 +347,15 @@
 
                 </div>
 
+
             </section>
+
 
 
             <!-- ================= STATS ================= -->
 
             <section class="stats-grid">
+
 
                 <!-- Resume -->
                 <article class="stat-card">
@@ -318,23 +364,27 @@
                         ↑
                     </div>
 
+
                     <div>
 
                         <span>
                             RESUME
                         </span>
 
+
                         <strong id="resumeStatus">
-                            Uploaded
+                            Checking...
                         </strong>
 
-                        <small>
-                            Ready for analysis
+
+                        <small id="resumeStatusText">
+                            Resume status
                         </small>
 
                     </div>
 
                 </article>
+
 
 
                 <!-- Skills -->
@@ -344,15 +394,18 @@
                         ✦
                     </div>
 
+
                     <div>
 
                         <span>
                             SKILLS
                         </span>
 
+
                         <strong id="skillsCount">
-                            8 Skills
+                            0 Skills
                         </strong>
+
 
                         <small>
                             Based on your profile
@@ -363,6 +416,7 @@
                 </article>
 
 
+
                 <!-- Projects -->
                 <article class="stat-card">
 
@@ -370,15 +424,18 @@
                         ◈
                     </div>
 
+
                     <div>
 
                         <span>
                             PROJECTS
                         </span>
 
+
                         <strong id="projectsCount">
-                            2 Projects
+                            0 Projects
                         </strong>
+
 
                         <small>
                             Added to profile
@@ -391,9 +448,11 @@
             </section>
 
 
+
             <!-- ================= SKILLS ================= -->
 
             <section class="dashboard-section">
+
 
                 <div class="section-heading-row">
 
@@ -403,11 +462,13 @@
                             YOUR SKILLS
                         </span>
 
+
                         <h2>
                             Technical skills
                         </h2>
 
                     </div>
+
 
                     <a
                         href="candidate-profile.html"
@@ -420,25 +481,27 @@
                 </div>
 
 
-                <div class="skills-card">
 
-                    <span>Java</span>
-                    <span>Python</span>
-                    <span>SQL</span>
-                    <span>HTML</span>
-                    <span>CSS</span>
-                    <span>JavaScript</span>
-                    <span>Git</span>
-                    <span>OOP</span>
+                <!-- Dynamic Skills -->
+                <div
+                    class="skills-card"
+                    id="skillsContainer">
+
+                    <span>
+                        No skills added yet
+                    </span>
 
                 </div>
 
+
             </section>
+
 
 
             <!-- ================= PROJECTS ================= -->
 
             <section class="dashboard-section">
+
 
                 <div class="section-heading-row">
 
@@ -448,11 +511,13 @@
                             YOUR WORK
                         </span>
 
+
                         <h2>
                             Projects
                         </h2>
 
                     </div>
+
 
                     <a
                         href="candidate-profile.html"
@@ -465,7 +530,12 @@
                 </div>
 
 
-                <div class="projects-grid">
+
+                <!-- Dynamic Projects -->
+                <div
+                    class="projects-grid"
+                    id="projectsContainer">
+
 
                     <!-- Project 1 -->
                     <article class="project-card">
@@ -482,9 +552,11 @@
 
                         </div>
 
+
                         <h3>
                             Quiz Application
                         </h3>
+
 
                         <p>
                             GUI-based quiz application developed
@@ -492,13 +564,23 @@
                             score calculation and question navigation.
                         </p>
 
+
                         <div class="project-tech">
 
-                            <span>Java</span>
-                            <span>Swing</span>
-                            <span>MySQL</span>
+                            <span>
+                                Java
+                            </span>
+
+                            <span>
+                                Swing
+                            </span>
+
+                            <span>
+                                MySQL
+                            </span>
 
                         </div>
+
 
                         <a
                             href="#"
@@ -510,6 +592,7 @@
                         </a>
 
                     </article>
+
 
 
                     <!-- Project 2 -->
@@ -527,9 +610,11 @@
 
                         </div>
 
+
                         <h3>
                             Weather App
                         </h3>
+
 
                         <p>
                             Weather application that displays
@@ -537,13 +622,23 @@
                             a web API.
                         </p>
 
+
                         <div class="project-tech">
 
-                            <span>HTML</span>
-                            <span>CSS</span>
-                            <span>JavaScript</span>
+                            <span>
+                                HTML
+                            </span>
+
+                            <span>
+                                CSS
+                            </span>
+
+                            <span>
+                                JavaScript
+                            </span>
 
                         </div>
+
 
                         <a
                             href="#"
@@ -556,18 +651,31 @@
 
                     </article>
 
+
                 </div>
 
             </section>
+
 
         </section>
 
     </main>
 
 
+
     <!-- ================= JAVASCRIPT ================= -->
 
+    <!-- API Configuration -->
+    <script src="js/config.js"></script>
+
+
+    <!-- API Service -->
+    <script src="js/api.js"></script>
+
+
+    <!-- Candidate Dashboard -->
     <script src="js/candidate-dashboard.js"></script>
+
 
 </body>
 

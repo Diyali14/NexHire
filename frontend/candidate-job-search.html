@@ -15,6 +15,7 @@
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
         rel="stylesheet">
 
+    <!-- CSS -->
     <link rel="stylesheet" href="css/candidate-job-search.css">
 </head>
 
@@ -54,7 +55,9 @@
                     type="button"
                     aria-label="Switch to dark mode"
                     title="Switch to dark mode">
+
                     ☼
+
                 </button>
 
 
@@ -67,17 +70,29 @@
                         type="button"
                         aria-expanded="false">
 
-                        <div class="profile-avatar">
-                            K
+                        <!-- Dynamic Avatar -->
+                        <div
+                            class="profile-avatar"
+                            id="headerAvatar">
+
+                            C
+
                         </div>
 
+
+                        <!-- Dynamic Name -->
                         <div class="profile-details">
 
-                            <strong>Kaushik</strong>
+                            <strong id="headerName">
+                                Candidate
+                            </strong>
 
-                            <small>Candidate</small>
+                            <small>
+                                Candidate
+                            </small>
 
                         </div>
+
 
                         <span class="profile-arrow">
                             ▾
@@ -94,18 +109,27 @@
                         <a
                             href="candidate-profile.html"
                             class="dropdown-item">
+
                             <span>◉</span>
+
                             View Profile
+
                         </a>
+
 
                         <a
                             href="candidate-profile.html"
                             class="dropdown-item">
+
                             <span>✎</span>
+
                             Edit Profile
+
                         </a>
 
+
                         <div class="dropdown-divider"></div>
+
 
                         <button
                             type="button"
@@ -113,6 +137,7 @@
                             id="logoutButton">
 
                             <span>↪</span>
+
                             Logout
 
                         </button>
@@ -150,6 +175,7 @@
 
 
                 <nav class="sidebar-nav">
+
 
                     <!-- DASHBOARD -->
                     <a
@@ -466,6 +492,7 @@
 
         <div class="job-modal">
 
+
             <!-- MODAL HEADER -->
             <div class="modal-header">
 
@@ -478,7 +505,9 @@
                     class="modal-close"
                     id="closeModal"
                     aria-label="Close">
+
                     ×
+
                 </button>
 
             </div>

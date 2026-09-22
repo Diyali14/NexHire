@@ -2,18 +2,21 @@
 // NexHire API Helper
 // =========================================================
 
-/*
-    Returns the JWT token saved after candidate login.
-*/
+"use strict";
+
+
+// =========================================================
+// AUTHENTICATION TOKEN
+// =========================================================
 
 function getAuthToken() {
     return sessionStorage.getItem("token");
 }
 
 
-/*
-    Creates headers for normal JSON API requests.
-*/
+// =========================================================
+// JSON HEADERS
+// =========================================================
 
 function getJsonHeaders() {
 
@@ -31,96 +34,68 @@ function getJsonHeaders() {
 }
 
 
-/*
-    Common API request function.
-
-    Supports:
-    - GET
-    - POST
-    - PUT
-    - DELETE
-    - FormData
-*/
+// =========================================================
+// COMMON API REQUEST
+// =========================================================
 
 async function apiRequest(endpoint, options = {}) {
 
-    const url =
-        `${NEXHIRE_API_BASE_URL}${endpoint}`;
-
-    const requestOptions = {
-        ...options
-    };
+    const url = `${NEXHIRE_API_BASE_URL}${endpoint}`;
 
     const headers = {
         ...getJsonHeaders(),
         ...(options.headers || {})
     };
 
+    const isFormData = options.body instanceof FormData;
 
-    /*
-        If the body is FormData, DO NOT manually set
-        Content-Type.
+    if (isFormData) {
 
-        The browser automatically creates:
-
-        multipart/form-data; boundary=....
-
-        This is required for Resume Upload.
-    */
-
-    if (options.body instanceof FormData) {
-
+        // Let the browser set the multipart boundary.
         delete headers["Content-Type"];
 
-    } else if (options.body) {
+    } else if (
+        options.body &&
+        typeof options.body === "string"
+    ) {
 
-        headers["Content-Type"] =
-            "application/json";
+        headers["Content-Type"] = "application/json";
     }
-
-
-    requestOptions.headers = headers;
-
 
     let response;
 
     try {
 
-        response = await fetch(
-            url,
-            requestOptions
-        );
+        response = await fetch(url, {
+            ...options,
+            headers
+        });
 
     } catch (error) {
 
         throw new Error(
-            "Unable to connect to the NexHire server."
+            "Unable to connect to the NexHire server. Please check your internet connection."
         );
     }
 
+    // -----------------------------------------------------
+    // HANDLE RESPONSE
+    // -----------------------------------------------------
 
-    /*
-        Try to read the response.
-    */
-
-    let data = null;
+    if (response.status === 204) {
+        return null;
+    }
 
     const contentType =
         response.headers.get("content-type") || "";
 
+    let data = null;
 
-    if (
-        contentType.includes(
-            "application/json"
-        )
-    ) {
+    if (contentType.includes("application/json")) {
 
         try {
-
             data = await response.json();
-
-        } catch (error) {
-
+        } catch {
             data = null;
         }
 
@@ -128,23 +103,20 @@ async function apiRequest(endpoint, options = {}) {
 
         try {
 
-            const text =
-                await response.text();
+            const text = await response.text();
 
             data = text
                 ? { message: text }
                 : null;
 
-        } catch (error) {
-
+        } catch {
             data = null;
         }
     }
 
-
-    /*
-        Handle HTTP errors.
-    */
+    // -----------------------------------------------------
+    // HANDLE ERRORS
+    // -----------------------------------------------------
 
     if (!response.ok) {
 
@@ -153,107 +125,130 @@ async function apiRequest(endpoint, options = {}) {
             data?.error ||
             `Request failed with status ${response.status}`;
 
-        const error =
-            new Error(message);
+        const error = new Error(message);
 
-        error.status =
-            response.status;
-
-        error.data =
-            data;
+        error.status = response.status;
+        error.data = data;
 
         throw error;
     }
-
 
     return data;
 }
 
 
-/*
-    GET request
-*/
+// =========================================================
+// GET REQUEST
+// =========================================================
 
 async function apiGet(endpoint) {
 
-    return apiRequest(
-        endpoint,
-        {
-            method: "GET"
-        }
-    );
+    return apiRequest(endpoint, {
+        method: "GET"
+    });
 }
 
 
-/*
-    POST JSON request
-*/
+// =========================================================
+// POST JSON REQUEST
+// =========================================================
 
-async function apiPost(
-    endpoint,
-    data
-) {
+async function apiPost(endpoint, data) {
 
-    return apiRequest(
-        endpoint,
-        {
-            method: "POST",
-            body: JSON.stringify(data)
-        }
-    );
+    return apiRequest(endpoint, {
+        method: "POST",
+        body: JSON.stringify(data)
+    });
 }
 
 
-/*
-    POST FormData request
+// =========================================================
+// POST FORMDATA REQUEST
+// =========================================================
 
-    Used for Resume Upload.
-*/
+async function apiPostFormData(endpoint, formData) {
 
-async function apiPostFormData(
-    endpoint,
-    formData
-) {
-
-    return apiRequest(
-        endpoint,
-        {
-            method: "POST",
-            body: formData
-        }
-    );
+    return apiRequest(endpoint, {
+        method: "POST",
+        body: formData
+    });
 }
 
 
-/*
-    PUT JSON request
-*/
+// =========================================================
+// PUT JSON REQUEST
+// =========================================================
 
-async function apiPut(
-    endpoint,
-    data
-) {
+async function apiPut(endpoint, data) {
 
-    return apiRequest(
-        endpoint,
-        {
-            method: "PUT",
-            body: JSON.stringify(data)
-        }
-    );
+    return apiRequest(endpoint, {
+        method: "PUT",
+        body: JSON.stringify(data)
+    });
 }
 
 
-/*
-    DELETE request
-*/
+// =========================================================
+// DELETE REQUEST
+// =========================================================
 
 async function apiDelete(endpoint) {
 
-    return apiRequest(
-        endpoint,
-        {
-            method: "DELETE"
+    return apiRequest(endpoint, {
+        method: "DELETE"
+    });
+}
+
+
+// =========================================================
+// DOWNLOAD BINARY FILE
+// =========================================================
+
+async function apiDownload(endpoint) {
+
+    const url = `${NEXHIRE_API_BASE_URL}${endpoint}`;
+
+    let response;
+
+    try {
+
+        response = await fetch(url, {
+            method: "GET",
+            headers: {
+                ...getJsonHeaders()
+            }
+        });
+
+    } catch {
+
+        throw new Error(
+            "Unable to connect to the NexHire server."
+        );
+    }
+
+    if (!response.ok) {
+
+        let message = `Download failed: ${response.status}`;
+
+        try {
+
+            const data = await response.json();
+
+            message =
+                data?.message ||
+                data?.error ||
+                message;
+
+        } catch {
+            // Keep the fallback message.
         }
-    );
+
+        const error = new Error(message);
+
+        error.status = response.status;
+
+        throw error;
+    }
+
+    return await response.blob();
 }

@@ -16,12 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const PROFILE_ENDPOINT = "/candidates/me";
 
-    const CHANGE_PASSWORD_ENDPOINT =
-        "/candidates/me/change-password";
-
-
-    const $ = (id) => document.getElementById(id);
-
+    const $ = (id) =>
+        document.getElementById(id);
 
     let originalProfile = {};
 
@@ -63,7 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
        API REQUEST
        ===================================================== */
 
-    async function apiRequest(endpoint, options = {}) {
+    async function apiRequest(
+        endpoint,
+        options = {}
+    ) {
 
         const token = getAuthToken();
 
@@ -110,7 +109,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
 
-                data = JSON.parse(responseText);
+                data =
+                    JSON.parse(responseText);
 
             } catch {
 
@@ -142,7 +142,16 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            throw new Error(message);
+            const error =
+                new Error(message);
+
+            error.status =
+                response.status;
+
+            error.data =
+                data;
+
+            throw error;
         }
 
 
@@ -171,7 +180,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        status.textContent = message;
+        status.textContent =
+            message;
 
         status.hidden = false;
 
@@ -187,7 +197,9 @@ document.addEventListener("DOMContentLoaded", () => {
         showMessage.timeout =
             window.setTimeout(() => {
 
-                status.classList.remove("show");
+                status.classList.remove(
+                    "show"
+                );
 
                 status.hidden = true;
 
@@ -236,7 +248,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (selectedTheme === "dark") {
 
-                themeToggle.textContent = "☀";
+                themeToggle.textContent =
+                    "☀";
 
                 themeToggle.setAttribute(
                     "aria-label",
@@ -250,7 +263,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             } else {
 
-                themeToggle.textContent = "☼";
+                themeToggle.textContent =
+                    "☼";
 
                 themeToggle.setAttribute(
                     "aria-label",
@@ -281,7 +295,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const currentTheme =
                 document.documentElement
-                    .getAttribute("data-theme");
+                    .getAttribute(
+                        "data-theme"
+                    );
 
 
             const newTheme =
@@ -330,7 +346,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             profileButton.setAttribute(
                 "aria-expanded",
-                isOpen ? "false" : "true"
+                isOpen
+                    ? "false"
+                    : "true"
             );
         }
     );
@@ -373,24 +391,42 @@ document.addEventListener("DOMContentLoaded", () => {
         () => {
 
             const keys = [
+
                 "token",
                 "accessToken",
+
                 "candidateId",
                 "candidateName",
+                "candidateEmail",
+
                 "resumeId",
-                "selectedJobId"
+                "selectedJobId",
+
+                "userId",
+                "userEmail",
+
+                "firstName",
+                "lastName",
+
+                "userRole",
+                "isAuthenticated"
             ];
 
 
             keys.forEach((key) => {
 
-                sessionStorage.removeItem(key);
+                sessionStorage.removeItem(
+                    key
+                );
 
-                localStorage.removeItem(key);
+                localStorage.removeItem(
+                    key
+                );
             });
 
 
             const candidateKeys = [
+
                 "candidate",
                 "candidateProfile",
                 "candidateData"
@@ -399,7 +435,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             candidateKeys.forEach((key) => {
 
-                localStorage.removeItem(key);
+                localStorage.removeItem(
+                    key
+                );
             });
 
 
@@ -441,7 +479,8 @@ document.addEventListener("DOMContentLoaded", () => {
         value
     ) {
 
-        const element = $(id);
+        const element =
+            $(id);
 
 
         if (element) {
@@ -474,7 +513,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const profileAvatar =
             $("profileAvatar");
-
 
         const headerAvatar =
             $("headerAvatar");
@@ -520,7 +558,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             $("profileFullName")
                 .textContent =
-                fullName || "Candidate";
+                fullName ||
+                "Candidate";
         }
 
 
@@ -536,7 +575,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             $("headerName")
                 .textContent =
-                fullName || "Candidate";
+                fullName ||
+                "Candidate";
         }
 
 
@@ -558,17 +598,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const fields = [
 
             profile.firstName,
-
             profile.lastName,
-
             profile.email,
-
             profile.phone,
-
             profile.linkedinUrl,
-
             profile.githubUrl,
-
             profile.bio
         ];
 
@@ -587,7 +621,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         return Math.round(
-            (completed / fields.length) * 100
+            (completed /
+                fields.length) *
+                100
         );
     }
 
@@ -597,7 +633,9 @@ document.addEventListener("DOMContentLoaded", () => {
     ) {
 
         const percentage =
-            calculateCompletion(profile);
+            calculateCompletion(
+                profile
+            );
 
 
         if ($("completionPercentage")) {
@@ -651,7 +689,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       POPULATE PROFILE
+       POPULATE PROFILE FORM
        ===================================================== */
 
     function populateProfileForm(
@@ -736,25 +774,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            /*
-             * Supports both:
-             *
-             * {
-             *   firstName: "...",
-             *   lastName: "..."
-             * }
-             *
-             * and:
-             *
-             * {
-             *   data: {
-             *      firstName: "...",
-             *      lastName: "..."
-             *   }
-             * }
-             */
-
-
             const profile =
                 result.data &&
                 typeof result.data === "object"
@@ -763,7 +782,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             originalProfile =
-                { ...profile };
+                {
+                    ...profile
+                };
 
 
             populateProfileForm(
@@ -771,7 +792,9 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            setFormEditing(false);
+            setFormEditing(
+                false
+            );
 
 
         } catch (error) {
@@ -780,6 +803,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 "Unable to load candidate profile:",
                 error
             );
+
+
+            if (
+                error.status === 401
+            ) {
+
+                sessionStorage.clear();
+
+                localStorage.removeItem(
+                    "token"
+                );
+
+                localStorage.removeItem(
+                    "accessToken"
+                );
+
+                window.location.href =
+                    "candidate-login.html";
+
+                return;
+            }
 
 
             showMessage(
@@ -815,21 +859,17 @@ document.addEventListener("DOMContentLoaded", () => {
         enabled
     ) {
 
-        isEditing = enabled;
+        isEditing =
+            enabled;
 
 
         const editableFields = [
 
             "firstName",
-
             "lastName",
-
             "phone",
-
             "linkedinUrl",
-
             "githubUrl",
-
             "bio"
         ];
 
@@ -837,7 +877,8 @@ document.addEventListener("DOMContentLoaded", () => {
         editableFields.forEach(
             (id) => {
 
-                const field = $(id);
+                const field =
+                    $(id);
 
 
                 if (field) {
@@ -868,7 +909,10 @@ document.addEventListener("DOMContentLoaded", () => {
         "click",
         () => {
 
-            setFormEditing(true);
+            setFormEditing(
+                true
+            );
+
 
             showMessage(
                 "You can now edit your profile.",
@@ -890,7 +934,9 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            setFormEditing(false);
+            setFormEditing(
+                false
+            );
 
 
             showMessage(
@@ -899,6 +945,76 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
     );
+
+
+    /* =====================================================
+       URL VALIDATION
+       ===================================================== */
+
+    function isValidLinkedInUrl(
+        value
+    ) {
+
+        if (!value) {
+            return true;
+        }
+
+
+        try {
+
+            const url =
+                new URL(value);
+
+
+            return (
+                url.protocol === "https:" &&
+                (
+                    url.hostname ===
+                        "linkedin.com" ||
+                    url.hostname.endsWith(
+                        ".linkedin.com"
+                    )
+                )
+            );
+
+        } catch {
+
+            return false;
+        }
+    }
+
+
+    function isValidGitHubUrl(
+        value
+    ) {
+
+        if (!value) {
+            return true;
+        }
+
+
+        try {
+
+            const url =
+                new URL(value);
+
+
+            return (
+                url.protocol === "https:" &&
+                (
+                    url.hostname ===
+                        "github.com" ||
+                    url.hostname.endsWith(
+                        ".github.com"
+                    )
+                )
+            );
+
+        } catch {
+
+            return false;
+        }
+    }
 
 
     /* =====================================================
@@ -917,15 +1033,54 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
+            /* =============================================
+               BASIC VALUES
+               ============================================= */
+
             const firstName =
-                getInputValue("firstName");
+                getInputValue(
+                    "firstName"
+                );
 
 
             const lastName =
-                getInputValue("lastName");
+                getInputValue(
+                    "lastName"
+                );
 
 
-            if (!firstName || !lastName) {
+            const phone =
+                getInputValue(
+                    "phone"
+                );
+
+
+            const linkedinUrl =
+                getInputValue(
+                    "linkedinUrl"
+                );
+
+
+            const githubUrl =
+                getInputValue(
+                    "githubUrl"
+                );
+
+
+            const bio =
+                getInputValue(
+                    "bio"
+                );
+
+
+            /* =============================================
+               REQUIRED FIELD VALIDATION
+               ============================================= */
+
+            if (
+                !firstName ||
+                !lastName
+            ) {
 
                 showMessage(
                     "First name and last name are required.",
@@ -936,25 +1091,83 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
+            /* =============================================
+               LINKEDIN VALIDATION
+               ============================================= */
+
+            if (
+                !isValidLinkedInUrl(
+                    linkedinUrl
+                )
+            ) {
+
+                showMessage(
+                    "Please enter a valid LinkedIn URL, for example: https://www.linkedin.com/in/your-profile",
+                    "error"
+                );
+
+                $("linkedinUrl")?.focus();
+
+                return;
+            }
+
+
+            /* =============================================
+               GITHUB VALIDATION
+               ============================================= */
+
+            if (
+                !isValidGitHubUrl(
+                    githubUrl
+                )
+            ) {
+
+                showMessage(
+                    "Please enter a valid GitHub URL, for example: https://github.com/your-username",
+                    "error"
+                );
+
+                $("githubUrl")?.focus();
+
+                return;
+            }
+
+
+            /* =============================================
+               API PAYLOAD
+               ============================================= */
+
             const updatedProfile = {
 
-                firstName,
+                firstName:
+                    firstName,
 
-                lastName,
+                lastName:
+                    lastName,
 
                 phone:
-                    getInputValue("phone"),
+                    phone || null,
 
                 linkedinUrl:
-                    getInputValue("linkedinUrl"),
+                    linkedinUrl || null,
 
                 githubUrl:
-                    getInputValue("githubUrl"),
+                    githubUrl || null,
 
                 bio:
-                    getInputValue("bio")
+                    bio || null
             };
 
+
+            console.log(
+                "Profile update payload:",
+                updatedProfile
+            );
+
+
+            /* =============================================
+               SAVE BUTTON
+               ============================================= */
 
             const saveButton =
                 $("saveProfileButton");
@@ -974,6 +1187,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
+            /* =============================================
+               SAVE TO BACKEND
+               ============================================= */
+
             try {
 
                 const result =
@@ -990,6 +1207,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
 
+                /* =========================================
+                   HANDLE RESPONSE
+                   ========================================= */
+
                 let profile;
 
 
@@ -1003,7 +1224,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         typeof result.data === "object"
                     ) {
 
-                        profile = result.data;
+                        profile =
+                            result.data;
 
                     } else if (
                         result.firstName !== undefined ||
@@ -1011,12 +1233,15 @@ document.addEventListener("DOMContentLoaded", () => {
                         result.email !== undefined
                     ) {
 
-                        profile = result;
+                        profile =
+                            result;
 
                     } else {
 
                         profile = {
+
                             ...originalProfile,
+
                             ...updatedProfile
                         };
                     }
@@ -1024,14 +1249,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else {
 
                     profile = {
+
                         ...originalProfile,
+
                         ...updatedProfile
                     };
                 }
 
 
+                /* =========================================
+                   UPDATE LOCAL PROFILE
+                   ========================================= */
+
                 originalProfile =
-                    { ...profile };
+                    {
+                        ...profile
+                    };
 
 
                 populateProfileForm(
@@ -1039,7 +1272,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
 
-                setFormEditing(false);
+                setFormEditing(
+                    false
+                );
 
 
                 showMessage(
@@ -1056,9 +1291,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
 
-                showMessage(
+                /* =========================================
+                   BACKEND VALIDATION MESSAGE
+                   ========================================= */
+
+                let errorMessage =
                     error.message ||
-                    "Unable to save your profile.",
+                    "Unable to save your profile.";
+
+
+                if (
+                    error.data &&
+                    typeof error.data === "object"
+                ) {
+
+                    errorMessage =
+                        error.data.message ||
+                        error.data.error ||
+                        errorMessage;
+                }
+
+
+                showMessage(
+                    errorMessage,
                     "error"
                 );
 
@@ -1073,167 +1328,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     saveButton.textContent =
                         originalButtonText ||
                         "Save Changes";
-                }
-            }
-        }
-    );
-
-
-    /* =====================================================
-       CHANGE PASSWORD
-       ===================================================== */
-
-    const changePasswordForm =
-        $("changePasswordForm");
-
-
-    changePasswordForm?.addEventListener(
-        "submit",
-        async (event) => {
-
-            event.preventDefault();
-
-
-            const currentPassword =
-                getInputValue(
-                    "currentPassword"
-                );
-
-
-            const newPassword =
-                getInputValue(
-                    "newPassword"
-                );
-
-
-            const confirmPassword =
-                getInputValue(
-                    "confirmPassword"
-                );
-
-
-            if (
-                !currentPassword ||
-                !newPassword ||
-                !confirmPassword
-            ) {
-
-                showMessage(
-                    "Please fill in all password fields.",
-                    "error"
-                );
-
-                return;
-            }
-
-
-            if (newPassword.length < 8) {
-
-                showMessage(
-                    "Your new password must contain at least 8 characters.",
-                    "error"
-                );
-
-                return;
-            }
-
-
-            if (
-                newPassword !==
-                confirmPassword
-            ) {
-
-                showMessage(
-                    "The new passwords do not match.",
-                    "error"
-                );
-
-                return;
-            }
-
-
-            if (
-                currentPassword ===
-                newPassword
-            ) {
-
-                showMessage(
-                    "Your new password must be different from your current password.",
-                    "error"
-                );
-
-                return;
-            }
-
-
-            const changeButton =
-                $("changePasswordButton");
-
-
-            const originalButtonText =
-                changeButton?.textContent;
-
-
-            if (changeButton) {
-
-                changeButton.disabled =
-                    true;
-
-                changeButton.textContent =
-                    "Updating...";
-            }
-
-
-            try {
-
-                await apiRequest(
-                    CHANGE_PASSWORD_ENDPOINT,
-                    {
-                        method: "POST",
-
-                        body:
-                            JSON.stringify({
-                                currentPassword,
-                                newPassword
-                            })
-                    }
-                );
-
-
-                changePasswordForm.reset();
-
-
-                showMessage(
-                    "Your password was changed successfully.",
-                    "success"
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    "Unable to change password:",
-                    error
-                );
-
-
-                showMessage(
-                    error.message ||
-                    "Unable to change your password.",
-                    "error"
-                );
-
-
-            } finally {
-
-                if (changeButton) {
-
-                    changeButton.disabled =
-                        false;
-
-                    changeButton.textContent =
-                        originalButtonText ||
-                        "Update Password";
                 }
             }
         }

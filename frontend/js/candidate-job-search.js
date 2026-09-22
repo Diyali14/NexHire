@@ -2,6 +2,11 @@
    NEXHIRE — CANDIDATE JOB SEARCH
    ========================================================= */
 
+
+/* =========================================================
+   DOM READY
+   ========================================================= */
+
 document.addEventListener("DOMContentLoaded", function () {
 
 
@@ -36,11 +41,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const jobModal =
         document.getElementById("jobModal");
 
+    const modalContent =
+        document.getElementById("modalContent");
+
     const closeModal =
         document.getElementById("closeModal");
 
-    const modalContent =
-        document.getElementById("modalContent");
+    const themeToggle =
+        document.getElementById("themeToggle");
 
     const profileButton =
         document.getElementById("profileButton");
@@ -48,11 +56,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const profileDropdown =
         document.getElementById("profileDropdown");
 
-    const themeToggle =
-        document.getElementById("themeToggle");
-
     const logoutButton =
         document.getElementById("logoutButton");
+
+    const headerName =
+        document.getElementById("headerName");
+
+    const headerAvatar =
+        document.getElementById("headerAvatar");
 
 
     /* =====================================================
@@ -70,7 +81,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function escapeHtml(value) {
 
-        if (value === null || value === undefined) {
+        if (
+            value === null ||
+            value === undefined
+        ) {
             return "";
         }
 
@@ -90,14 +104,14 @@ document.addEventListener("DOMContentLoaded", function () {
     function formatDate(dateValue) {
 
         if (!dateValue) {
-            return "Date unavailable";
+            return "Not specified";
         }
 
         const date =
             new Date(dateValue);
 
-        if (Number.isNaN(date.getTime())) {
-            return "Date unavailable";
+        if (isNaN(date.getTime())) {
+            return "Not specified";
         }
 
         return date.toLocaleDateString(
@@ -122,30 +136,171 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         return skills
-            .filter(skill =>
-                typeof skill === "string"
-            )
-            .map(skill =>
-                skill.trim()
-            )
+            .map(function (skill) {
+
+                if (typeof skill === "string") {
+                    return skill;
+                }
+
+                if (
+                    skill &&
+                    typeof skill === "object"
+                ) {
+
+                    return (
+                        skill.name ||
+                        skill.normalizedName ||
+                        ""
+                    );
+                }
+
+                return "";
+
+            })
             .filter(Boolean);
     }
 
 
     /* =====================================================
-       GET COMPANY INITIAL
+       COMPANY INITIAL
        ===================================================== */
 
-    function getCompanyInitial(company) {
+    function getCompanyInitial(companyName) {
 
-        if (!company) {
-            return "C";
+        if (!companyName) {
+            return "N";
         }
 
-        return company
+        return companyName
             .trim()
             .charAt(0)
             .toUpperCase();
+    }
+
+
+    /* =====================================================
+       GET AUTH TOKEN
+       ===================================================== */
+
+    function getAuthToken() {
+
+        return (
+            sessionStorage.getItem("token") ||
+            localStorage.getItem("token")
+        );
+    }
+
+
+    /* =====================================================
+       GET RESUME ID
+       ===================================================== */
+
+    function getResumeId() {
+
+        return (
+            sessionStorage.getItem("resumeId") ||
+            localStorage.getItem("resumeId")
+        );
+    }
+
+
+    /* =====================================================
+       LOAD CANDIDATE DATA
+       Data comes from Candidate Dashboard
+       ===================================================== */
+
+    function loadCandidateFromDashboard() {
+
+        const storedProfile =
+            sessionStorage.getItem(
+                "candidateProfile"
+            );
+
+
+        if (!storedProfile) {
+
+            console.warn(
+                "Candidate profile data not found in sessionStorage."
+            );
+
+            return;
+        }
+
+
+        try {
+
+            const profile =
+                JSON.parse(storedProfile);
+
+
+            const firstName =
+                profile.firstName || "";
+
+            const lastName =
+                profile.lastName || "";
+
+
+            const fullName =
+                `${firstName} ${lastName}`.trim();
+
+
+            /* =================================================
+               UPDATE HEADER NAME
+               ================================================= */
+
+            if (headerName) {
+
+                headerName.textContent =
+                    fullName || "Candidate";
+
+            }
+
+
+            /* =================================================
+               UPDATE HEADER AVATAR
+               ================================================= */
+
+            if (headerAvatar) {
+
+                if (firstName) {
+
+                    headerAvatar.textContent =
+                        firstName
+                            .charAt(0)
+                            .toUpperCase();
+
+                } else if (lastName) {
+
+                    headerAvatar.textContent =
+                        lastName
+                            .charAt(0)
+                            .toUpperCase();
+
+                } else {
+
+                    headerAvatar.textContent =
+                        "C";
+
+                }
+
+            }
+
+
+            console.log(
+                "Candidate data loaded from dashboard:",
+                profile
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Failed to read candidate profile:",
+                error
+            );
+
+        }
+
     }
 
 
@@ -155,118 +310,180 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function loadJobs() {
 
-        jobList.innerHTML = `
-            <div class="loading-state">
-                Loading available jobs...
-            </div>
-        `;
-
-        noResults.hidden = true;
-
         try {
 
-            const response =
-                await apiGet("/candidates/jobs");
+            if (jobList) {
 
-            if (!Array.isArray(response)) {
+                jobList.innerHTML = `
+                    <div class="loading-state">
+                        Loading jobs...
+                    </div>
+                `;
+
+            }
+
+
+            console.log(
+                "Loading candidate jobs..."
+            );
+
+
+            const response =
+                await apiGet(
+                    "/candidates/jobs"
+                );
+
+
+            console.log(
+                "Jobs API Response:",
+                response
+            );
+
+
+            /*
+             * Backend may return either:
+             *
+             * [
+             *   {...}
+             * ]
+             *
+             * or
+             *
+             * {
+             *   content: [...]
+             * }
+             */
+
+            let jobData = response;
+
+
+            if (
+                response &&
+                !Array.isArray(response) &&
+                Array.isArray(response.content)
+            ) {
+
+                jobData =
+                    response.content;
+
+            }
+
+
+            if (!Array.isArray(jobData)) {
 
                 throw new Error(
                     "Invalid jobs response from server."
                 );
+
             }
 
 
-            jobs = response.map(job => {
+            jobs =
+                jobData.map(function (job) {
 
-                return {
+                    return {
 
-                    jobId: job.jobId,
+                        jobId:
+                            job.jobId ||
+                            job.id,
 
-                    jobTitle:
-                        job.jobTitle ||
-                        "Untitled Job",
+                        jobTitle:
+                            job.jobTitle ||
+                            job.title ||
+                            "Untitled Job",
 
-                    company:
-                        job.companyName ||
-                        "",
+                        companyName:
+                            job.companyName ||
+                            job.company ||
+                            "Company",
 
-                    jobDescription:
-                        job.jobDescription ||
-                        "No description provided.",
+                        jobDescription:
+                            job.jobDescription ||
+                            job.description ||
+                            "No description available.",
 
-                    experienceRequired:
-                        job.experienceRequired ||
-                        "",
+                        experienceRequired:
+                            job.experienceRequired ||
+                            job.experience ||
+                            "Not specified",
 
-                    educationRequired:
-                        job.educationRequired ||
-                        "",
+                        educationRequired:
+                            job.educationRequired ||
+                            job.education ||
+                            "Not specified",
 
-                    processingStatus:
-                        job.processingStatus ||
-                        "UNKNOWN",
+                        skills:
+                            normalizeSkills(
+                                job.skills
+                            ),
 
-                    createdAt:
-                        job.createdAt ||
-                        null,
+                        processingStatus:
+                            job.processingStatus ||
+                            "",
 
-                    updatedAt:
-                        job.updatedAt ||
-                        null,
+                        location:
+                            job.location ||
+                            job.city ||
+                            job.jobLocation ||
+                            "",
 
-                    skills:
-                        normalizeSkills(
-                            job.skills
-                        ),
+                        jobType:
+                            job.jobType ||
+                            job.type ||
+                            "",
 
-                    location:
-                        job.location ||
-                        "",
+                        salary:
+                            job.salary,
 
-                    type:
-                        job.type ||
-                        "",
+                        salaryMax:
+                            job.salaryMax,
 
-                    salary:
-                        job.salary ||
-                        ""
-                };
+                        createdAt:
+                            job.createdAt,
 
-            });
+                        updatedAt:
+                            job.updatedAt
+
+                    };
+
+                });
 
 
-            /* newest first */
+            filteredJobs =
+                [...jobs];
 
-            jobs.sort(
-                (a, b) =>
-                    new Date(b.createdAt || 0) -
-                    new Date(a.createdAt || 0)
+
+            sortFilteredJobs();
+
+            displayJobs();
+
+
+            console.log(
+                "Candidate jobs loaded successfully."
             );
 
-
-            searchJobs();
 
         } catch (error) {
 
             console.error(
-                "Failed to load jobs:",
+                "Load Jobs Error:",
                 error
             );
 
-            jobList.innerHTML = "";
 
-            resultCount.textContent =
-                "Unable to load jobs";
+            if (jobList) {
 
-            noResults.hidden = false;
+                jobList.innerHTML = `
+                    <div class="loading-state">
+                        Failed to load jobs.
+                        Please try again.
+                    </div>
+                `;
 
-            noResults.querySelector("h3").textContent =
-                "Unable to load jobs";
+            }
 
-            noResults.querySelector("p").textContent =
-                error.message ||
-                "Please try again later.";
         }
+
     }
 
 
@@ -277,86 +494,108 @@ document.addEventListener("DOMContentLoaded", function () {
     function searchJobs() {
 
         const keyword =
-            searchInput.value
-                .trim()
-                .toLowerCase();
+            searchInput
+                ? searchInput.value
+                    .trim()
+                    .toLowerCase()
+                : "";
+
 
         const location =
-            locationInput.value
-                .trim()
-                .toLowerCase();
+            locationInput
+                ? locationInput.value
+                    .trim()
+                    .toLowerCase()
+                : "";
 
-        const selectedType =
-            jobType.value
-                .trim()
-                .toLowerCase();
+
+        const selectedJobType =
+            jobType
+                ? jobType.value
+                    .trim()
+                    .toLowerCase()
+                : "";
 
 
         filteredJobs =
-            jobs.filter(job => {
-
-                /* -----------------------------------------
-                   KEYWORD
-                   ----------------------------------------- */
-
-                const searchableText = [
-
-                    job.jobTitle,
-
-                    job.company,
-
-                    job.jobDescription,
-
-                    job.experienceRequired,
-
-                    job.educationRequired,
-
-                    ...job.skills
-
-                ]
-                    .join(" ")
-                    .toLowerCase();
+            jobs.filter(function (job) {
 
 
-                const matchesKeyword =
+                /* =========================================
+                   SEARCHABLE TEXT
+                   ========================================= */
+
+                const searchableText = (
+
+                    (job.jobTitle || "") +
+                    " " +
+                    (job.companyName || "") +
+                    " " +
+                    (job.jobDescription || "") +
+                    " " +
+                    (job.experienceRequired || "") +
+                    " " +
+                    (job.educationRequired || "") +
+                    " " +
+                    (job.location || "") +
+                    " " +
+                    (job.jobType || "") +
+                    " " +
+                    (job.skills || []).join(" ")
+
+                ).toLowerCase();
+
+
+                const keywordMatch =
                     !keyword ||
-                    searchableText.includes(keyword);
+                    searchableText.includes(
+                        keyword
+                    );
 
 
-                /* -----------------------------------------
+                /* =========================================
                    LOCATION
-                   ----------------------------------------- */
+                   ========================================= */
 
                 const jobLocation =
                     String(
                         job.location || ""
                     ).toLowerCase();
 
-                const matchesLocation =
+
+                const locationMatch =
                     !location ||
-                    !jobLocation ||
-                    jobLocation.includes(location);
+                    jobLocation.includes(
+                        location
+                    );
 
 
-                /* -----------------------------------------
+                /* =========================================
                    JOB TYPE
-                   ----------------------------------------- */
+                   ========================================= */
 
-                const jobTypeValue =
+                const currentJobType =
                     String(
-                        job.type || ""
+                        job.jobType || ""
                     ).toLowerCase();
 
-                const matchesType =
-                    !selectedType ||
-                    !jobTypeValue ||
-                    jobTypeValue === selectedType;
+
+                let jobTypeMatch = true;
+
+
+                if (selectedJobType) {
+
+                    jobTypeMatch =
+                        currentJobType ===
+                        selectedJobType;
+
+                }
 
 
                 return (
-                    matchesKeyword &&
-                    matchesLocation &&
-                    matchesType
+                    keywordMatch &&
+                    locationMatch &&
+                    jobTypeMatch
                 );
 
             });
@@ -364,7 +603,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         sortFilteredJobs();
 
-        displayJobs(filteredJobs);
+        displayJobs();
+
     }
 
 
@@ -375,33 +615,69 @@ document.addEventListener("DOMContentLoaded", function () {
     function sortFilteredJobs() {
 
         const sortValue =
-            sortJobs.value;
+            sortJobs
+                ? sortJobs.value
+                : "default";
 
 
         if (
-            sortValue === "default" ||
-            sortValue === "recent"
+            sortValue === "recent" ||
+            sortValue === "default"
         ) {
 
             filteredJobs.sort(
-                (a, b) =>
-                    new Date(
-                        b.createdAt || 0
-                    ) -
-                    new Date(
-                        a.createdAt || 0
-                    )
+                function (a, b) {
+
+                    const dateA =
+                        new Date(
+                            a.createdAt || 0
+                        ).getTime();
+
+
+                    const dateB =
+                        new Date(
+                            b.createdAt || 0
+                        ).getTime();
+
+
+                    return dateB - dateA;
+
+                }
             );
 
-            return;
         }
 
 
-        /*
-         * Salary sorting cannot be performed reliably
-         * because the supplied API response does not
-         * currently provide a usable salary field.
-         */
+        else if (
+            sortValue === "salary"
+        ) {
+
+            filteredJobs.sort(
+                function (a, b) {
+
+                    const salaryA =
+                        Number(
+                            a.salaryMax ||
+                            a.salary ||
+                            0
+                        );
+
+
+                    const salaryB =
+                        Number(
+                            b.salaryMax ||
+                            b.salary ||
+                            0
+                        );
+
+
+                    return salaryB - salaryA;
+
+                }
+            );
+
+        }
+
     }
 
 
@@ -409,50 +685,73 @@ document.addEventListener("DOMContentLoaded", function () {
        DISPLAY JOBS
        ===================================================== */
 
-    function displayJobs(jobArray) {
+    function displayJobs() {
 
-        /* reset no-result text */
-
-        noResults.querySelector("h3").textContent =
-            "No jobs found";
-
-        noResults.querySelector("p").textContent =
-            "Try changing your search filters.";
-
-
-        resultCount.textContent =
-            `${jobArray.length} ${
-                jobArray.length === 1
-                    ? "job"
-                    : "jobs"
-            } found`;
-
-
-        if (jobArray.length === 0) {
-
-            jobList.innerHTML = "";
-
-            noResults.hidden = false;
-
+        if (!jobList) {
             return;
         }
 
 
-        noResults.hidden = true;
+        if (resultCount) {
+
+            resultCount.textContent =
+                `${filteredJobs.length} ${
+                    filteredJobs.length === 1
+                        ? "job"
+                        : "jobs"
+                } found`;
+
+        }
+
+
+        if (
+            filteredJobs.length === 0
+        ) {
+
+            jobList.innerHTML = "";
+
+
+            if (noResults) {
+
+                noResults.hidden =
+                    false;
+
+            }
+
+            return;
+
+        }
+
+
+        if (noResults) {
+
+            noResults.hidden =
+                true;
+
+        }
 
 
         jobList.innerHTML =
-            jobArray.map(job => {
+            filteredJobs.map(
+                function (job) {
 
-                const skillsHtml =
-                    job.skills.length > 0
+
+                    const skillsHtml =
+                        job.skills.length > 0
 
                         ? job.skills
-                            .map(skill => `
-                                <span class="skill-tag">
-                                    ${escapeHtml(skill)}
-                                </span>
-                            `)
+                            .slice(0, 5)
+                            .map(
+                                function (skill) {
+
+                                    return `
+                                        <span class="skill-tag">
+                                            ${escapeHtml(skill)}
+                                        </span>
+                                    `;
+
+                                }
+                            )
                             .join("")
 
                         : `
@@ -462,62 +761,84 @@ document.addEventListener("DOMContentLoaded", function () {
                         `;
 
 
-                return `
+                    return `
+                        <article
+                            class="job-card"
+                            data-job-id="${escapeHtml(job.jobId)}">
 
-                    <article
-                        class="job-card"
-                        data-job-id="${escapeHtml(job.jobId)}">
-
-                        <div class="job-top">
-
-
-                            <div class="job-heading">
+                            <div class="job-card-header">
 
                                 <div class="company-avatar">
                                     ${escapeHtml(
                                         getCompanyInitial(
-                                            job.company
+                                            job.companyName
                                         )
                                     )}
                                 </div>
 
+                                <div class="job-card-title">
 
-                                <div>
-
-                                    <h3 class="job-title">
+                                    <h3>
                                         ${escapeHtml(
                                             job.jobTitle
                                         )}
                                     </h3>
 
-                                    <div class="job-company">
+                                    <p>
                                         ${escapeHtml(
-                                            job.company ||
-                                            "Company not specified"
+                                            job.companyName
                                         )}
-                                    </div>
+                                    </p>
 
                                 </div>
 
                             </div>
 
 
-                            <div class="job-actions">
+                            <div class="job-card-info">
+
+                                <span>
+                                    Experience:
+                                    ${escapeHtml(
+                                        job.experienceRequired
+                                    )}
+                                </span>
+
+                                <span>
+                                    Education:
+                                    ${escapeHtml(
+                                        job.educationRequired
+                                    )}
+                                </span>
+
+                            </div>
+
+
+                            <div class="job-card-skills">
+
+                                ${skillsHtml}
+
+                            </div>
+
+
+                            <div class="job-card-footer">
+
+                                <span class="job-date">
+                                    Posted:
+                                    ${escapeHtml(
+                                        formatDate(
+                                            job.createdAt
+                                        )
+                                    )}
+                                </span>
+
 
                                 <button
                                     type="button"
-                                    class="save-button"
-                                    data-save-id="${escapeHtml(job.jobId)}">
-
-                                    ♡ Save
-
-                                </button>
-
-
-                                <button
-                                    type="button"
-                                    class="view-button"
-                                    data-view-id="${escapeHtml(job.jobId)}">
+                                    class="view-job-button"
+                                    data-job-id="${escapeHtml(
+                                        job.jobId
+                                    )}">
 
                                     View Job
 
@@ -525,188 +846,56 @@ document.addEventListener("DOMContentLoaded", function () {
 
                             </div>
 
-                        </div>
+                        </article>
+                    `;
 
-
-                        <!-- META -->
-
-                        <div class="job-meta">
-
-                            ${
-                                job.type
-                                    ? `
-                                        <span class="job-meta-item">
-                                            ◈
-                                            ${escapeHtml(job.type)}
-                                        </span>
-                                      `
-                                    : ""
-                            }
-
-
-                            ${
-                                job.location
-                                    ? `
-                                        <span class="job-meta-item">
-                                            ◉
-                                            ${escapeHtml(job.location)}
-                                        </span>
-                                      `
-                                    : ""
-                            }
-
-
-                            ${
-                                job.experienceRequired
-                                    ? `
-                                        <span class="job-meta-item">
-                                            ▣
-                                            ${escapeHtml(
-                                                job.experienceRequired
-                                            )}
-                                        </span>
-                                      `
-                                    : ""
-                            }
-
-
-                            ${
-                                job.salary
-                                    ? `
-                                        <span class="job-meta-item">
-                                            ₹
-                                            ${escapeHtml(job.salary)}
-                                        </span>
-                                      `
-                                    : ""
-                            }
-
-                        </div>
-
-
-                        <!-- DESCRIPTION -->
-
-                        <p class="job-description">
-
-                            ${escapeHtml(
-                                job.jobDescription
-                            )}
-
-                        </p>
-
-
-                        <!-- SKILLS -->
-
-                        <div class="job-skills">
-
-                            ${skillsHtml}
-
-                        </div>
-
-
-                        <!-- FOOTER -->
-
-                        <div class="job-footer">
-
-                            <span>
-                                Posted:
-                                ${formatDate(
-                                    job.createdAt
-                                )}
-                            </span>
-
-                            <span>
-                                ${escapeHtml(
-                                    job.processingStatus
-                                )}
-                            </span>
-
-                        </div>
-
-                    </article>
-
-                `;
-
-            }).join("");
+                }
+            ).join("");
 
 
         attachJobButtons();
+
     }
 
 
     /* =====================================================
-       JOB BUTTON EVENTS
+       ATTACH VIEW JOB BUTTONS
        ===================================================== */
 
     function attachJobButtons() {
 
-
-        /* -----------------------------------------
-           SAVE
-           ----------------------------------------- */
-
-        document
-            .querySelectorAll(
-                "[data-save-id]"
-            )
-            .forEach(button => {
-
-                button.addEventListener(
-                    "click",
-                    function () {
-
-                        if (
-                            this.classList.contains(
-                                "saved"
-                            )
-                        ) {
-
-                            this.classList.remove(
-                                "saved"
-                            );
-
-                            this.textContent =
-                                "♡ Save";
-
-                        } else {
-
-                            this.classList.add(
-                                "saved"
-                            );
-
-                            this.textContent =
-                                "♥ Saved";
-                        }
-
-                    }
-                );
-
-            });
+        const viewButtons =
+            document.querySelectorAll(
+                ".view-job-button"
+            );
 
 
-        /* -----------------------------------------
-           VIEW JOB
-           ----------------------------------------- */
-
-        document
-            .querySelectorAll(
-                "[data-view-id]"
-            )
-            .forEach(button => {
+        viewButtons.forEach(
+            function (button) {
 
                 button.addEventListener(
                     "click",
                     function () {
 
                         const jobId =
-                            this.dataset.viewId;
+                            this.getAttribute(
+                                "data-job-id"
+                            );
 
-                        openJobDetails(jobId);
+
+                        if (jobId) {
+
+                            openJobDetails(
+                                jobId
+                            );
+
+                        }
 
                     }
                 );
 
-            });
+            }
+        );
 
     }
 
@@ -717,21 +906,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function openJobDetails(jobId) {
 
-        modalContent.innerHTML = `
+        if (
+            !jobModal ||
+            !modalContent
+        ) {
+            return;
+        }
 
-            <div class="loading-state">
-                Loading job details...
-            </div>
-
-        `;
 
         jobModal.hidden = false;
 
-        document.body.style.overflow =
-            "hidden";
+
+        modalContent.innerHTML = `
+            <div class="loading-state">
+                Loading job details...
+            </div>
+        `;
 
 
         try {
+
+            console.log(
+                "Loading job details:",
+                jobId
+            );
+
 
             const job =
                 await apiGet(
@@ -739,6 +938,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         jobId
                     )}`
                 );
+
+
+            console.log(
+                "Job Details Response:",
+                job
+            );
 
 
             const skills =
@@ -750,241 +955,189 @@ document.addEventListener("DOMContentLoaded", function () {
             const skillsHtml =
                 skills.length > 0
 
-                    ? skills
-                        .map(skill => `
+                ? skills.map(
+                    function (skill) {
+
+                        return `
                             <span class="skill-tag">
                                 ${escapeHtml(skill)}
                             </span>
-                        `)
-                        .join("")
+                        `;
 
-                    : `
-                        <span class="skill-tag">
-                            Skills not specified
-                        </span>
-                    `;
+                    }
+                ).join("")
 
+                : `
+                    <span class="skill-tag">
+                        Skills not specified
+                    </span>
+                `;
+
+
+            /* =================================================
+               MODAL HTML
+               ================================================= */
 
             modalContent.innerHTML = `
 
-                <div class="modal-job-header">
-
-                    <h2 class="modal-job-title">
-
-                        ${escapeHtml(
-                            job.jobTitle ||
-                            "Untitled Job"
-                        )}
-
-                    </h2>
+                <div class="job-detail-container">
 
 
-                    <div class="modal-company">
+                    <!-- JOB TITLE -->
 
-                        ${escapeHtml(
-                            job.companyName ||
-                            "Company not specified"
-                        )}
+                    <div class="job-detail-heading">
 
-                    </div>
+                        <div class="company-avatar large">
 
-                </div>
-
-
-                <!-- INFORMATION -->
-
-                <div class="modal-info-grid">
-
-
-                    <div class="modal-info-item">
-
-                        <span class="modal-info-label">
-                            Job ID
-                        </span>
-
-                        <span class="modal-info-value">
                             ${escapeHtml(
-                                job.jobId ||
-                                jobId
+                                getCompanyInitial(
+                                    job.companyName
+                                )
                             )}
-                        </span>
+
+                        </div>
+
+
+                        <div>
+
+                            <h3>
+                                ${escapeHtml(
+                                    job.jobTitle ||
+                                    "Untitled Job"
+                                )}
+                            </h3>
+
+
+                            <p>
+                                ${escapeHtml(
+                                    job.companyName ||
+                                    "Company"
+                                )}
+                            </p>
+
+                        </div>
 
                     </div>
 
 
-                    <div class="modal-info-item">
+                    <!-- JOB INFORMATION -->
 
-                        <span class="modal-info-label">
-                            Status
-                        </span>
+                    <div class="job-detail-info">
 
-                        <span class="modal-info-value">
+
+                        <div class="detail-item">
+
+                            <strong>
+                                Experience
+                            </strong>
+
+                            <span>
+                                ${escapeHtml(
+                                    job.experienceRequired ||
+                                    "Not specified"
+                                )}
+                            </span>
+
+                        </div>
+
+
+                        <div class="detail-item">
+
+                            <strong>
+                                Education
+                            </strong>
+
+                            <span>
+                                ${escapeHtml(
+                                    job.educationRequired ||
+                                    "Not specified"
+                                )}
+                            </span>
+
+                        </div>
+
+
+                        <div class="detail-item">
+
+                            <strong>
+                                Posted
+                            </strong>
+
+                            <span>
+                                ${escapeHtml(
+                                    formatDate(
+                                        job.createdAt
+                                    )
+                                )}
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- DESCRIPTION -->
+
+                    <div class="job-detail-section">
+
+                        <h4>
+                            Job Description
+                        </h4>
+
+
+                        <p>
                             ${escapeHtml(
-                                job.processingStatus ||
-                                "UNKNOWN"
+                                job.jobDescription ||
+                                "No description available."
                             )}
-                        </span>
+                        </p>
 
                     </div>
 
 
-                    <div class="modal-info-item">
+                    <!-- SKILLS -->
 
-                        <span class="modal-info-label">
-                            Experience
-                        </span>
+                    <div class="job-detail-section">
 
-                        <span class="modal-info-value">
-                            ${escapeHtml(
-                                job.experienceRequired ||
-                                "Not specified"
-                            )}
-                        </span>
-
-                    </div>
+                        <h4>
+                            Required Skills
+                        </h4>
 
 
-                    <div class="modal-info-item">
+                        <div class="job-skills">
 
-                        <span class="modal-info-label">
-                            Education
-                        </span>
+                            ${skillsHtml}
 
-                        <span class="modal-info-value">
-                            ${escapeHtml(
-                                job.educationRequired ||
-                                "Not specified"
-                            )}
-                        </span>
+                        </div>
 
                     </div>
 
 
-                    ${
-                        job.location
-                            ? `
-                                <div class="modal-info-item">
+                    <!-- APPLY -->
 
-                                    <span class="modal-info-label">
-                                        Location
-                                    </span>
+                    <div class="job-detail-actions">
 
-                                    <span class="modal-info-value">
-                                        ${escapeHtml(
-                                            job.location
-                                        )}
-                                    </span>
+                        <button
+                            type="button"
+                            class="modal-apply-button"
+                            id="applyNowButton">
 
-                                </div>
-                              `
-                            : ""
-                    }
+                            Apply Now
 
-
-                    ${
-                        job.type
-                            ? `
-                                <div class="modal-info-item">
-
-                                    <span class="modal-info-label">
-                                        Job Type
-                                    </span>
-
-                                    <span class="modal-info-value">
-                                        ${escapeHtml(
-                                            job.type
-                                        )}
-                                    </span>
-
-                                </div>
-                              `
-                            : ""
-                    }
-
-                </div>
-
-
-
-                <!-- DESCRIPTION -->
-
-                <div class="modal-section">
-
-                    <h4>
-                        Job Description
-                    </h4>
-
-                    <p>
-
-                        ${escapeHtml(
-                            job.jobDescription ||
-                            "No description provided."
-                        )}
-
-                    </p>
-
-                </div>
-
-
-
-                <!-- SKILLS -->
-
-                <div class="modal-section">
-
-                    <h4>
-                        Required Skills
-                    </h4>
-
-                    <div class="modal-skills">
-
-                        ${skillsHtml}
+                        </button>
 
                     </div>
 
-                </div>
-
-
-
-                <!-- DATES -->
-
-                <div class="modal-section">
-
-                    <h4>
-                        Job Information
-                    </h4>
-
-                    <p>
-
-                        Posted:
-                        ${formatDate(
-                            job.createdAt
-                        )}
-
-                        <br>
-
-                        Updated:
-                        ${formatDate(
-                            job.updatedAt
-                        )}
-
-                    </p>
 
                 </div>
-
-
-
-                <!-- APPLY -->
-
-                <button
-                    type="button"
-                    class="modal-apply-button"
-                    id="applyNowButton">
-
-                    Apply Now
-
-                </button>
 
             `;
 
+
+            /* =================================================
+               GET APPLY BUTTON
+               ================================================= */
 
             const applyButton =
                 document.getElementById(
@@ -992,54 +1145,818 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
 
-            if (applyButton) {
-
-                applyButton.addEventListener(
-                    "click",
-                    function () {
-
-                        alert(
-                            "Application submission is not connected yet. Please provide the backend application API endpoint and request format."
-                        );
-
-                    }
-                );
-
+            if (!applyButton) {
+                return;
             }
+
+
+            /* =================================================
+               APPLY BUTTON CLICK
+               ================================================= */
+
+            applyButton.addEventListener(
+                "click",
+                function () {
+
+                    applyForJob(
+                        job.jobId ||
+                        jobId,
+                        applyButton
+                    );
+
+                }
+            );
+
+
+            /* =================================================
+               CHECK EXISTING APPLICATION
+               ================================================= */
+
+            await checkExistingApplication(
+                job.jobId ||
+                jobId,
+                applyButton
+            );
 
 
         } catch (error) {
 
             console.error(
-                "Failed to load job details:",
+                "Job Details Error:",
                 error
             );
 
 
             modalContent.innerHTML = `
 
-                <div class="no-results">
+                <div class="loading-state">
 
-                    <div class="no-results-icon">
-                        !
-                    </div>
+                    Failed to load job details.
 
-                    <h3>
-                        Unable to load job
-                    </h3>
+                    <br><br>
 
-                    <p>
-                        ${
-                            escapeHtml(
-                                error.message ||
-                                "Please try again."
-                            )
-                        }
-                    </p>
+                    ${escapeHtml(
+                        error.message ||
+                        "Please try again."
+                    )}
 
                 </div>
 
             `;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       CHECK EXISTING APPLICATION
+
+       Endpoint:
+       GET /candidates/jobs/{jobId}/application
+       ===================================================== */
+
+    async function checkExistingApplication(
+        jobId,
+        applyButton
+    ) {
+
+        if (!applyButton) {
+            return null;
+        }
+
+
+        const token =
+            getAuthToken();
+
+
+        if (!token) {
+
+            console.log(
+                "User is not logged in. Skipping application status check."
+            );
+
+            return null;
+
+        }
+
+
+        const numericJobId =
+            Number(jobId);
+
+
+        if (
+            !numericJobId ||
+            numericJobId <= 0
+        ) {
+
+            console.error(
+                "Invalid job ID:",
+                jobId
+            );
+
+            return null;
+
+        }
+
+
+        try {
+
+            console.log(
+                "Checking existing application for job:",
+                numericJobId
+            );
+
+
+            const response =
+                await fetch(
+                    `${NEXHIRE_API_BASE_URL}/candidates/jobs/${numericJobId}/application`,
+                    {
+                        method: "GET",
+
+                        headers: {
+
+                            "Accept":
+                                "application/json",
+
+                            "Authorization":
+                                `Bearer ${token}`
+
+                        }
+
+                    }
+                );
+
+
+            /* =================================================
+               404 = NOT APPLIED
+               ================================================= */
+
+            if (
+                response.status === 404
+            ) {
+
+                console.log(
+                    "No existing application for job:",
+                    numericJobId
+                );
+
+                return null;
+
+            }
+
+
+            let data = {};
+
+
+            try {
+
+                data =
+                    await response.json();
+
+            } catch (error) {
+
+                console.warn(
+                    "Could not parse application status response.",
+                    error
+                );
+
+            }
+
+
+            console.log(
+                "Application Status Response:",
+                data
+            );
+
+
+            if (!response.ok) {
+
+                console.warn(
+                    "Application status request failed:",
+                    response.status,
+                    data
+                );
+
+                return null;
+
+            }
+
+
+            /* =================================================
+               EXISTING APPLICATION FOUND
+               ================================================= */
+
+            if (
+                data &&
+                data.applicationId
+            ) {
+
+                applyButton.textContent =
+                    "✓ Applied";
+
+
+                applyButton.disabled =
+                    true;
+
+
+                applyButton.classList.add(
+                    "applied"
+                );
+
+
+                /* =============================================
+                   SAVE APPLICATION INFORMATION
+                   ============================================= */
+
+                if (
+                    data.applicationId
+                ) {
+
+                    sessionStorage.setItem(
+                        "applicationId",
+                        data.applicationId
+                    );
+
+                }
+
+
+                if (
+                    data.jobId
+                ) {
+
+                    sessionStorage.setItem(
+                        "appliedJobId",
+                        data.jobId
+                    );
+
+                }
+
+
+                if (
+                    data.resumeId
+                ) {
+
+                    sessionStorage.setItem(
+                        "appliedResumeId",
+                        data.resumeId
+                    );
+
+                }
+
+
+                if (
+                    data.status
+                ) {
+
+                    sessionStorage.setItem(
+                        "applicationStatus",
+                        data.status
+                    );
+
+                }
+
+
+                console.log(
+                    "Application already exists."
+                );
+
+
+                console.log(
+                    "Application Status:",
+                    data.status
+                );
+
+
+                if (
+                    data.overallScore !== null &&
+                    data.overallScore !== undefined
+                ) {
+
+                    console.log(
+                        "Overall Match Score:",
+                        data.overallScore
+                    );
+
+                }
+
+
+                return data;
+
+            }
+
+
+            return null;
+
+
+        } catch (error) {
+
+            console.warn(
+                "Could not check application status:",
+                error
+            );
+
+            return null;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       APPLY FOR JOB
+
+       Endpoint:
+       POST /jobs/{jobId}/apply
+       ===================================================== */
+
+    async function applyForJob(
+        jobId,
+        applyButton
+    ) {
+
+        try {
+
+
+            /* =================================================
+               GET TOKEN
+               ================================================= */
+
+            const token =
+                getAuthToken();
+
+
+            if (!token) {
+
+                alert(
+                    "Please login first."
+                );
+
+
+                window.location.href =
+                    "candidate-login.html";
+
+
+                return;
+
+            }
+
+
+            /* =================================================
+               GET RESUME ID
+               ================================================= */
+
+            let resumeId =
+                getResumeId();
+
+
+            if (!resumeId) {
+
+                alert(
+                    "Please upload and process your resume before applying for a job."
+                );
+
+
+                window.location.href =
+                    "ResumeUpload.html";
+
+
+                return;
+
+            }
+
+
+            resumeId =
+                Number(resumeId);
+
+
+            /* =================================================
+               VALIDATE JOB ID
+               ================================================= */
+
+            const numericJobId =
+                Number(jobId);
+
+
+            if (
+                !numericJobId ||
+                numericJobId <= 0
+            ) {
+
+                alert(
+                    "Invalid job ID."
+                );
+
+                return;
+
+            }
+
+
+            /* =================================================
+               VALIDATE RESUME ID
+               ================================================= */
+
+            if (
+                !resumeId ||
+                resumeId <= 0
+            ) {
+
+                alert(
+                    "Invalid resume ID."
+                );
+
+                return;
+
+            }
+
+
+            console.log(
+                "===================================="
+            );
+
+
+            console.log(
+                "APPLYING FOR JOB"
+            );
+
+
+            console.log(
+                "Job ID:",
+                numericJobId
+            );
+
+
+            console.log(
+                "Resume ID:",
+                resumeId
+            );
+
+
+            console.log(
+                "===================================="
+            );
+
+
+            /* =================================================
+               CHECK RESUME PROCESSING STATUS
+               ================================================= */
+
+            if (applyButton) {
+
+                applyButton.disabled =
+                    true;
+
+                applyButton.textContent =
+                    "Checking Resume...";
+
+            }
+
+
+            const statusResponse =
+                await fetch(
+                    `${NEXHIRE_API_BASE_URL}/resumes/${resumeId}/status`,
+                    {
+                        method: "GET",
+
+                        headers: {
+
+                            "Accept":
+                                "application/json",
+
+                            "Authorization":
+                                `Bearer ${token}`
+
+                        }
+
+                    }
+                );
+
+
+            let statusData = {};
+
+
+            try {
+
+                statusData =
+                    await statusResponse.json();
+
+            } catch (error) {
+
+                console.warn(
+                    "Could not parse resume status response.",
+                    error
+                );
+
+            }
+
+
+            console.log(
+                "Resume Status Response:",
+                statusData
+            );
+
+
+            if (!statusResponse.ok) {
+
+                throw new Error(
+                    statusData.message ||
+                    statusData.error ||
+                    "Unable to check resume processing status."
+                );
+
+            }
+
+
+            const resumeStatus =
+                String(
+                    statusData.status ||
+                    ""
+                ).toUpperCase();
+
+
+            console.log(
+                "Resume Processing Status:",
+                resumeStatus
+            );
+
+
+            /* =================================================
+               RESUME NOT COMPLETED
+               ================================================= */
+
+            if (
+                resumeStatus !== "COMPLETED"
+            ) {
+
+                if (applyButton) {
+
+                    applyButton.disabled =
+                        false;
+
+                    applyButton.textContent =
+                        "Apply Now";
+
+                }
+
+
+                if (
+                    resumeStatus === "QUEUED" ||
+                    resumeStatus === "PROCESSING"
+                ) {
+
+                    alert(
+                        "Your resume is still being processed. Please wait until processing is completed and then apply."
+                    );
+
+                } else {
+
+                    alert(
+                        `Your resume is not ready yet. Current status: ${
+                            resumeStatus ||
+                            "UNKNOWN"
+                        }`
+                    );
+
+                }
+
+
+                return;
+
+            }
+
+
+            /* =================================================
+               RESUME COMPLETED
+               ================================================= */
+
+            if (applyButton) {
+
+                applyButton.disabled =
+                    true;
+
+                applyButton.textContent =
+                    "Applying...";
+
+            }
+
+
+            /* =================================================
+               APPLY API
+               POST /jobs/{jobId}/apply
+               ================================================= */
+
+            const response =
+                await fetch(
+                    `${NEXHIRE_API_BASE_URL}/jobs/${numericJobId}/apply`,
+                    {
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json",
+
+                            "Accept":
+                                "application/json",
+
+                            "Authorization":
+                                `Bearer ${token}`
+
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                resumeId:
+                                    resumeId
+
+                            })
+
+                    }
+                );
+
+
+            /* =================================================
+               READ RESPONSE
+               ================================================= */
+
+            let data = {};
+
+
+            try {
+
+                data =
+                    await response.json();
+
+            } catch (error) {
+
+                console.warn(
+                    "Could not parse application response.",
+                    error
+                );
+
+            }
+
+
+            console.log(
+                "Application API Response:",
+                data
+            );
+
+
+            /* =================================================
+               HANDLE ERROR
+               ================================================= */
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    data.error ||
+                    `Application failed with status ${response.status}.`
+                );
+
+            }
+
+
+            /* =================================================
+               SUCCESS
+               ================================================= */
+
+            console.log(
+                "Application submitted successfully:",
+                data
+            );
+
+
+            /* =================================================
+               SAVE APPLICATION ID
+               ================================================= */
+
+            if (
+                data.applicationId
+            ) {
+
+                sessionStorage.setItem(
+                    "applicationId",
+                    data.applicationId
+                );
+
+            }
+
+
+            /* =================================================
+               SAVE JOB ID
+               ================================================= */
+
+            if (
+                data.jobId
+            ) {
+
+                sessionStorage.setItem(
+                    "appliedJobId",
+                    data.jobId
+                );
+
+            }
+
+
+            /* =================================================
+               SAVE RESUME ID
+               ================================================= */
+
+            if (
+                data.resumeId
+            ) {
+
+                sessionStorage.setItem(
+                    "appliedResumeId",
+                    data.resumeId
+                );
+
+            }
+
+
+            /* =================================================
+               SAVE APPLICATION STATUS
+               ================================================= */
+
+            if (
+                data.status
+            ) {
+
+                sessionStorage.setItem(
+                    "applicationStatus",
+                    data.status
+                );
+
+            }
+
+
+            /* =================================================
+               UPDATE BUTTON
+               ================================================= */
+
+            if (applyButton) {
+
+                applyButton.textContent =
+                    "✓ Applied";
+
+                applyButton.disabled =
+                    true;
+
+                applyButton.classList.add(
+                    "applied"
+                );
+
+            }
+
+
+            /* =================================================
+               SUCCESS ALERT
+               ================================================= */
+
+            alert(
+                data.message ||
+                "Application submitted successfully."
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Apply Job Error:",
+                error
+            );
+
+
+            /* =================================================
+               RESTORE BUTTON
+               ================================================= */
+
+            if (applyButton) {
+
+                applyButton.disabled =
+                    false;
+
+                applyButton.textContent =
+                    "Apply Now";
+
+                applyButton.classList.remove(
+                    "applied"
+                );
+
+            }
+
+
+            /* =================================================
+               ERROR MESSAGE
+               ================================================= */
+
+            alert(
+                error.message ||
+                "Failed to apply for this job."
+            );
 
         }
 
@@ -1052,9 +1969,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function closeJobModal() {
 
-        jobModal.hidden = true;
+        if (!jobModal) {
+            return;
+        }
 
-        document.body.style.overflow = "";
+
+        jobModal.hidden =
+            true;
+
+
+        if (modalContent) {
+
+            modalContent.innerHTML =
+                "";
+
+        }
+
     }
 
 
@@ -1075,7 +2005,8 @@ document.addEventListener("DOMContentLoaded", function () {
             function (event) {
 
                 if (
-                    event.target === jobModal
+                    event.target ===
+                    jobModal
                 ) {
 
                     closeJobModal();
@@ -1088,12 +2019,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    /* =====================================================
+       ESCAPE KEY
+       ===================================================== */
+
     document.addEventListener(
         "keydown",
         function (event) {
 
             if (
                 event.key === "Escape" &&
+                jobModal &&
                 !jobModal.hidden
             ) {
 
@@ -1106,7 +2042,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =====================================================
-       SEARCH EVENTS
+       SEARCH BUTTON
        ===================================================== */
 
     if (searchBtn) {
@@ -1118,6 +2054,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+
+    /* =====================================================
+       SEARCH INPUT
+       ===================================================== */
 
     if (searchInput) {
 
@@ -1139,6 +2079,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    /* =====================================================
+       LOCATION INPUT
+       ===================================================== */
+
     if (locationInput) {
 
         locationInput.addEventListener(
@@ -1159,6 +2103,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    /* =====================================================
+       JOB TYPE
+       ===================================================== */
+
     if (jobType) {
 
         jobType.addEventListener(
@@ -1169,6 +2117,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    /* =====================================================
+       SORT
+       ===================================================== */
+
     if (sortJobs) {
 
         sortJobs.addEventListener(
@@ -1177,9 +2129,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 sortFilteredJobs();
 
-                displayJobs(
-                    filteredJobs
-                );
+                displayJobs();
 
             }
         );
@@ -1191,7 +2141,10 @@ document.addEventListener("DOMContentLoaded", function () {
        PROFILE DROPDOWN
        ===================================================== */
 
-    if (profileButton) {
+    if (
+        profileButton &&
+        profileDropdown
+    ) {
 
         profileButton.addEventListener(
             "click",
@@ -1199,159 +2152,50 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 event.stopPropagation();
 
+
                 const isOpen =
-                    profileDropdown.classList.toggle(
-                        "open"
-                    );
+                    profileButton.getAttribute(
+                        "aria-expanded"
+                    ) === "true";
+
 
                 profileButton.setAttribute(
                     "aria-expanded",
-                    String(isOpen)
+                    String(!isOpen)
+                );
+
+
+                profileDropdown.classList.toggle(
+                    "show"
                 );
 
             }
         );
 
-    }
 
-
-    document.addEventListener(
-        "click",
-        function (event) {
-
-            if (
-                profileDropdown &&
-                profileButton &&
-                !profileDropdown.contains(event.target) &&
-                !profileButton.contains(event.target)
-            ) {
-
-                profileDropdown.classList.remove(
-                    "open"
-                );
+        document.addEventListener(
+            "click",
+            function () {
 
                 profileButton.setAttribute(
                     "aria-expanded",
                     "false"
                 );
 
-            }
 
-        }
-    );
-
-
-    /* =====================================================
-       THEME
-       ===================================================== */
-
-    function applyTheme(theme) {
-
-        if (theme === "dark") {
-
-            document.documentElement.setAttribute(
-                "data-theme",
-                "dark"
-            );
-
-
-            if (themeToggle) {
-
-                /*
-                 * Your requested icon convention:
-                 * Dark mode -> ☀
-                 */
-
-                themeToggle.textContent =
-                    "☀";
-
-                themeToggle.setAttribute(
-                    "aria-label",
-                    "Switch to light mode"
-                );
-
-                themeToggle.setAttribute(
-                    "title",
-                    "Switch to light mode"
+                profileDropdown.classList.remove(
+                    "show"
                 );
 
             }
-
-        } else {
-
-            document.documentElement.removeAttribute(
-                "data-theme"
-            );
-
-
-            if (themeToggle) {
-
-                /*
-                 * Your requested icon convention:
-                 * Light mode -> ☼
-                 */
-
-                themeToggle.textContent =
-                    "☼";
-
-                themeToggle.setAttribute(
-                    "aria-label",
-                    "Switch to dark mode"
-                );
-
-                themeToggle.setAttribute(
-                    "title",
-                    "Switch to dark mode"
-                );
-
-            }
-
-        }
-
-    }
-
-
-    const savedTheme =
-        localStorage.getItem(
-            "nexhire-theme"
         );
 
 
-    applyTheme(
-        savedTheme === "dark"
-            ? "dark"
-            : "light"
-    );
-
-
-    if (themeToggle) {
-
-        themeToggle.addEventListener(
+        profileDropdown.addEventListener(
             "click",
-            function () {
+            function (event) {
 
-                const currentTheme =
-                    document.documentElement
-                        .getAttribute(
-                            "data-theme"
-                        );
-
-
-                const newTheme =
-                    currentTheme === "dark"
-                        ? "light"
-                        : "dark";
-
-
-                localStorage.setItem(
-                    "nexhire-theme",
-                    newTheme
-                );
-
-
-                applyTheme(
-                    newTheme
-                );
+                event.stopPropagation();
 
             }
         );
@@ -1380,24 +2224,221 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
 
-                localStorage.removeItem(
+                /* =========================================
+                   SESSION STORAGE
+                   ========================================= */
+
+                sessionStorage.removeItem(
+                    "token"
+                );
+
+                sessionStorage.removeItem(
+                    "userId"
+                );
+
+                sessionStorage.removeItem(
+                    "userEmail"
+                );
+
+                sessionStorage.removeItem(
+                    "firstName"
+                );
+
+                sessionStorage.removeItem(
+                    "lastName"
+                );
+
+                sessionStorage.removeItem(
+                    "userRole"
+                );
+
+                sessionStorage.removeItem(
+                    "isAuthenticated"
+                );
+
+                sessionStorage.removeItem(
                     "candidateId"
                 );
 
-                localStorage.removeItem(
+                sessionStorage.removeItem(
                     "candidateName"
                 );
 
-                localStorage.removeItem(
+                sessionStorage.removeItem(
+                    "candidateProfile"
+                );
+
+                sessionStorage.removeItem(
                     "resumeId"
                 );
 
+                sessionStorage.removeItem(
+                    "applicationId"
+                );
 
-                sessionStorage.clear();
+                sessionStorage.removeItem(
+                    "appliedJobId"
+                );
 
+                sessionStorage.removeItem(
+                    "appliedResumeId"
+                );
+
+                sessionStorage.removeItem(
+                    "applicationStatus"
+                );
+
+
+                /* =========================================
+                   LOCAL STORAGE
+                   ========================================= */
+
+                localStorage.removeItem(
+                    "token"
+                );
+
+                localStorage.removeItem(
+                    "userId"
+                );
+
+                localStorage.removeItem(
+                    "userEmail"
+                );
+
+                localStorage.removeItem(
+                    "firstName"
+                );
+
+                localStorage.removeItem(
+                    "lastName"
+                );
+
+                localStorage.removeItem(
+                    "userRole"
+                );
+
+                localStorage.removeItem(
+                    "isAuthenticated"
+                );
+
+
+                /* =========================================
+                   REDIRECT
+                   ========================================= */
 
                 window.location.href =
                     "candidate-login.html";
+
+            }
+
+        );
+
+    }
+
+
+    /* =====================================================
+       THEME
+       ===================================================== */
+
+    function applyTheme(theme) {
+
+        if (
+            theme === "dark"
+        ) {
+
+            document.documentElement.setAttribute(
+                "data-theme",
+                "dark"
+            );
+
+
+            if (themeToggle) {
+
+                themeToggle.textContent =
+                    "☀";
+
+                themeToggle.setAttribute(
+                    "aria-label",
+                    "Switch to light mode"
+                );
+
+                themeToggle.setAttribute(
+                    "title",
+                    "Switch to light mode"
+                );
+
+            }
+
+        }
+
+        else {
+
+            document.documentElement.removeAttribute(
+                "data-theme"
+            );
+
+
+            if (themeToggle) {
+
+                themeToggle.textContent =
+                    "☼";
+
+                themeToggle.setAttribute(
+                    "aria-label",
+                    "Switch to dark mode"
+                );
+
+                themeToggle.setAttribute(
+                    "title",
+                    "Switch to dark mode"
+                );
+
+            }
+
+        }
+
+    }
+
+
+    const savedTheme =
+        localStorage.getItem(
+            "nexhire-theme"
+        ) ||
+        "light";
+
+
+    applyTheme(
+        savedTheme
+    );
+
+
+    if (themeToggle) {
+
+        themeToggle.addEventListener(
+            "click",
+            function () {
+
+                const currentTheme =
+                    document.documentElement.getAttribute(
+                        "data-theme"
+                    );
+
+
+                const newTheme =
+                    currentTheme === "dark"
+                        ? "light"
+                        : "dark";
+
+
+                localStorage.setItem(
+                    "nexhire-theme",
+                    newTheme
+                );
+
+
+                applyTheme(
+                    newTheme
+                );
 
             }
         );
@@ -1409,6 +2450,13 @@ document.addEventListener("DOMContentLoaded", function () {
        INITIAL LOAD
        ===================================================== */
 
+    loadCandidateFromDashboard();
+
     loadJobs();
+
+
+    console.log(
+        "NexHire Candidate Job Search loaded successfully."
+    );
 
 });

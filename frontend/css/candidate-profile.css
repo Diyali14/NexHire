@@ -1517,22 +1517,6 @@ html[data-theme="dark"] .icon-button.theme-toggle:hover {
 }
 
 
-/* =========================================================
-   CHANGE PASSWORD
-   ========================================================= */
-
-.password-section {
-
-    margin-bottom: 10px;
-}
-
-
-.password-section .form-grid {
-
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-}
-
 
 /* =========================================================
    VALIDATION
