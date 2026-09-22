@@ -1154,7 +1154,7 @@ https://nexhire-backend-5zv7.onrender.com
 
 ## API Documentation
 
-**[INSERT SWAGGER / OPENAPI URL IF AVAILABLE]**
+https://nex-hire-resume-matcher.vercel.app/
 
 Only expose API documentation here if Swagger/OpenAPI is actually enabled and publicly accessible.
 
@@ -1240,9 +1240,9 @@ The following paths are placeholders and should only be used after the correspon
 | Team Member             | Contributions                                                                                                                              |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Diyali Mukherjee**    | Spring Boot backend, REST APIs, Authentication, Database integration, RabbitMQ integration, Backend orchestration, Server-side integration |
-| **Shoham Jana**         | FastAPI AI service, Model integration, Resume/JD parsing, Semantic matching, Skill-gap analysis, Interview-question generation             |
-| **Shoumi Sahu**         | Candidate-side frontend                                                                                                                    |
-| **Nandini Shetty**      | Candidate-side frontend                                                                                                                    |
+| **Soham Jana**         | FastAPI AI service, Model integration, Resume/JD parsing, Semantic matching, Skill-gap analysis, Interview-question generation             |
+| **Soumi Sahu**         | Candidate-side frontend                                                                                                                    |
+| **Nandini Sethy**      | Candidate-side frontend                                                                                                                    |
 | **Kaushik Debnath**     | Recruiter-side frontend                                                                                                                    |
 | **Ritesh Kumar Pathak** | Recruiter-side frontend                                                                                                                    |
 
