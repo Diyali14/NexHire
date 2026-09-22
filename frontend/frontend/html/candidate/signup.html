@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Candidate Signup — NexHire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../../css/theme.css">
+  <link rel="stylesheet" href="../../css/global.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/auth.css">
+</head>
+<body class="auth-page">
+  <header class="auth-topbar">
+    <div class="container auth-navbar">
+      <a class="brand" href="../../index.html">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span class="brand-name">Nex<span>Hire</span></span>
+      </a>
+      <div class="auth-nav-actions">
+        <button class="theme-toggle icon-button" type="button" aria-label="Toggle theme">
+          <i data-lucide="moon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="auth-main">
+    <div class="auth-shell">
+      <div class="auth-showcase">
+        <div class="auth-showcase-content">
+          <div class="auth-kicker"><i data-lucide="sparkles"></i> CREATE CANDIDATE ACCOUNT</div>
+          <h1>Join NexHire <span>Today.</span></h1>
+          <p>Create your candidate profile to upload your resume, match with top opportunities, and generate tailored interview prep.</p>
+          <div class="auth-benefits">
+            <div class="auth-benefit">
+              <div class="auth-benefit-icon"><i data-lucide="check"></i></div>
+              <span>Automated resume analysis</span>
+            </div>
+            <div class="auth-benefit">
+              <div class="auth-benefit-icon"><i data-lucide="check"></i></div>
+              <span>Detailed skill gap insights</span>
+            </div>
+            <div class="auth-benefit">
+              <div class="auth-benefit-icon"><i data-lucide="check"></i></div>
+              <span>AI preparation questions</span>
+            </div>
+          </div>
+        </div>
+        <div class="auth-showcase-footer">
+          <i data-lucide="shield-check"></i> Instant Access Upon Registration
+        </div>
+      </div>
+
+      <div class="auth-form-panel">
+        <div class="auth-form-wrap">
+          <div class="auth-form-header">
+            <span class="auth-portal"><i data-lucide="user-plus"></i> Candidate Signup</span>
+            <h2>Create Account</h2>
+            <p>Fill out the information below to get started.</p>
+          </div>
+
+          <form id="candidateSignupForm" class="auth-form">
+            <div class="form-message" id="formMessage"></div>
+
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-field">
+                <label for="firstName">First Name</label>
+                <input class="form-input" type="text" id="firstName" name="firstName" placeholder="John" required>
+              </div>
+              <div class="form-field">
+                <label for="lastName">Last Name</label>
+                <input class="form-input" type="text" id="lastName" name="lastName" placeholder="Doe" required>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="email">Email Address</label>
+              <div class="input-wrap">
+                <!-- <i data-lucide="mail"></i> -->
+                <input class="form-input" type="email" id="email" name="email" placeholder="john.doe@example.com" required>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="phone">Phone Number</label>
+              <div class="input-wrap">
+                <!-- <i data-lucide="phone"></i> -->
+                <input class="form-input" type="tel" id="phone" name="phone" placeholder="1234567890" required>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="password">Password</label>
+              <div class="input-wrap has-password-toggle">
+                <!-- <i data-lucide="lock"></i> -->
+                <input class="form-input" type="password" id="password" name="password" placeholder="At least 8 characters" minlength="8" required>
+                <button type="button" class="password-toggle" id="togglePasswordBtn" aria-label="Show password">
+                  <i data-lucide="eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="button button-primary auth-submit" id="submitBtn">
+              <span>Create Candidate Account</span> <i data-lucide="arrow-right"></i>
+            </button>
+          </form>
+
+          <div class="auth-switch">
+            Already have a candidate account? <a href="login.html">Log in here</a>
+          </div>
+          <div class="auth-secondary-links">
+            <a href="../recruiter/signup.html">Switch to Recruiter Signup</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../js/config.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/theme.js"></script>
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/api/apiClient.js"></script>
+  <script src="../../js/api/authApi.js"></script>
+  <script src="../../js/candidate/signup.js"></script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+/* =========================================================
+   NexHire — Modern Reusable UI Components
+   ========================================================= */
+
+/* Buttons */
+.button, .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.button:disabled, .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button-primary, .btn-primary {
+  background-color: var(--accent-primary);
+  color: #ffffff;
+}
+.button-primary:hover:not(:disabled), .btn-primary:hover:not(:disabled) {
+  background-color: var(--accent-primary-hover);
+  color: #ffffff;
+}
+
+.button-secondary, .btn-secondary {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+.button-secondary:hover:not(:disabled), .btn-secondary:hover:not(:disabled) {
+  background-color: var(--border-color);
+}
+
+.button-danger, .btn-danger {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+.button-danger:hover:not(:disabled), .btn-danger:hover:not(:disabled) {
+  background-color: #dc2626;
+}
+
+.button-small, .btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8125rem;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.icon-button:hover {
+  color: var(--text-primary);
+  border-color: var(--border-color-hover);
+}
+
+/* Cards & Glassmorphism */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--card-shadow);
+  transition: border-color var(--transition-fast);
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--card-shadow);
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-queued {
+  background-color: var(--status-queued-bg);
+  color: var(--status-queued-text);
+}
+.status-processing {
+  background-color: var(--status-processing-bg);
+  color: var(--status-processing-text);
+}
+.status-completed, .status-matched {
+  background-color: var(--status-completed-bg);
+  color: var(--status-completed-text);
+}
+.status-failed {
+  background-color: var(--status-failed-bg);
+  color: var(--status-failed-text);
+}
+
+/* Score Indicators */
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+.score-high {
+  background-color: var(--score-high-bg);
+  color: var(--score-high-text);
+}
+.score-mid {
+  background-color: var(--score-mid-bg);
+  color: var(--score-mid-text);
+}
+.score-low {
+  background-color: var(--score-low-bg);
+  color: var(--score-low-text);
+}
+.score-pending {
+  background-color: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
+/* Skill Chips */
+.skill-chip {
+  display: inline-block;
+  padding: 4px 10px;
+  background-color: var(--accent-primary-light);
+  color: var(--accent-primary);
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+.skill-chip.chip-high {
+  border-left: 3px solid #ef4444;
+}
+
+/* Form Controls */
+.form-group, .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.form-group label, .form-field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.form-control, input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select, textarea {
+  width: 100%;
+  padding: 10px 14px;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+.form-control:focus, input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-primary-light);
+}
+
+/* Toast Container */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 9999;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--card-shadow);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  animation: slideUp 0.3s ease;
+}
+.toast-success i { color: #22c55e; }
+.toast-error i { color: #ef4444; }
+.toast-info i { color: var(--accent-primary); }
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  background-color: var(--card-bg);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+}
+.empty-icon {
+  font-size: 2.5rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.empty-state h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.empty-state p {
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  max-width: 400px;
+  margin: 0 auto 16px auto;
+}
+
+/* Skeleton Loaders */
+.skeleton-card {
+  padding: 20px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+}
+.skeleton-line {
+  height: 14px;
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--border-color) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+.skeleton-title { height: 20px; width: 60%; margin-bottom: 12px; }
+.skeleton-text { width: 90%; }
+.skeleton-short { width: 40%; }
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Modal Backdrops & Drawers */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-content {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  max-width: 650px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--card-shadow);
+}

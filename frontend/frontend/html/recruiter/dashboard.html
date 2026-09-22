@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recruiter Dashboard — NexHire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../../css/theme.css">
+  <link rel="stylesheet" href="../../css/global.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="dashboard.html">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span class="brand-name">Nex<span>Hire</span></span>
+      </a>
+      <div class="side-label">RECRUITER WORKSPACE</div>
+      <nav class="side-nav">
+        <a href="dashboard.html" class="side-link active"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="post-job.html" class="side-link"><i data-lucide="plus-circle"></i> Post New Job</a>
+        <a href="jobs.html" class="side-link"><i data-lucide="briefcase"></i> My Jobs</a>
+        <a href="profile.html" class="side-link"><i data-lucide="user"></i> Recruiter Profile</a>
+        <a href="#" class="side-link logout" id="logoutBtn"><i data-lucide="log-out"></i> Logout</a>
+      </nav>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main style="display: flex; flex-direction: column; min-height: 100vh;">
+      <header class="topbar">
+        <div class="top-actions">
+          <button class="icon-button mobile-menu" id="mobileMenuBtn" aria-label="Open navigation menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <span class="crumb">Recruiter Portal / Dashboard</span>
+        </div>
+        <div class="top-actions">
+          <button class="theme-toggle icon-button" aria-label="Toggle theme">
+            <i data-lucide="moon"></i>
+          </button>
+          <div class="profile-chip" style="display: flex; align-items: center; gap: 8px;">
+            <div class="avatar-sm" id="recruiterAvatar" style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-secondary); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem;">R</div>
+            <span id="recruiterNameText" style="font-weight: 600; font-size: 0.875rem;">Recruiter</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+          <div>
+            <h1 id="recruiterGreeting">Good morning, Recruiter!</h1>
+            <p style="color: var(--text-muted);">Overview of your active job postings and recruiter profile.</p>
+          </div>
+          <a href="post-job.html" class="button button-primary"><i data-lucide="plus"></i> Post New Job</a>
+        </div>
+
+        <!-- Recruiter Profile Card Summary -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <span class="side-label" style="padding:0;">RECRUITER PROFILE SUMMARY</span>
+              <h2 id="recruiterFullName">Recruiter Profile</h2>
+              <div style="font-size: 0.9375rem; color: var(--text-secondary); margin-top: 4px;">
+                <span id="recruiterDesignation">Hiring Manager</span> &bull; <strong id="recruiterCompany">Tech Corp</strong>
+              </div>
+              <div style="display: flex; gap: 16px; margin-top: 12px; font-size: 0.875rem; color: var(--text-muted); flex-wrap: wrap;">
+                <span id="recruiterEmail"><i data-lucide="mail" style="width: 14px; height: 14px; vertical-align: middle;"></i> --</span>
+                <span id="recruiterPhone"><i data-lucide="phone" style="width: 14px; height: 14px; vertical-align: middle;"></i> --</span>
+              </div>
+            </div>
+            <a href="profile.html" class="button button-secondary button-small">Edit Profile</a>
+          </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+          <div class="card">
+            <div style="color: var(--text-muted); font-size: 0.8125rem; font-weight: 600;">ACTIVE JOB POSTINGS</div>
+            <div id="statJobsCount" style="font-size: 1.75rem; font-weight: 700; margin: 6px 0;">0</div>
+            <div style="font-size: 0.8125rem; color: var(--text-muted);">Created by you</div>
+          </div>
+          <div class="card">
+            <div style="color: var(--text-muted); font-size: 0.8125rem; font-weight: 600;">PARSED JOB DESCRIPTIONS</div>
+            <div id="statParsedJobsCount" style="font-size: 1.75rem; font-weight: 700; margin: 6px 0;">0</div>
+            <div style="font-size: 0.8125rem; color: var(--text-muted);">Completed status</div>
+          </div>
+        </div>
+
+        <!-- Latest 3 Jobs Section -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3>Latest Job Postings</h3>
+            <a href="jobs.html" class="button button-secondary button-small">View All Jobs &rarr;</a>
+          </div>
+          <div id="latestJobsContainer">
+            <div class="skeleton-card">
+              <div class="skeleton-line skeleton-title"></div>
+              <div class="skeleton-line skeleton-text"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../js/config.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/theme.js"></script>
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/api/apiClient.js"></script>
+  <script src="../../js/api/recruiterApi.js"></script>
+  <script src="../../js/api/jobApi.js"></script>
+  <script src="../../js/recruiter/dashboard.js"></script>
+</body>
+</html>

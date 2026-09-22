@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recruiter Login — NexHire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../../css/theme.css">
+  <link rel="stylesheet" href="../../css/global.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/auth.css">
+</head>
+<body class="auth-page">
+  <header class="auth-topbar">
+    <div class="container auth-navbar">
+      <a class="brand" href="../../index.html">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span class="brand-name">Nex<span>Hire</span></span>
+      </a>
+      <div class="auth-nav-actions">
+        <button class="theme-toggle icon-button" type="button" aria-label="Toggle theme">
+          <i data-lucide="moon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="auth-main">
+    <div class="auth-shell">
+      <div class="auth-showcase">
+        <div class="auth-showcase-content">
+          <div class="auth-kicker"><i data-lucide="briefcase"></i> RECRUITER WORKSPACE</div>
+          <h1>Hire With <span>Clarity.</span></h1>
+          <p>Streamline hiring with automated job parsing, applicant score rankings, and secure resume access.</p>
+          <div class="auth-benefits">
+            <div class="auth-benefit">
+              <div class="auth-benefit-icon"><i data-lucide="check"></i></div>
+              <span>Automated Job Description parsing</span>
+            </div>
+            <div class="auth-benefit">
+              <div class="auth-benefit-icon"><i data-lucide="check"></i></div>
+              <span>Deterministic candidate score ranking</span>
+            </div>
+            <div class="auth-benefit">
+              <div class="auth-benefit-icon"><i data-lucide="check"></i></div>
+              <span>Secure binary resume stream downloads</span>
+            </div>
+          </div>
+        </div>
+        <div class="auth-showcase-footer">
+          <i data-lucide="shield-check"></i> Enterprise Recruiter Authorization
+        </div>
+      </div>
+
+      <div class="auth-form-panel">
+        <div class="auth-form-wrap">
+          <div class="auth-form-header">
+            <span class="auth-portal"><i data-lucide="briefcase-business"></i> Recruiter Portal</span>
+            <h2>Recruiter Sign In</h2>
+            <p>Enter your workspace credentials to access your dashboard.</p>
+          </div>
+
+          <form id="recruiterLoginForm" class="auth-form">
+            <div class="form-message" id="formMessage"></div>
+
+            <div class="form-field">
+              <label for="email">Work Email</label>
+              <div class="input-wrap">
+                <!-- <i data-lucide="mail"></i> -->
+                <input class="form-input" type="email" id="email" name="email" placeholder="recruiter@company.com" required>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="password">Password</label>
+              <div class="input-wrap has-password-toggle">
+                <!-- <i data-lucide="lock"></i> -->
+                <input class="form-input" type="password" id="password" name="password" placeholder="••••••••" required>
+                <button type="button" class="password-toggle" id="togglePasswordBtn" aria-label="Show password">
+                  <i data-lucide="eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="button button-primary auth-submit" id="submitBtn">
+              <span>Login to Recruiter Workspace</span> <i data-lucide="arrow-right"></i>
+            </button>
+          </form>
+
+          <div class="auth-switch">
+            Don't have a recruiter account? <a href="signup.html">Register here</a>
+          </div>
+          <div class="auth-secondary-links">
+            <a href="../candidate/login.html">Switch to Candidate Login</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../js/config.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/theme.js"></script>
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/api/apiClient.js"></script>
+  <script src="../../js/api/authApi.js"></script>
+  <script src="../../js/recruiter/login.js"></script>
+</body>
+</html>
